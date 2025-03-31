@@ -3,33 +3,27 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const {verify, reset} = require("../utils/html")
 const { send_mail } = require("../middleware/nodemailer");
-const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordschema, changeUserPasswordschema } = require("../validation/user");
-const { validate } = require("../helper/utilities");
+const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordschema, changeUserPasswordschema } = require("../middleware/validation");
 
 exports.registerUser = async (req, res) => {
-    try {
-      const validated = await validate(req.body, registerSchema)
-      const {userName, email, password, phoneNo, confirmPassword } = validated;
+  try {
+    // const validatedData = await validate(req.body, registerSchema)
+    const {userName, email, password,role,phoneNo, confirmPassword } = req.body;
   
-      if (!userName || !email || !password  || !phoneNo || !confirmPassword) {
-        return res.status(400).json({
-          message: "Input required for all field",
-        });
-      }
+    if (!userName || !email || !password  || !phoneNo || !confirmPassword) {
+      return res.status(400).json({
+        message: "Input required for all field",
+      });
+    }
   
-      if (password !== confirmPassword) {
-        return res.status(400).json({
-          message: "Password does not match",
-        });
-      }
-      if (phoneNo.length !== 10) {
-        return res.status(400).json({
-            message: "Please input phone Number up to 10 digit"
-        })
-      }
-  
-      const existingEmail = await userModel.findOne({ email: email.toLowerCase() });
-  console.log(existingEmail);
+    if (password !== confirmPassword) {
+      return res.status(400).json({
+        message: "Password does not match",
+      });
+    }
+    
+    const existingEmail = await userModel.findOne({ email: email.toLowerCase() });
+     console.log(existingEmail);
       if (existingEmail) {
         return res.status(400).json({
           message: `${email.toLowerCase()} already exist`,
@@ -44,6 +38,7 @@ exports.registerUser = async (req, res) => {
         email,
         phoneNo: '234'+phoneNo,
         password: hashedPassword,
+        role: req.body.role || 'Attendee'
       });
   
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -64,26 +59,27 @@ exports.registerUser = async (req, res) => {
       await user.save();
       res.status(201).json({
         message: "Account registered successfully",
-        data: user,
+        data: user,token
       });
-    } catch (error) {
+  } catch (error) {
       console.log(error.message);
       res.status(500).json({
-        message: "Error registering user",
-      });
-    }
+        message: 'internal Server Error'
+      })
+  }
 };
+
 exports.verifyUser = async (req, res) => {
-    try {
-        const { token } = req.params;
+  try {
+    const { token } = req.params;
     
-        if (!token) {
-          return res.status(404).json({
-            message: "Token not found",
-          });
-        }
+      if (!token) {
+        return res.status(404).json({
+          message: "Token not found",
+        });
+      }
     
-        jwt.verify(token, process.env.JWT_SECRET, async (error, payload) => {
+       jwt.verify(token, process.env.JWT_SECRET, async (error, payload) => {
           if (error) {
             if (error instanceof jwt.JsonWebTokenError) {
               const { userId } = jwt.decode(token);
@@ -123,77 +119,79 @@ exports.verifyUser = async (req, res) => {
               });
             }
           } else {
-            const user = await userModel.findById(payload.userId);
+          const user = await userModel.findById(payload.userId);
     
-            if (!user) {
+          if (!user) {
               return res.status(404).json({
-                message: "Account not found",
-              });
-            }
+              message: "Account not found",
+            });
+          }
     
-            if (user.isVerified === true) {
+          if (user.isVerified === true) {
               return res.status(400).json({
                 message: "Account is verified already",
               });
-            }
-    
-            user.isVerified = true;
-            await user.save();
-    
-            res.status(200).json({
-              message: "Account verified successfully",
-            });
           }
-        });
-      } catch (error) {
-        console.log(error.message);
-        if (error instanceof jwt.JsonWebTokenError) {
-          return res.status(400).json({
-            message: "Session expired: link has been sent to email address",
-          });
-        }
-        res.status(500).json({
-            message: "Error Verifying user",
-          });
-        }
-}
-exports.logInUser = async (req, res) => {
-    try {
-      const validated = await validate(req.body, loginSchema)
-        const { email, password } = validated;
-
-        if (!email) {
-          return res.status(400).json({
-            message: "Please enter your email address",
-          });
-        }
     
-        if (!password) {
-          return res.status(400).json({
-            message: "Please your password",
-          });
-        }
-        const user = await userModel.findOne({email:email.toLowerCase()});
-        // console.log('user', user);
+          user.isVerified = true;
+          await user.save();
+    
+          res.status(200).json({
+           message: "Account verified successfully",
+        });
+      }
+    });
+  } catch (error) {
+   console.log(error.message);
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+      message: "Session expired: link has been sent to email address",
+      });
+    }
+    res.status(500).json({
+     message: "Error Verifying user",
+    });
+  }
+};
+
+
+exports.logInUser = async (req, res) => {
+  try {
+    // const validatedData = await validate(req.body, loginSchema)
+    const { email, password } = req.body;
+
+    if (!email) {
+        return res.status(400).json({
+        message: "Please enter your email address",
+        });
+    }
+    
+    if (!password) {
+      return res.status(400).json({
+      message: "Please your password",
+      });
+    }
+    const user = await userModel.findOne({email:email.toLowerCase()});
+    // console.log('user', user);
         
     
-        if (!user) {
-          return res.status(400).json({
-            message: "Account not found",
-          });
-        }
+    if (!user) {
+      return res.status(400).json({
+      message: "Account not found",
+      });
+    }
     
-        const isCorrectPassword = await bcrypt.compare(password, user.password);
+    const isCorrectPassword = await bcrypt.compare(password, user.password);
     
-        if (!isCorrectPassword) {
-          return res.status(400).json({
-            message: "Incorrect password",
-          });
-        }
+    if (!isCorrectPassword) {
+      return res.status(400).json({
+        message: "Incorrect password",
+      });
+    }
     
-        if (user.isVerified === false) {
-          const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-            expiresIn: "5mins",
+    if (user.isVerified === false) {
+      const token = jwt.sign({ userId: user._id, isLoggedIn: user.isLoggedIn, role: user.role }, process.env.JWT_SECRET, {
+        expiresIn: "5mins",
           });
           const link = `${req.protocol}://${req.get(
             "host"
@@ -219,23 +217,45 @@ exports.logInUser = async (req, res) => {
           { expiresIn: "1day" }
         );
         await user.save();
+
+        if (user.role === 'Admin') {
+         return res.status(200).json({
+          message: "Admin login successful",
+          data: user,
+          token
+        });
+      } else if (user.role === 'Organizer') {
+       return res.status(200).json({
+        message: "Organizer login successful",
+        data: user,
+        token
+        });
+      } else if (user.role === 'Attendee') {
+       return res.status(200).json({
+        message: "Attendee login successful",
+        data: user,
+        token
+        });
+      }
     
         res.status(200).json({
           message: "Account login successfull",
           data: user,
           token
         });
-    } catch (error) {
-        console.log(error.message)        
-        res.status(500).json({
-            message: 'Internal server error '
-        })
-    }
-}
+  } catch (error) {
+      console.log(error.message);
+      res.status(500).json({
+        message: 'internal Server Error'
+      })
+  }
+};
+
+
 exports.forgotUserPassword = async (req, res) => {
-    try {
-      const validated = await validate(req.body, forgotPasswordSchema)
-        const { email } = validated;
+  try {
+      // const validatedData = await validate(req.body, forgotPasswordSchema)
+        const { email } = req.body;
     const user = await userModel.findOne({ email: email.toLowerCase() });
 
     if (!user) {
@@ -262,38 +282,93 @@ exports.forgotUserPassword = async (req, res) => {
     return res.status(200).json({
       message: "Link has been sent to email address",
     });
-    } catch (error) {
-        console.log(error.message)        
-        res.status(500).json({
-            message: 'Internal server error'
-        })
-    }
+  } catch (error) {
+      console.log(error.message);
+      res.status(500).json({
+        message: 'internal Server Error'
+    })
+  }
 };
+
+
 exports.resetUserPassword = async (req, res) => {
-    try {
-      const { token } = req.params;
+  try {
+    const { token } = req.params;
   
-      if (!token) {
+    if (!token) {
         return res.status(404).json({
           message: "Token not found",
         });
-      }
-      const validated = await validate(req.body, resetPasswordschema)
+    }
+    // const validatedData = await validate(req.body, resetPasswordSchema)
   
-      const { newPassword, confirmPassword } = validated;
+    const { newPassword, confirmPassword } = req.body;
   
-      if (newPassword !== confirmPassword) {
+    if (newPassword !== confirmPassword) {
         return res.status(400).json({
           message: "Password does not match",
-        });
-      }
+     });
+    }
   
-      const { userId } = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await userModel.findById(userId);
+    const { userId } = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await userModel.findById(userId);
+  
+    if (!user) {
+     return res.status(404).json({
+        message: "Account not found",
+      });
+    }
+  
+    const saltedRound = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, saltedRound);
+    user.password = hashedPassword;
+    await user.save();
+  
+    res.status(200).json({
+        message: "Password changed successfully",
+    });
+  }catch (error) {
+    console.log(error.message);
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: "Session expired. Please enter your email to resend link",
+      });
+    }
+    res.status(500).json({
+      message: 'internal Server Error'
+    })
+  }
+};
+
+
+exports.changeUserPassword = async (req, res) => {
+  try {
+      const { id } = req.params;
+      // const validatedData = await validate(req.body, changeUserPasswordSchema)
+      const { currentPassword, newPassword, confirmPassword } = req.body;
+  
+      const user = await userModel.findById(id);
   
       if (!user) {
         return res.status(404).json({
           message: "Account not found",
+        });
+      }
+  
+      const isPasswordCorrect = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
+  
+      if (!isPasswordCorrect) {
+        return res.status(400).json({
+          message: "Incorrect password",
+        });
+      }
+  
+      if (newPassword !== confirmPassword) {
+        return res.status(400).json({
+          message: "Password does not match",
         });
       }
   
@@ -303,85 +378,36 @@ exports.resetUserPassword = async (req, res) => {
       await user.save();
   
       res.status(200).json({
-        message: "Password changed successfully",
+        message: "Password change successfully",
       });
-    } catch (error) {
-      console.log(error.message);
-      if (error instanceof jwt.JsonWebTokenError) {
-        return res.status(400).json({
-          message: "Session expired. Please enter your email to resend link",
-        });
-      }
-      res.status(500).json({
-        message: "Error resetting password",
-      });
-    }
-  };
-  exports.changeUserPassword = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const validated = await validate(req.body, changeUserPasswordschema)
-        const { currentPassword, newPassword, confirmPassword } = validated;
-    
-        const user = await userModel.findById(id);
-    
-        if (!user) {
-          return res.status(404).json({
-            message: "Account not found",
-          });
-        }
-    
-        const isPasswordCorrect = await bcrypt.compare(
-          currentPassword,
-          user.password
-        );
-    
-        if (!isPasswordCorrect) {
-          return res.status(400).json({
-            message: "Incorrect password",
-          });
-        }
-    
-        if (newPassword !== confirmPassword) {
-          return res.status(400).json({
-            message: "Password does not match",
-          });
-        }
-    
-        const saltedRound = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, saltedRound);
-        user.password = hashedPassword;
-        await user.save();
-    
-        res.status(200).json({
-          message: "Password change successfully",
-        });
-    } catch (error) {
-        console.log(error.message)        
-        res.status(500).json({
-            message: 'Internal server error'
-        })
-    }
-  };
-  exports.logOut = async (req, res) => {
-    try {
-      // console.log(req.user);
-      const user = await userModel.findById(req.user.userId);
-      if(!user) {
-        return res.satus(404).json({
-            message: 'User Not Found'
-        });
-      }
-      user.isLoggedIn = false
-      await user.save()
-      res.status(200).json({
-        message: 'User logout Successfully'
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: 'internal Server Error'
     })
-    } catch (err) {
-      console.log(err.message);
-      res.status(500).json({ 
-        message: "Internal Server Error" 
-    });
+  }
+};
+
+
+
+exports.logOut = async (req, res) => {
+  try {
+    // console.log(req.user);
+    const user = await userModel.findById(req.user.userId);
+    if(!user) {
+      return res.satus(404).json({
+          message: 'User Not Found'
+      });
     }
-  };
-  
+    user.isLoggedIn = false
+    await user.save()
+    res.status(200).json({
+      message: 'User logout Successfully'
+  })
+  } catch (err) {
+    console.log(err.message);
+    res.status(500).json({ 
+      message: "Internal Server Error" 
+  });
+  }
+};

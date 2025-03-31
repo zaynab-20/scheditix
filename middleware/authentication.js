@@ -1,4 +1,4 @@
-const userModel = require("../models/userModel");
+const userModel = require("../models/user");
 const jwt = require("jsonwebtoken");
 
 exports.authenticate = async (req, res, next) => {
@@ -25,7 +25,12 @@ exports.authenticate = async (req, res, next) => {
     if(user.isLoggedIn !== decodedToken.isLoggedIn){
       return res.status(401).json({message: 'Unauthorized'})
     }
-    req.user = decodedToken;
+    req.user = {
+      userId: user._id,
+      role: user.role,
+      isAdmin: user.isAdmin,
+      isLoggedIn: user.isLoggedIn
+    };  
 
     next();
   } catch (error) {
@@ -66,7 +71,7 @@ exports.adminAuth = async (req, res, next) => {
       });
     }
 
-    if (user.isAdmin !== true) {
+    if (req.user.role !== "Admin") {
       return res.status(401).json({
         message: "Unauthorized: Please contact Admin",
       });
