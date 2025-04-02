@@ -38,7 +38,7 @@ exports.registerUser = async (req, res) => {
         email,
         phoneNo: '234'+phoneNo,
         password: hashedPassword,
-        role: req.body.role || 'Attendee'
+        role: req.body.role || 'Admin'
       });
   
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {

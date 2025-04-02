@@ -53,7 +53,6 @@ exports.initializePayment = async (req, res) => {
       attendeeName,
       reference: ref,
       amount: ticket.ticketPrice,
-      status: 'Pending',
       paymentDate:formattedData
     })
 
@@ -65,7 +64,7 @@ exports.initializePayment = async (req, res) => {
       }
     })
 
-    // console.log(response.data);
+    console.log(response);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -76,63 +75,44 @@ exports.initializePayment = async (req, res) => {
 
 
 exports.verifyPayment = async (req, res) => {
-  try {
-    const { reference } = req.query; 
+  try{
+    const { reference } = req.query;
 
     if (!reference) {
       return res.status(400).json({ message: "Reference is required" });
     }
+    
+    const payment = await paymentModel.findOne({reference: reference});
+    
+    if (!payment) {
+      return res.status(400).json({ message: "Transaction not found" });
+    }
 
+    const ticket = await ticketModel.findOne({eventId: payment.eventId})
     const response = await axios.get(
-      "https://api.korapay.com/merchant/api/v1/transactions/${reference}",
+      `https://api.korapay.com/merchant/api/v1/charges/${reference}`,
       {
         headers: {
-          Authorization:` Bearer ${korapaySecret}`
-        }
+          Authorization: `Bearer ${korapaySecret}`,
+        },
       }
     );
 
-    const { data } = response.data; 
 
-    if (!data) {
-      return res.status(404).json({ message: "Transaction not found" });
-    }
+    const { data } = response;
 
-    
-    const payment = await paymentModel.findOne({ reference });
-
-    if (!payment) {
-      return res.status(404).json({ message: "Payment not found in the database" });
-    }
-
-    if (status === "success") {
-      data.status = "Success";
+    if (data.status && data.data.status === 'success') {
+      let total = ticket.soldTicket;
+      ticket.soldTicket = total += 1;
+      await ticket.save();
+      payment.status = 'Successful'
       await payment.save();
-
-      const ticket = await ticketModel.findById(payment.eventId);
-
-      if (ticket) {
-        ticket.soldTicket += 1;
-        await ticket.save();
-      }
-
-      return res.status(200).json({
-        message: "Payment verified successfully",
-        data: payment
-      });
-    } else {
-      data.status = "Failed";
-      await payment.save();
-
-      return res.status(400).json({
-        message: "Payment verification failed",
-        data: payment
-      });
+      res.status(200).json({
+        message: 'Payment successful'
+      })
     }
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: "Error verifying payment",
-    });
+  }catch(error){
+    console.log(error.message)
+    res.status(500).json({message: 'Error Verifying Payment'})
   }
 };

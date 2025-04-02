@@ -24,7 +24,7 @@ const ticketSchema = new mongoose.Schema({
   },
   ticketType: {
     type: String,
-    enum: ['VIP', 'Early Bird', 'Regular']
+    require: true
   },
   tableNumber: {
     type: Number,
