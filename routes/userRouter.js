@@ -1,5 +1,4 @@
-const { registerUser, verifyUser, logInUser, forgotUserPassword, resetUserPassword, changeUserPassword, logOut } = require('../controllers/userController')
-// const validate = require('../helper/utilities')
+const { registerUser, verifyUser, logInUser, forgotUserPassword, resetUserPassword, changeUserPassword, logOut, getAllEventPlanner, updateEventPlanner, deleteEventPlanner } = require('../controllers/eventPlanner')
 const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, changeUserPasswordSchema } = require('../middleware/validation')
 const { authenticate } = require('../middleware/authentication')
 
@@ -18,5 +17,11 @@ router.post('/reset-password/user/:token',resetPasswordSchema,resetUserPassword)
 router.post('/change/password/user/:id',authenticate,changeUserPasswordSchema,changeUserPassword);
 
 router.post('/logout',authenticate,logOut);
+
+router.put('/update/user/:id', updateEventPlanner);
+
+router.delete('/delete/user/:id', deleteEventPlanner);
+
+
 
 module.exports = router
