@@ -18,7 +18,7 @@ exports.registerSchema = (req, res, next) => {
     confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
       "any.only": "Passwords do not match",
     }),
-    role: Joi.string().valid('Admin', 'Organizer', 'Attendee').optional(),
+    role: Joi.string().valid('Admin', 'Organizer').optional(),
   });
 
   const { error } = schema.validate(req.body, { abortEarly: false });
@@ -94,44 +94,38 @@ exports.changeUserPasswordSchema = (req, res, next) => {
 
 
 const eventValidationSchema = Joi.object({
-  title: Joi.string().trim().min(3).max(100).required().messages({
+  eventTitle: Joi.string().trim().min(3).max(100).required().messages({
     "string.empty": "Event title is required",
     "string.min": "Event title must be at least 3 characters",
     "string.max": "Event title cannot exceed 100 characters",
   }),
-  date: Joi.date().iso().required().messages({
+  eventDate: Joi.date().iso().required().messages({
     "date.base": "Event date must be a valid date",
     "any.required": "Event date is required",
   }),
-  time: Joi.string().required().messages({
+  eventTime: Joi.string().required().messages({
     "string.empty": "Event time is required",
   }),
-  location: Joi.string().trim().min(3).max(200).required().messages({
+  eventLocation: Joi.string().trim().min(3).max(200).required().messages({
     "string.empty": "Location is required",
     "string.min": "Location must be at least 3 characters",
     "string.max": "Location cannot exceed 200 characters",
   }),
-  agenda: Joi.string().trim().min(5).max(1000).required().messages({
+  eventAgenda: Joi.string().trim().min(5).max(1000).required().messages({
     "string.empty": "Agenda is required",
     "string.min": "Agenda must be at least 5 characters",
     "string.max": "Agenda cannot exceed 1000 characters",
   }),
-  description: Joi.string().trim().min(10).max(3000).required().messages({
+  eventDescription: Joi.string().trim().min(10).max(3000).required().messages({
     "string.empty": "Description is required",
     "string.min": "Description must be at least 10 characters",
     "string.max": "Description cannot exceed 3000 characters",
   }),
-  speakers: Joi.alternatives().try(
-    Joi.array().items(Joi.string().trim().min(3).max(100)),
-    Joi.string().trim().min(3).max(100)  // This allows a single speaker if it's not an array
-  ).messages({
-    "string.min": "Each speaker name must be at least 3 characters",
-    "string.max": "Each speaker name cannot exceed 100 characters",
-  }),
+
   image: Joi.string().uri().optional().messages({
     "string.uri": "Image must be a valid URL"
   }),
-  eventType: Joi.string().required().messages({
+  eventCategory: Joi.string().required().messages({
     "string.empty": "Event type is required"
   })
 });
@@ -140,7 +134,7 @@ exports.validateEvent = (req, res, next) => {
   const { error } = eventValidationSchema.validate(req.body, { abortEarly: false });
   if (error) {
     return res.status(400).json({
-      message: error.details.map(err => err.message).join('. ')
+      message: error.details.map(err => err.message)
     });
   }
   next();

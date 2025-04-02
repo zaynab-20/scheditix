@@ -1,6 +1,6 @@
 const mongoose = require ('mongoose');
-const userSchema = mongoose.Schema({
-  userName: {
+const eventPlannerSchema = mongoose.Schema({
+  fullname: {
    type: String,
    required: true,
    lowercase: true,
@@ -22,8 +22,8 @@ const userSchema = mongoose.Schema({
   },
   role: { 
     type: String,
-    enum: ['Admin', 'Organizer', 'Attendee'],
-    default: 'Admin'
+    enum: ['Admin', 'Event Planner'],
+    default: 'Event Planner'
   },
   isAdmin: {
    type: Boolean,
@@ -39,6 +39,6 @@ const userSchema = mongoose.Schema({
   }
 }, {timestamps: true})
 
-const userModel = mongoose.model("Users", userSchema)
+const eventPlannerModel = mongoose.model("eventPlanners", eventPlannerSchema)
 
-module.exports = userModel
+module.exports = eventPlannerModel
