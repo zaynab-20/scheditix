@@ -1,27 +1,27 @@
 const mongoose = require('mongoose')
 
 const eventSchema = new mongoose.Schema({
-  title: {
+  eventTitle: {
     type: String,
     require: true
   },
-  date: {
+  eventDate: {
     type: Date,
     require:true
   },
-  time: {
+  eventTime: {
     type: String,
     require:true
   },
-  location: {
+  eventLocation: {
     type: String,
     require:true
   },
-  agenda: {
+  eventAgenda: {
     type: String,
     require:true
   },
-  description: {
+  eventDescription: {
     type: String,
     require:true
   },
@@ -29,11 +29,11 @@ const eventSchema = new mongoose.Schema({
     type: String,
     require:true
   }],
-  eventType: {
+  eventCategory: {
     type: String, 
     require: true
   },
-  image: {
+  image: [{
     imageUrl: {
       type: String,
       require: true
@@ -42,10 +42,18 @@ const eventSchema = new mongoose.Schema({
       type: String,
       require: true
     }
-  },
+  }],
   organizerId: {
     type:mongoose.SchemaTypes.ObjectId,
     ref: 'User',
+    require: true
+  },
+  totalTableNumber: {
+    type: Number,
+    require: true
+  },
+  totalSeatNumber: {
+    type: Number,
     require: true
   },
   sharableLink: {

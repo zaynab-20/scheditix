@@ -5,8 +5,8 @@ const fs = require("fs");
 exports.createEvent = async (req, res) => {
   try {
     const organizerId = req.user.userId;
-    const { title, date, time, location, agenda, description, speakers, eventType} = req.body;
-    const file = req.file; // Handling a single image
+    const {eventTitle,eventDate,eventTime,eventLocation,eventAgenda,eventDescription,speakers,eventCategory} = req.body;
+    const file = req.file;
 
     let image = {};
 
@@ -31,12 +31,14 @@ exports.createEvent = async (req, res) => {
       eventType,
       organizerId,
       image,
+      totalTableNumber,
+      totalSeatNumber
     });
-
-    const sharableLink = `${req.protocol}://${req.get('host')}/api/v1/event/${eventType}/${event._id}`
-
-    event.sharableLink = sharableLink
     await event.save();
+
+    const sharableLink = `${req.protocol}://${req.get('host')}/api/v1/event/${eventCategory}/${eventId}`
+    event.sharableLink = sharableLink
+   
 
     // fs.unlinkSync(file.path);
 
@@ -88,28 +90,28 @@ exports.updateEvent = async (req, res) => {
   try {
     const organizerId = req.user.userId;
     const { eventId } = req.params;
-    const { title, date, time, location, agenda, description, speakers, eventType} = req.body;
+    const { eventTitle, eventDate, eventTime, eventLocation, eventAgenda, eventDescription, speakers, eventCategory } = req.body;
 
     const event = await eventModel.findById(eventId);
     if (!event) {
       return res.status(404).json({ message: 'Event Not Found' });
     }
 
-
     const data = {
-      title,
-      date,
-      time,
-      location,
-      agenda,
-      description,
+      eventTitle,
+      eventDate,
+      eventTime,
+      eventLocation,
+      eventAgenda,
+      eventDescription,
       speakers,
-      eventType,
+      eventCategory,
       organizerId
     };
 
-    if (eventType) {
-      data.sharableLink = `${req.protocol}://${req.get('host')}/api/v1/event/${eventType}/${eventId}`;
+    // If the event type or sharable link should be updated, include it
+    if (req.body.eventCategory) {
+      data.sharableLink = `${req.protocol}://${req.get('host')}/api/v1/event/${eventCategory}/${eventId}`;
     }
 
     if (req.file && req.file.path) {
@@ -117,9 +119,9 @@ exports.updateEvent = async (req, res) => {
         await cloudinary.uploader.destroy(event.image.imagePublicId);
       }
 
-      
       const result = await cloudinary.uploader.upload(req.file.path);
       fs.unlinkSync(req.file.path); 
+
       data.image = {
         imageUrl: result.secure_url,
         imagePublicId: result.public_id,
@@ -134,8 +136,6 @@ exports.updateEvent = async (req, res) => {
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 };
-
-
 
 
 exports.deleteEvent = async (req, res) => {
@@ -164,11 +164,11 @@ exports.deleteEvent = async (req, res) => {
 
 exports.getEventById = async (req, res) => {
   try {
-    const { eventType, eventId } = req.params;
-    const event = await eventModel.findOne({ _id:eventId,eventType });
+    const { eventCategory, eventId } = req.params;
+    const event = await eventModel.findOne({ _id:eventId,eventCategory });
 
     if (!event) {
-      return res.status(404).json({ message: 'Event not found or mismatched event type' });
+      return res.status(404).json({ message: 'Event not found' });
     }
 
     res.status(200).json({

@@ -23,29 +23,16 @@ exports.createTicket = async (req, res) => {
       })
     };
 
-    const checkInCode = generator.generate(8, {
+    const checkInCode = generator.generate(5, {
       upperCaseAlphabets: true,
       lowerCaseAlphabets: true,
       specialChars: false,
     });
 
-    const existingTickets = await ticketModel.find({ eventId: eventId });
-
     let tableNumber = 1;
     let seatNumber = 1;
 
-    if (existingTickets.length > 0) {
-      const lastTicket = existingTickets[existingTickets.length - 1];
-      tableNumber = lastTicket.tableNumber;
-      seatNumber = lastTicket.seatNumber;
-
-      if (seatNumber >= 5) { 
-        tableNumber += 1; 
-        seatNumber = 1; 
-      } else {
-        seatNumber += 1; 
-      }
-    }
+    
 
     const newTicket = new ticketModel({
       eventId: event._id,
