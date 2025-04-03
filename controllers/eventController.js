@@ -14,6 +14,8 @@ exports.createEvent = async (req, res) => {
       endTime,
       eventAgenda,
       eventRule,
+      startDate,
+      endDate,
       totalTableNumber,
       totalSeatNumber,
     } = req.body;
@@ -21,6 +23,7 @@ exports.createEvent = async (req, res) => {
     
     let result;
     let imagePath = {};
+    let image = []
 
     if (files && files[0]) {
       for (const images of files) {
@@ -45,15 +48,15 @@ exports.createEvent = async (req, res) => {
       eventRule,
       totalTableNumber,
       totalSeatNumber,
-      image: imagePath
+      image: image
     });
     await event.save();
 
-    const sharableLink = `${req.protocol}://${req.get(
-      "host"
-    )}/api/v1/event/${eventCategory}/${eventId}`;
-    event.sharableLink = sharableLink;
-    await event.save();
+    // const sharableLink = `${req.protocol}://${req.get(
+    //   "host"
+    // )}/api/v1/event/${eventCategory}/${eventId}`;
+    // event.sharableLink = sharableLink;
+    // await event.save();
 
     res
       .status(201)
@@ -100,19 +103,9 @@ exports.getAllEvent = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {
   try {
-    const organizerId = req.user.userId;
+    // const organizerId = req.user.userId;
     const { eventId } = req.params;
-    const {
-      eventTitle,
-      eventDate,
-      eventTime,
-      eventLocation,
-      eventAgenda,
-      eventDescription,
-      speakers,
-      eventCategory,
-      totalTableNumber,
-      totalSeatNumber,
+    const {eventTitle,eventDescription,eventCategory,eventLocation,startTime,endTime,eventAgenda,eventRule,totalTableNumber,totalSeatNumber,
     } = req.body;
 
     const event = await eventModel.findById(eventId);
@@ -122,37 +115,40 @@ exports.updateEvent = async (req, res) => {
 
     const data = {
       eventTitle,
-      eventDate,
-      eventTime,
-      eventLocation,
-      eventAgenda,
       eventDescription,
-      speakers,
       eventCategory,
+      eventLocation,
+      startTime,
+      endTime,
+      eventAgenda,
+      eventRule,
       totalTableNumber,
       totalSeatNumber,
-      organizerId,
     };
 
     // If the event type or sharable link should be updated, include it
-    if (req.body.eventCategory) {
-      data.sharableLink = `${req.protocol}://${req.get(
-        "host"
-      )}/api/v1/event/${eventCategory}/${eventId}`;
-    }
+    // if (req.body.eventCategory) {
+    //   data.sharableLink = `${req.protocol}://${req.get(
+    //     "host"
+    //   )}/api/v1/event/${eventCategory}/${eventId}`;
+    // }
 
-    if (req.file && req.file.path) {
-      if (event.image && event.image.imagePublicId) {
-        await cloudinary.uploader.destroy(event.image.imagePublicId);
+    if(req.files && req.file[0]){
+      for(const image of event.images){
+        await cloudinary.uploader.destroy(image.imagePublicId)
       }
-
-      const result = await cloudinary.uploader.upload(req.file.path);
-      fs.unlinkSync(req.file.path);
-
-      data.image = {
-        imageUrl: result.secure_url,
-        imagePublicId: result.public_id,
-      };
+      const image = []
+      
+      for(const image of req.files){
+        const result = await cloudinary.uploader.upload(image.path)
+        fs.unlinkSync(image.path)
+        const photo = {
+          imageUrl: result.secure_url,
+          imagePublicId: result.public_id
+        }
+        image.push(photo)
+      }
+      data.images = image;
     }
 
     const updatedEvent = await eventModel.findByIdAndUpdate(eventId, data, {
@@ -191,25 +187,5 @@ exports.deleteEvent = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: "Internal Server Error" });
-  }
-};
-
-exports.getEventById = async (req, res) => {
-  try {
-    const { eventCategory, eventId } = req.params;
-    const event = await eventModel.findOne({ _id: eventId, eventCategory });
-
-    if (!event) {
-      return res.status(404).json({ message: "Event not found" });
-    }
-
-    res.status(200).json({
-      message: "Event fetched successfully",
-      data: event,
-    });
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
   }
 };
