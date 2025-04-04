@@ -7,8 +7,10 @@ const router = express.Router();
 
 /**
  * @swagger
- * /create/event:
+ * /api/v1/create/event:
  *   post:
+ *     tags:
+ *       - Events
  *     summary: Create a new event
  *     description: This endpoint allows an event planner to create a new event.
  *     consumes:
@@ -76,10 +78,13 @@ const router = express.Router();
  *         description: Internal Server Error
  */
 router.post('/create/event', authenticate, upload.array('image'), validateEvent, createEvent);
+
 /**
  * @swagger
- * /events:
+ * /api/v1/events:
  *   get:
+ *     tags:
+ *       - Events
  *     summary: Get all events
  *     description: This endpoint allows an event planner to retrieve a list of all events.
  *     responses:
@@ -92,8 +97,10 @@ router.get('/events', getAllEvent);
 
 /**
  * @swagger
- * /update/event/{id}:
+ * /api/v1/update/event/{id}:
  *   put:
+ *     tags:
+ *       - Events
  *     summary: Update an event
  *     description: This endpoint allows an event planner to update the details of an existing event.
  *     consumes:
@@ -154,12 +161,14 @@ router.get('/events', getAllEvent);
  *       404:
  *         description: Event not found
  */
-router.put('/update/event/:id',  authenticate, upload.array('image'), validateEvent,updateEvent);
+router.put('/update/event/:id', authenticate, upload.array('image'), validateEvent, updateEvent);
 
 /**
  * @swagger
- * /delete/event/{id}:
+ * /api/v1/delete/event/{id}:
  *   delete:
+ *     tags:
+ *       - Events
  *     summary: Delete an event
  *     description: This endpoint allows an event planner to delete an event by its ID.
  *     parameters:
