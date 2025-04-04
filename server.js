@@ -52,7 +52,7 @@ const options = {
 };
 
 const openapiSpecification = swaggerJsdoc(options);
-app.use("/scheditix", swagger_UI.serve, swagger_UI.setup(openapiSpecification))
+app.use("/documentation", swagger_UI.serve, swagger_UI.setup(openapiSpecification))
 
 app.listen(PORT,() => {
   console.log(`My Server is Currently Running On Port ${PORT}`)

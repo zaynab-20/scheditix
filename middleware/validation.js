@@ -7,7 +7,7 @@ exports.registerSchema = (req, res, next) => {
   const schema = Joi.object({
     fullname: Joi.string().trim().min(3).max(50).required(),
     email: Joi.string().trim().email().required(),
-    phoneNo: Joi.string().min(10).max(15).pattern(/^[0-9]+$/).required().messages({
+    phoneNo: Joi.string().trim().min(10).max(10).pattern(/^[0-9]+$/).required().messages({
       "string.pattern.base": "Phone number must contain only digits",
       "string.min": "Phone number is too short",
       "string.max": "Phone number is too long",
@@ -18,7 +18,6 @@ exports.registerSchema = (req, res, next) => {
     confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
       "any.only": "Passwords do not match",
     }),
-    role: Joi.string().valid('Admin', 'Organizer').optional(),
   });
 
   const { error } = schema.validate(req.body, { abortEarly: false });

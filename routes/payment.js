@@ -3,84 +3,71 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /payment/{ticketId}:
+ * /api/v1/payment/initialize/{ticketId}:
  *   post:
- *     summary: Initialize payment for ticket purchase
- *     description: This endpoint allows an attendee to initialize a payment for a ticket purchase.
+ *     summary: Initialize payment for a ticket
+ *     description: Starts a new payment session for a given ticket.
+ *     tags:
+ *       - Payment
  *     parameters:
  *       - in: path
  *         name: ticketId
- *         description: ID of the ticket to purchase
- *         required: true
- *         type: string
- *       - in: body
- *         name: paymentDetails
- *         description: Payment details for the attendee
  *         required: true
  *         schema:
- *           type: object
- *           required:
- *             - attendeeName
- *             - attendeeEmail
- *           properties:
- *             attendeeName:
- *               type: string
- *               example: "John Doe"
- *             attendeeEmail:
- *               type: string
- *               example: "johndoe@example.com"
+ *           type: string
+ *         description: ID of the ticket
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - attendeeName
+ *               - attendeeEmail
+ *             properties:
+ *               attendeeName:
+ *                 type: string
+ *                 example: John Doe
+ *               attendeeEmail:
+ *                 type: string
+ *                 format: email
+ *                 example: johndoe@gmail.com
  *     responses:
  *       200:
  *         description: Payment initialized successfully
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Payment initialize Successful"
- *             data:
- *               type: object
- *               properties:
- *                 reference:
- *                   type: string
- *                   example: "123ABC456XYZ"
- *                 checkout_url:
- *                   type: string
- *                   example: "https://korapay.com/checkout/123ABC456XYZ"
- *       400:
- *         description: Bad Request
  *       404:
  *         description: Ticket not found
+ *       400:
+ *         description: All tickets sold out
  *       500:
- *         description: Internal Server Error
+ *         description: Error initializing payment
  */
+
 router.post('/payment/:ticketId', initializePayment);
 
 /**
  * @swagger
- * /verify:
+ * /payment/verify:
  *   get:
- *     summary: Verify payment status
- *     description: This endpoint allows verification of payment status using the reference ID.
+ *     summary: Verify payment transaction
+ *     description: Verifies the status of a payment transaction using the reference code.
+ *     tags:
+ *       - Payment
  *     parameters:
  *       - in: query
  *         name: reference
- *         description: Reference ID of the payment to verify
  *         required: true
- *         type: string
+ *         schema:
+ *           type: string
+ *         description: Transaction reference code
  *     responses:
  *       200:
- *         description: Payment verification successful
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *               example: "Payment successful"
+ *         description: Payment successful
  *       400:
- *         description: Reference is required or Transaction not found
+ *         description: Reference missing or transaction not found
  *       500:
- *         description: Internal Server Error
+ *         description: Error verifying payment
  */
 router.get('/verify', verifyPayment);
 
