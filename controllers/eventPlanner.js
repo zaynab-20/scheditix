@@ -34,11 +34,12 @@ exports.registerUser = async (req, res) => {
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
 
-    const eventPlanner = new eventPlannerModel({
+    const eventPlanner = await new eventPlannerModel({
       fullname: nameFormat,
       email,
       phoneNo: "234" + phoneNo,
       password: hashedPassword,
+      confirmPassword: hashedPassword,
       role: req.body.role || "Event Planner",
     });
 
