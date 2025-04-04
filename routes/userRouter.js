@@ -8,6 +8,8 @@ const router = require('express').Router()
  * @swagger
  * /api/v1/register/User:
  *   post:
+ *     tags:
+ *       - Users
  *     summary: Register a new user
  *     description: This endpoint allows a new user to register with their personal details.
  *     parameters:
@@ -59,6 +61,8 @@ router.post('/register/User', registerSchema, registerUser);
  * @swagger
  * /api/v1/verify/user/{token}:
  *   get:
+ *     tags:
+ *       - Users
  *     summary: Verify a user's email
  *     description: This endpoint is used to verify a user's email address with a token sent during registration.
  *     parameters:
@@ -81,6 +85,8 @@ router.get('/verify/user/:token', verifyUser);
  * @swagger
  * /api/v1/login/user:
  *   post:
+ *     tags:
+ *       - Users
  *     summary: Login a user
  *     description: This endpoint allows a user to log in using their email and password.
  *     parameters:
@@ -116,6 +122,8 @@ router.post('/login/user', loginSchema, logInUser);
  * @swagger
  * /api/v1/forgot-password/user:
  *   post:
+ *     tags:
+ *       - Users
  *     summary: Forgot password
  *     description: This endpoint sends a password reset link to the user's email.
  *     parameters:
@@ -144,6 +152,8 @@ router.post('/forgot-password/user', forgotPasswordSchema, forgotUserPassword);
  * @swagger
  * /api/v1/reset-password/user/{token}:
  *   post:
+ *     tags:
+ *       - Users
  *     summary: Reset password
  *     description: This endpoint allows a user to reset their password using a valid token.
  *     parameters:
@@ -184,6 +194,8 @@ router.post('/reset-password/user/:token', resetPasswordSchema, resetUserPasswor
  * @swagger
  * /api/v1/change/password/user/{id}:
  *   post:
+ *     tags:
+ *       - Users
  *     summary: Change user password
  *     description: This endpoint allows a user to change their current password.
  *     parameters:
@@ -229,6 +241,8 @@ router.post('/change/password/user/:id', authenticate, changeUserPasswordSchema,
  * @swagger
  * /api/v1/logout:
  *   post:
+ *     tags:
+ *       - Users
  *     summary: Logout a user
  *     description: This endpoint allows a user to log out from their session.
  *     responses:
@@ -243,6 +257,8 @@ router.post('/logout', authenticate, logOut);
  * @swagger
  * /api/v1/update/user/{id}:
  *   put:
+ *     tags:
+ *       - Users
  *     summary: Update user details
  *     description: This endpoint allows an event planner to update their details.
  *     parameters:
@@ -280,12 +296,14 @@ router.post('/logout', authenticate, logOut);
  *       500:
  *         description: Internal Server Error
  */
-router.put('/update/user/:id', updateEventPlanner);
+router.put('/update/user/:id', authenticate, updateEventPlanner);
 
 /**
  * @swagger
  * /api/v1/delete/user/{id}:
  *   delete:
+ *     tags:
+ *       - Users
  *     summary: Delete a user
  *     description: This endpoint allows an admin to delete a user from the system.
  *     parameters:
@@ -302,6 +320,6 @@ router.put('/update/user/:id', updateEventPlanner);
  *       500:
  *         description: Internal Server Error
  */
-router.delete('/delete/user/:id', deleteEventPlanner);
+router.delete('/delete/user/:id', authenticate, deleteEventPlanner);
 
 module.exports = router;

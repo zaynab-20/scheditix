@@ -34,7 +34,7 @@ const options = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: 'BASE URL: https://scheditix.onrender.com',
+      title: 'BASE URL: https://scheditix.onrender.com/documentation',
       version: '1.0.0',
     },
     components: {
