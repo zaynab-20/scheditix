@@ -5,7 +5,18 @@ const fs = require("fs");
 exports.createEvent = async (req, res) => {
   try {
     // const organizerId = req.user.userId;
-    const {eventTitle,eventDescription,eventCategory,eventLocation,startTime,endTime,eventAgenda,eventRule,startDate,endDate,totalTableNumber,totalSeatNumber
+    const {eventTitle,
+           eventDescription,
+           eventCategory,
+           eventLocation,
+           startTime,
+           endTime,
+           eventAgenda,
+           eventRule,
+           startDate,
+           endDate,
+           totalTableNumber,
+           totalSeatNumber
     } = req.body;
     const files = req.files;
     

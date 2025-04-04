@@ -18,13 +18,13 @@ const router = require('express').Router()
  *         schema:
  *           type: object
  *           required:
- *             - fullName
+ *             - fullname
  *             - email
  *             - password
  *             - phoneNo
  *             - confirmPassword
  *           properties:
- *             fullName:
+ *             fullname:
  *               type: string
  *               example: "John Doe"
  *             email:

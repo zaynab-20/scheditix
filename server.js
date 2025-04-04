@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json())
 app.use(cors())
 
-// app.use('/api/v1', userRouter);
+app.use('/api/v1', userRouter);
 app.use('/api/v1',eventRouter);
 app.use('/api/v1',ticketRouter);
 app.use('/api/v1',paymentRouter);
