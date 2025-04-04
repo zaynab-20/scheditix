@@ -6,9 +6,9 @@ const { send_mail } = require("../middleware/nodemailer");
 
 exports.registerUser = async (req, res) => {
   try {
-    const { fullName, email, password, role, phoneNo, confirmPassword } =
+    const { fullname, email, password, role, phoneNo, confirmPassword } =
       req.body;
-    const full_name = fullName.split(" ");
+    const full_name = fullname.split(" ");
     const nameFormat = full_name
       .map((e) => {
         return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase();
@@ -42,22 +42,22 @@ exports.registerUser = async (req, res) => {
       role: req.body.role || "Event Planner",
     });
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    const token = jwt.sign({ eventPlannerId: eventPlanner._id }, process.env.JWT_SECRET, {
       expiresIn: "1h",
     });
     const link = `${req.protocol}://${req.get(
       "host"
     )}/api/v1/verify/user/${token}`;
-    const nickName = user.userName;
+    const firstName = eventPlanner.fullname;
 
     const mailOptions = {
-      email: user.email,
+      email: eventPlanner.email,
       subject: "Account Verification",
-      html: verify(link, nickName),
+      html: verify(link, firstName),
     };
 
     await send_mail(mailOptions);
-    await user.save();
+    await eventPlanner.save();
     res.status(201).json({
       message: "Account registered successfully",
       data: eventPlanner,
@@ -66,7 +66,7 @@ exports.registerUser = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: "internal Server Error",
+      message: "internal Server Error " + error.message,
     });
   }
 };
@@ -84,35 +84,35 @@ exports.verifyUser = async (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, async (error, payload) => {
       if (error) {
         if (error instanceof jwt.JsonWebTokenError) {
-          const { userId } = jwt.decode(token);
-          const user = await eventPlannerModel.findById(userId);
+          const { eventPlannerId } = jwt.decode(token);
+          const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
 
-          if (!user) {
+          if (!eventPlanner) {
             return res.status(404).json({
               message: "Account not found",
             });
           }
 
-          if (user.isVerified === true) {
+          if (eventPlanner.isVerified === true) {
             return res.status(400).json({
               message: "Account is verified already",
             });
           }
 
           const newToken = jwt.sign(
-            { userId: user._id },
+            { eventPlannerId: eventPlanner._id },
             process.env.JWT_SECRET,
             { expiresIn: "5mins" }
           );
           const link = `${req.protocol}://${req.get(
             "host"
           )}/api/v1/verify/user/${newToken}`;
-          const nickName = user.userName;
+          const firstName = eventPlanner.fullname.split(" ")[0];
 
           const mailOptions = {
-            email: user.email,
+            email: eventPlanner.email,
             subject: "Resend: Account Verification",
-            html: verify(link, nickName),
+            html: verify(link, firstName),
           };
 
           await send_mail(mailOptions);
@@ -121,22 +121,22 @@ exports.verifyUser = async (req, res) => {
           });
         }
       } else {
-        const user = await eventPlannerModel.findById(payload.userId);
+        const eventPlanner = await eventPlannerModel.findById(payload.eventPlannerId);
 
-        if (!user) {
+        if (!eventPlanner) {
           return res.status(404).json({
             message: "Account not found",
           });
         }
 
-        if (user.isVerified === true) {
+        if (eventPlanner.isVerified === true) {
           return res.status(400).json({
             message: "Account is verified already",
           });
         }
 
-        user.isVerified = true;
-        await user.save();
+        eventPlanner.isVerified = true;
+        await eventPlanner.save();
 
         res.status(200).json({
           message: "Account verified successfully",

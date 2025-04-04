@@ -5,7 +5,7 @@ const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d
 // Registration Validation Schema
 exports.registerSchema = (req, res, next) => {
   const schema = Joi.object({
-    fullName: Joi.string().trim().min(3).max(50).required(),
+    fullname: Joi.string().trim().min(3).max(50).required(),
     email: Joi.string().trim().email().required(),
     phoneNo: Joi.string().min(10).max(15).pattern(/^[0-9]+$/).required().messages({
       "string.pattern.base": "Phone number must contain only digits",
