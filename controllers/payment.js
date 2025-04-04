@@ -111,6 +111,7 @@ exports.verifyPayment = async (req, res) => {
         message: 'Payment successful'
       })
     }
+    // console.log(response)
   }catch(error){
     console.log(error.message)
     res.status(500).json({message: 'Error Verifying Payment'})

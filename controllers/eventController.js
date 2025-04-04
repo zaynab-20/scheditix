@@ -5,19 +5,7 @@ const fs = require("fs");
 exports.createEvent = async (req, res) => {
   try {
     // const organizerId = req.user.userId;
-    const {
-      eventTitle,
-      eventDescription,
-      eventCategory,
-      eventLocation,
-      startTime,
-      endTime,
-      eventAgenda,
-      eventRule,
-      startDate,
-      endDate,
-      totalTableNumber,
-      totalSeatNumber,
+    const {eventTitle,eventDescription,eventCategory,eventLocation,startTime,endTime,eventAgenda,eventRule,startDate,endDate,totalTableNumber,totalSeatNumber
     } = req.body;
     const files = req.files;
     
@@ -33,6 +21,7 @@ exports.createEvent = async (req, res) => {
           imageUrl: result.secure_url,
           imagePublicId: result.public_id,
         }
+        image.push(imagePath)
       }
       
     }
@@ -46,6 +35,8 @@ exports.createEvent = async (req, res) => {
       endTime,
       eventAgenda,
       eventRule,
+      startDate,
+      endDate,
       totalTableNumber,
       totalSeatNumber,
       image: image
@@ -122,8 +113,10 @@ exports.updateEvent = async (req, res) => {
       endTime,
       eventAgenda,
       eventRule,
+      startDate,
+      endDate,
       totalTableNumber,
-      totalSeatNumber,
+      totalSeatNumber
     };
 
     // If the event type or sharable link should be updated, include it

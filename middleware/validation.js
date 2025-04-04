@@ -5,7 +5,7 @@ const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d
 // Registration Validation Schema
 exports.registerSchema = (req, res, next) => {
   const schema = Joi.object({
-    userName: Joi.string().trim().min(3).max(50).required(),
+    fullName: Joi.string().trim().min(3).max(50).required(),
     email: Joi.string().trim().email().required(),
     phoneNo: Joi.string().min(10).max(15).pattern(/^[0-9]+$/).required().messages({
       "string.pattern.base": "Phone number must contain only digits",
@@ -32,7 +32,9 @@ exports.registerSchema = (req, res, next) => {
 exports.loginSchema = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().trim().email().required(),
-    password: Joi.string().required(),
+    password: Joi.string().pattern(passwordPattern).required().messages({
+      "string.pattern.base": "Password must be at least 6 characters long, and include uppercase, lowercase, digit, and special character",
+    }),
   });
 
   const { error } = schema.validate(req.body, { abortEarly: false });
@@ -93,40 +95,62 @@ exports.changeUserPasswordSchema = (req, res, next) => {
 };
 
 
+
 const eventValidationSchema = Joi.object({
   eventTitle: Joi.string().trim().min(3).max(100).required().messages({
     "string.empty": "Event title is required",
     "string.min": "Event title must be at least 3 characters",
     "string.max": "Event title cannot exceed 100 characters",
   }),
-  eventDate: Joi.date().iso().required().messages({
-    "date.base": "Event date must be a valid date",
-    "any.required": "Event date is required",
+  eventDescription: Joi.string().trim().min(10).max(3000).required().messages({
+    "string.empty": "Description is required",
+    "string.min": "Description must be at least 10 characters",
+    "string.max": "Description cannot exceed 3000 characters",
   }),
-  eventTime: Joi.string().required().messages({
-    "string.empty": "Event time is required",
+  eventCategory: Joi.string().trim().required().messages({
+    "string.empty": "Event category is required",
   }),
   eventLocation: Joi.string().trim().min(3).max(200).required().messages({
     "string.empty": "Location is required",
     "string.min": "Location must be at least 3 characters",
     "string.max": "Location cannot exceed 200 characters",
   }),
+  startDate: Joi.date().iso().required().messages({
+    "date.base": "Start date must be a valid date",
+    "any.required": "Start date is required",
+  }),
+  endDate: Joi.date().iso().required().messages({
+    "date.base": "End date must be a valid date",
+    "any.required": "End date is required",
+  }),
+  startTime: Joi.string().required().messages({
+    "string.empty": "Start time is required",
+  }),
+  endTime: Joi.string().required().messages({
+    "string.empty": "End time is required",
+  }),
   eventAgenda: Joi.string().trim().min(5).max(1000).required().messages({
     "string.empty": "Agenda is required",
     "string.min": "Agenda must be at least 5 characters",
     "string.max": "Agenda cannot exceed 1000 characters",
   }),
-  eventDescription: Joi.string().trim().min(10).max(3000).required().messages({
-    "string.empty": "Description is required",
-    "string.min": "Description must be at least 10 characters",
-    "string.max": "Description cannot exceed 3000 characters",
+  eventRule: Joi.string().trim().min(5).max(500).required().messages({
+    "string.empty": "Event rules are required",
+    "string.min": "Event rules must be at least 5 characters",
+    "string.max": "Event rules cannot exceed 500 characters",
   }),
-
+  totalTableNumber: Joi.number().integer().positive().required().messages({
+    "number.base": "Total table number must be a valid number",
+    "number.positive": "Total table number must be greater than 0",
+    "any.required": "Total table number is required",
+  }),
+  totalSeatNumber: Joi.number().integer().positive().required().messages({
+    "number.base": "Total seat number must be a valid number",
+    "number.positive": "Total seat number must be greater than 0",
+    "any.required": "Total seat number is required",
+  }),
   image: Joi.string().uri().optional().messages({
     "string.uri": "Image must be a valid URL"
-  }),
-  eventCategory: Joi.string().required().messages({
-    "string.empty": "Event type is required"
   })
 });
 
@@ -140,3 +164,41 @@ exports.validateEvent = (req, res, next) => {
   next();
 };
 
+
+const ticketValidationSchema = Joi.object({
+  totalTicketNumber: Joi.number().integer().positive().required().messages({
+    "number.base": "Total ticket number must be a valid number",
+    "number.positive": "Total ticket number must be greater than zero",
+    "any.required": "Total ticket number is required",
+  }),
+  ticketType: Joi.string().trim().min(3).max(100).required().messages({
+    "string.empty": "Ticket type is required",
+    "string.min": "Ticket type must be at least 3 characters",
+    "string.max": "Ticket type cannot exceed 100 characters",
+  }),
+  ticketPrice: Joi.number().positive().required().messages({
+    "number.base": "Ticket price must be a valid number",
+    "number.positive": "Ticket price must be greater than zero",
+    "any.required": "Ticket price is required",
+  }),
+  tableNumber: Joi.number().integer().positive().required().messages({
+    "number.base": "Table number must be a valid number",
+    "number.positive": "Table number must be greater than zero",
+    "any.required": "Table number is required",
+  }),
+  seatNumber: Joi.number().integer().positive().required().messages({
+    "number.base": "Seat number must be a valid number",
+    "number.positive": "Seat number must be greater than zero",
+    "any.required": "Seat number is required",
+  }),
+});
+
+exports.validateTicket = (req, res, next) => {
+  const { error } = ticketValidationSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    return res.status(400).json({
+      message: error.details.map(err => err.message)
+    });
+  }
+  next();
+};

@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json())
 app.use(cors())
 
-app.use('/api/v1', userRouter);
+// app.use('/api/v1', userRouter);
 app.use('/api/v1',eventRouter);
 app.use('/api/v1',ticketRouter);
 app.use('/api/v1',paymentRouter);
@@ -26,6 +26,33 @@ app.use((error, req, res, next) => {
   }
   next()
 })
+
+const swaggerJsdoc = require("swagger-jsdoc");
+const swagger_UI = require("swagger-ui-express")
+
+const options = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'HELLO FRONTEND',
+      version: '1.0.0',
+    },
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: "http",
+          scheme: "bearer",
+           bearerFormat: "JWT"
+        }
+      }
+    }, 
+    security: [{ BearerAuth: [] }]
+  },
+  apis: ["./routes/*.js"] // Ensure this points to the correct path
+};
+
+const openapiSpecification = swaggerJsdoc(options);
+app.use("/scheditix", swagger_UI.serve, swagger_UI.setup(openapiSpecification))
 
 app.listen(PORT,() => {
   console.log(`My Server is Currently Running On Port ${PORT}`)
