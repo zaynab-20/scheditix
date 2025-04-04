@@ -29,10 +29,21 @@ exports.createTicket = async (req, res) => {
       specialChars: false,
     });
 
-    let tableNumber = 1;
-    let seatNumber = 1;
-
+    let tableNumber = 0; 
+    let seatNumber = 0;  
     
+    if (ticket) { 
+        tableNumber = ticket.totalTableNumber;
+        seatNumber = ticket.totalSeatNumber;
+    }    
+
+    for(let t = 1; t <= tableNumber; t++){
+      for(let s = 1; s <= seatNumber; s++){
+        console.log(`table${i} seat${o}`)
+      }
+    }
+    
+
 
     const newTicket = new ticketModel({
       eventId: event._id,
