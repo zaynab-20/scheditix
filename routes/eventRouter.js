@@ -11,71 +11,62 @@ const router = express.Router();
  *   post:
  *     summary: Create a new event
  *     description: This endpoint allows an event planner to create a new event.
- *     parameters:
- *       - in: body
- *         name: event
- *         description: Event creation details
- *         required: true
- *         schema:
- *           type: object
- *           required:
- *             - eventTitle
- *             - eventDescription
- *             - eventCategory
- *             - eventLocation
- *             - startTime
- *             - endTime
- *             - eventAgenda
- *             - eventRule
- *             - startDate
- *             - endDate
- *             - totalTableNumber
- *             - totalSeatNumber
- *           properties:
- *             eventTitle:
- *               type: string
- *               example: "Wedding Celebration"
- *             eventDescription:
- *               type: string
- *               example: "A beautiful wedding celebration."
- *             eventCategory:
- *               type: string
- *               example: "Wedding"
- *             eventLocation:
- *               type: string
- *               example: "Downtown Hall"
- *             startTime:
- *               type: string
- *               format: time
- *               example: "14:00"
- *             endTime:
- *               type: string
- *               format: time
- *               example: "18:00"
- *             eventAgenda:
- *               type: string
- *               example: "Speech, Dinner, Dancing"
- *             eventRule:
- *               type: string
- *               example: "No smoking or drinking"
- *             startDate:
- *               type: string
- *               format: date
- *               example: "2025-05-10"
- *             endDate:
- *               type: string
- *               format: date
- *               example: "2025-05-10"
- *             totalTableNumber:
- *               type: integer
- *               example: 10
- *             totalSeatNumber:
- *               type: integer
- *               example: 100
- *             image:
- *               type: string
- *               format: binary
- *               description: "Upload a cover image for the event"
+ *     consumes:
+ *       - multipart/form-data
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - eventTitle
+ *               - eventDescription
+ *               - eventCategory
+ *               - eventLocation
+ *               - startTime
+ *               - endTime
+ *               - eventAgenda
+ *               - eventRule
+ *               - startDate
+ *               - endDate
+ *               - totalTableNumber
+ *               - totalSeatNumber
+ *             properties:
+ *               eventTitle:
+ *                 type: string
+ *               eventDescription:
+ *                 type: string
+ *               eventCategory:
+ *                 type: string
+ *               eventLocation:
+ *                 type: string
+ *               startTime:
+ *                 type: string
+ *                 format: time
+ *               endTime:
+ *                 type: string
+ *                 format: time
+ *               eventAgenda:
+ *                 type: string
+ *               eventRule:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               totalTableNumber:
+ *                 type: integer
+ *               totalSeatNumber:
+ *                 type: integer
+ *               image:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Upload one or more images
  *     responses:
  *       201:
  *         description: Event created successfully
@@ -105,59 +96,56 @@ router.get('/events', getAllEvent);
  *   put:
  *     summary: Update an event
  *     description: This endpoint allows an event planner to update the details of an existing event.
+ *     consumes:
+ *       - multipart/form-data
  *     parameters:
  *       - in: path
  *         name: id
- *         description: ID of the event to update
- *         required: true
- *         type: string
- *       - in: body
- *         name: event
- *         description: Updated event details
  *         required: true
  *         schema:
- *           type: object
- *           properties:
- *             eventTitle:
- *               type: string
- *               example: "Wedding Celebration"
- *             eventDescription:
- *               type: string
- *               example: "A beautiful wedding celebration."
- *             eventCategory:
- *               type: string
- *               example: "Wedding"
- *             eventLocation:
- *               type: string
- *               example: "Downtown Hall"
- *             startTime:
- *               type: string
- *               format: time
- *               example: "14:00"
- *             endTime:
- *               type: string
- *               format: time
- *               example: "18:00"
- *             eventAgenda:
- *               type: string
- *               example: "Speech, Dinner, Dancing"
- *             eventRule:
- *               type: string
- *               example: "No smoking or drinking"
- *             startDate:
- *               type: string
- *               format: date
- *               example: "2025-05-10"
- *             endDate:
- *               type: string
- *               format: date
- *               example: "2025-05-10"
- *             totalTableNumber:
- *               type: integer
- *               example: 10
- *             totalSeatNumber:
- *               type: integer
- *               example: 100
+ *           type: string
+ *         description: ID of the event to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               eventTitle:
+ *                 type: string
+ *               eventDescription:
+ *                 type: string
+ *               eventCategory:
+ *                 type: string
+ *               eventLocation:
+ *                 type: string
+ *               startTime:
+ *                 type: string
+ *                 format: time
+ *               endTime:
+ *                 type: string
+ *                 format: time
+ *               eventAgenda:
+ *                 type: string
+ *               eventRule:
+ *                 type: string
+ *               startDate:
+ *                 type: string
+ *                 format: date
+ *               endDate:
+ *                 type: string
+ *                 format: date
+ *               totalTableNumber:
+ *                 type: integer
+ *               totalSeatNumber:
+ *                 type: integer
+ *               image:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   format: binary
+ *                 description: Upload one or more images
  *     responses:
  *       200:
  *         description: Event updated successfully
@@ -166,7 +154,7 @@ router.get('/events', getAllEvent);
  *       404:
  *         description: Event not found
  */
-router.put('/update/event/:id', authenticate, validateEvent, updateEvent);
+router.put('/update/event/:id',  authenticate, upload.array('image'), validateEvent,updateEvent);
 
 /**
  * @swagger
