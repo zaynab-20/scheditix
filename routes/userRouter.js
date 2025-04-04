@@ -1,4 +1,4 @@
-const { registerUser, verifyUser, logInUser, forgotUserPassword, resetUserPassword, changeUserPassword, logOut, getAllEventPlanner, updateEventPlanner, deleteEventPlanner } = require('../controllers/eventPlanner')
+const { registerUser, verifyUser, logInUser, forgotUserPassword, resetUserPassword, changeUserPassword, logOut,  updateEventPlanner, deleteEventPlanner } = require('../controllers/eventPlanner')
 const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, changeUserPasswordSchema } = require('../middleware/validation')
 const { authenticate } = require('../middleware/authentication')
 
@@ -6,7 +6,7 @@ const router = require('express').Router()
 
 /**
  * @swagger
- * /register/User:
+ * /api/v1/register/User:
  *   post:
  *     summary: Register a new user
  *     description: This endpoint allows a new user to register with their personal details.
@@ -30,18 +30,18 @@ const router = require('express').Router()
  *             email:
  *               type: string
  *               format: email
- *               example: "john.doe@example.com"
+ *               example: "zatoloye@gmail.com"
  *             password:
  *               type: string
  *               format: password
- *               example: "Password123"
+ *               example: "Ade&20b"
  *             confirmPassword:
  *               type: string
  *               format: password
- *               example: "Password123"
+ *               example: "Ade&20b"
  *             phoneNo:
  *               type: string
- *               example: "1234567890"
+ *               example: "9123456789"
  *             role:
  *               type: string
  *               example: "Event Planner"
@@ -57,7 +57,7 @@ router.post('/register/User', registerSchema, registerUser);
 
 /**
  * @swagger
- * /verify/user/{token}:
+ * /api/v1/verify/user/{token}:
  *   get:
  *     summary: Verify a user's email
  *     description: This endpoint is used to verify a user's email address with a token sent during registration.
@@ -79,7 +79,7 @@ router.get('/verify/user/:token', verifyUser);
 
 /**
  * @swagger
- * /login/user:
+ * /api/v1/login/user:
  *   post:
  *     summary: Login a user
  *     description: This endpoint allows a user to log in using their email and password.
@@ -97,11 +97,11 @@ router.get('/verify/user/:token', verifyUser);
  *             email:
  *               type: string
  *               format: email
- *               example: "john.doe@example.com"
+ *               example: "zatoloye@gmail.com"
  *             password:
  *               type: string
  *               format: password
- *               example: "Password123"
+ *               example: "Ade&20b"
  *     responses:
  *       200:
  *         description: Login successful
@@ -114,7 +114,7 @@ router.post('/login/user', loginSchema, logInUser);
 
 /**
  * @swagger
- * /forgot-password/user:
+ * /api/v1/forgot-password/user:
  *   post:
  *     summary: Forgot password
  *     description: This endpoint sends a password reset link to the user's email.
@@ -131,7 +131,7 @@ router.post('/login/user', loginSchema, logInUser);
  *             email:
  *               type: string
  *               format: email
- *               example: "john.doe@example.com"
+ *               example: "zatoloye@gmail.com"
  *     responses:
  *       200:
  *         description: Reset password link sent successfully
@@ -142,7 +142,7 @@ router.post('/forgot-password/user', forgotPasswordSchema, forgotUserPassword);
 
 /**
  * @swagger
- * /reset-password/user/{token}:
+ * /api/v1/reset-password/user/{token}:
  *   post:
  *     summary: Reset password
  *     description: This endpoint allows a user to reset their password using a valid token.
@@ -165,11 +165,11 @@ router.post('/forgot-password/user', forgotPasswordSchema, forgotUserPassword);
  *             newPassword:
  *               type: string
  *               format: password
- *               example: "NewPassword123"
+ *               example: "Ade&20br"
  *             confirmPassword:
  *               type: string
  *               format: password
- *               example: "NewPassword123"
+ *               example: "Ade&20br"
  *     responses:
  *       200:
  *         description: Password reset successfully
@@ -182,7 +182,7 @@ router.post('/reset-password/user/:token', resetPasswordSchema, resetUserPasswor
 
 /**
  * @swagger
- * /change/password/user/{id}:
+ * /api/v1/change/password/user/{id}:
  *   post:
  *     summary: Change user password
  *     description: This endpoint allows a user to change their current password.
@@ -206,15 +206,15 @@ router.post('/reset-password/user/:token', resetPasswordSchema, resetUserPasswor
  *             currentPassword:
  *               type: string
  *               format: password
- *               example: "OldPassword123"
+ *               example: "Ade&20br"
  *             newPassword:
  *               type: string
  *               format: password
- *               example: "NewPassword123"
+ *               example: "Ade&20br1"
  *             confirmPassword:
  *               type: string
  *               format: password
- *               example: "NewPassword123"
+ *               example: "Ade&20br1"
  *     responses:
  *       200:
  *         description: Password changed successfully
@@ -227,7 +227,7 @@ router.post('/change/password/user/:id', authenticate, changeUserPasswordSchema,
 
 /**
  * @swagger
- * /logout:
+ * /api/v1/logout:
  *   post:
  *     summary: Logout a user
  *     description: This endpoint allows a user to log out from their session.
@@ -241,7 +241,7 @@ router.post('/logout', authenticate, logOut);
 
 /**
  * @swagger
- * /update/user/{id}:
+ * /api/v1/update/user/{id}:
  *   put:
  *     summary: Update user details
  *     description: This endpoint allows an event planner to update their details.
@@ -264,14 +264,14 @@ router.post('/logout', authenticate, logOut);
  *             email:
  *               type: string
  *               format: email
- *               example: "john.doe@example.com"
+ *               example: "zatoloye@gmail.com"
  *             phoneNo:
  *               type: string
- *               example: "1234567890"
+ *               example: "9123456789"
  *             password:
  *               type: string
  *               format: password
- *               example: "UpdatedPassword123"
+ *               example: "Ade&20br1"
  *     responses:
  *       200:
  *         description: User details updated successfully
@@ -284,7 +284,7 @@ router.put('/update/user/:id', updateEventPlanner);
 
 /**
  * @swagger
- * /delete/user/{id}:
+ * /api/v1/delete/user/{id}:
  *   delete:
  *     summary: Delete a user
  *     description: This endpoint allows an admin to delete a user from the system.
