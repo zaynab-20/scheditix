@@ -6,7 +6,7 @@ const { send_mail } = require("../middleware/nodemailer");
 
 exports.registerUser = async (req, res) => {
   try {
-    const { fullname, email, password, role, phoneNo, confirmPassword } =
+    const { fullname, email, password, phoneNo, confirmPassword } =
       req.body;
     const full_name = fullname.split(" ");
     const nameFormat = full_name
@@ -40,7 +40,6 @@ exports.registerUser = async (req, res) => {
       phoneNo: "234" + phoneNo,
       password: hashedPassword,
       confirmPassword: hashedPassword,
-      role: req.body.role || "Event Planner",
     });
 
     const token = jwt.sign({ eventPlannerId: eventPlanner._id }, process.env.JWT_SECRET, {

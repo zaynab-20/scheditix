@@ -5,53 +5,47 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/tickets/create/ticket/{eventId}:
+ * /api/v1/create/ticket/{eventId}:
  *   post:
- *     summary: Create a new ticket for an event
- *     description: This endpoint allows the creation of a new ticket for a specific event.
+ *     summary: Create a ticket for an event
+ *     description: Generates a ticket for a specific event if one doesn't already exist.
+ *     tags:
+ *       - Ticket Management
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: eventId
- *         description: ID of the event for which the ticket is being created
- *         required: true
- *         type: string
- *       - in: body
- *         name: ticket
- *         description: Ticket creation details
  *         required: true
  *         schema:
- *           type: object
- *           required:
- *             - totalTicketNumber
- *             - ticketType
- *             - ticketPrice
- *           properties:
- *             totalTicketNumber:
- *               type: integer
- *               example: 100
- *             ticketType:
- *               type: string
- *               example: "VIP"
- *             ticketPrice:
- *               type: number
- *               format: float
- *               example: 50.00
+ *           type: string
+ *         description: The ID of the event to create a ticket for
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               totalTicketNumber:
+ *                 type: integer
+ *                 example: 200
+ *               ticketType:
+ *                 type: string
+ *                 example: "VIP"
+ *               ticketPrice:
+ *                 type: number
+ *                 format: float
+ *                 example: 5000
  *     responses:
  *       201:
  *         description: Ticket created successfully
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *             data:
- *               $ref: "#/definitions/Ticket"
  *       400:
- *         description: Ticket already exists
+ *         description: Ticket already exists or invalid input
  *       404:
  *         description: Event not found
  *       500:
- *         description: Internal Server Error
+ *         description: Error creating ticket
  */
 router.post('/create/ticket/:eventId', validateTicket, createTicket);
 
@@ -60,29 +54,23 @@ router.post('/create/ticket/:eventId', validateTicket, createTicket);
  * /api/v1/tickets/{eventId}:
  *   get:
  *     summary: Get all tickets for an event
- *     description: Retrieves all tickets for a specific event.
+ *     description: Retrieve all tickets that belong to a specific event.
+ *     tags:
+ *       - Ticket Management
  *     parameters:
  *       - in: path
  *         name: eventId
- *         description: ID of the event
  *         required: true
- *         type: string
+ *         schema:
+ *           type: string
+ *         description: The ID of the event
  *     responses:
  *       200:
- *         description: List of tickets retrieved successfully
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *             data:
- *               type: array
- *               items:
- *                 $ref: "#/definitions/Ticket"
+ *         description: Tickets retrieved successfully
  *       404:
  *         description: No tickets found for this event
  *       500:
- *         description: Internal Server Error
+ *         description: Error retrieving tickets
  */
 router.get('/tickets/:eventId', getAllTickets);
 
@@ -90,76 +78,68 @@ router.get('/tickets/:eventId', getAllTickets);
  * @swagger
  * /api/v1/ticket/{ticketId}:
  *   get:
- *     summary: Get a specific ticket by ID
- *     description: Retrieves a ticket by its unique ID.
+ *     summary: Get ticket by ID
+ *     description: Retrieve a specific ticket by its unique ID.
+ *     tags:
+ *       - Ticket Management
  *     parameters:
  *       - in: path
  *         name: ticketId
- *         description: ID of the ticket
  *         required: true
- *         type: string
+ *         schema:
+ *           type: string
+ *         description: The ID of the ticket
  *     responses:
  *       200:
  *         description: Ticket retrieved successfully
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *             data:
- *               $ref: "#/definitions/Ticket"
  *       404:
  *         description: Ticket not found
  *       500:
- *         description: Internal Server Error
+ *         description: Error retrieving ticket
  */
 router.get('/ticket/:ticketId', getTicketById);
 
 /**
  * @swagger
  * /api/v1/ticket/{ticketId}:
- *   put:
+ *   patch:
  *     summary: Update a ticket
- *     description: Update an existing ticket by its ID (except for the check-in code).
+ *     description: Update ticket details excluding the check-in code.
+ *     tags:
+ *       - Ticket Management
  *     parameters:
  *       - in: path
  *         name: ticketId
- *         description: ID of the ticket to update
- *         required: true
- *         type: string
- *       - in: body
- *         name: ticket
- *         description: Updated ticket details
  *         required: true
  *         schema:
- *           type: object
- *           properties:
- *             totalTicketNumber:
- *               type: integer
- *               example: 150
- *             ticketType:
- *               type: string
- *               example: "Regular"
- *             ticketPrice:
- *               type: number
- *               format: float
- *               example: 30.00
+ *           type: string
+ *         description: The ID of the ticket to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               totalTicketNumber:
+ *                 type: integer
+ *                 example: 300
+ *               ticketType:
+ *                 type: string
+ *                 example: "Regular"
+ *               ticketPrice:
+ *                 type: number
+ *                 format: float
+ *                 example: 3000
  *     responses:
  *       200:
  *         description: Ticket updated successfully
- *         schema:
- *           type: object
- *           properties:
- *             message:
- *               type: string
- *             data:
- *               $ref: "#/definitions/Ticket"
  *       400:
- *         description: Cannot update checkInCode
+ *         description: Invalid update (e.g. checkInCode modification)
  *       404:
  *         description: Ticket not found
  *       500:
- *         description: Internal Server Error
+ *         description: Error updating ticket
  */
 router.put('/ticket/:ticketId', validateTicket, updateTicket);
 
@@ -169,19 +149,22 @@ router.put('/ticket/:ticketId', validateTicket, updateTicket);
  *   delete:
  *     summary: Delete a ticket
  *     description: Delete a ticket by its unique ID.
+ *     tags:
+ *       - Ticket Management
  *     parameters:
  *       - in: path
  *         name: ticketId
- *         description: ID of the ticket to delete
  *         required: true
- *         type: string
+ *         schema:
+ *           type: string
+ *         description: The ID of the ticket to delete
  *     responses:
  *       200:
  *         description: Ticket deleted successfully
  *       404:
  *         description: Ticket not found
  *       500:
- *         description: Internal Server Error
+ *         description: Error deleting ticket
  */
 router.delete('/ticket/:ticketId', deleteTicket);
 

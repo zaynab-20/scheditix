@@ -8,234 +8,209 @@ const router = require('express').Router()
  * @swagger
  * /api/v1/register/User:
  *   post:
+ *     summary: Register a new user
+ *     description: Registers a new event planner with the provided details.
  *     tags:
  *       - Users
- *     summary: Register a new user
- *     description: This endpoint allows a new user to register with their personal details.
- *     parameters:
- *       - in: body
- *         name: user
- *         description: User registration details
- *         required: true
- *         schema:
- *           type: object
- *           required:
- *             - fullname
- *             - email
- *             - password
- *             - phoneNo
- *             - confirmPassword
- *           properties:
- *             fullname:
- *               type: string
- *               example: "John Doe"
- *             email:
- *               type: string
- *               format: email
- *               example: "zatoloye@gmail.com"
- *             password:
- *               type: string
- *               format: password
- *               example: "Ade&20b"
- *             confirmPassword:
- *               type: string
- *               format: password
- *               example: "Ade&20b"
- *             phoneNo:
- *               type: string
- *               example: "9123456789"
- *             role:
- *               type: string
- *               example: "Event Planner"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *                 example: "John Doe"
+ *               email:
+ *                 type: string
+ *                 example: "johndoe@sample.com"
+ *               phoneNo:
+ *                 type: string
+ *                 example: "8123456789"
+ *               password:
+ *                 type: string
+ *                 example: "StrongPass123"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "StrongPass123"
  *     responses:
  *       201:
- *         description: User registered successfully
+ *         description: Account registered successfully
  *       400:
- *         description: Bad Request
+ *         description: Bad request, invalid input or email already exists
  *       500:
  *         description: Internal Server Error
  */
-router.post('/register/User', registerSchema, registerUser);
+router.post("/register/User", registerSchema, registerUser);
 
 /**
  * @swagger
  * /api/v1/verify/user/{token}:
  *   get:
+ *     summary: Verify user account
+ *     description: Verifies a user's email using the provided token.
  *     tags:
  *       - Users
- *     summary: Verify a user's email
- *     description: This endpoint is used to verify a user's email address with a token sent during registration.
  *     parameters:
  *       - in: path
  *         name: token
- *         description: Token for verification
  *         required: true
- *         type: string
+ *         schema:
+ *           type: string
+ *         description: JWT token for user verification
  *     responses:
  *       200:
  *         description: Account verified successfully
  *       400:
- *         description: Bad Request
+ *         description: Invalid or expired token
  *       404:
  *         description: Account not found
+ *       500:
+ *         description: Internal Server Error
  */
-router.get('/verify/user/:token', verifyUser);
+router.get("/verify/user/:token", verifyUser);
 
 /**
  * @swagger
  * /api/v1/login/user:
  *   post:
+ *     summary: Log in a user
+ *     description: Logs in a user with valid email and password.
  *     tags:
  *       - Users
- *     summary: Login a user
- *     description: This endpoint allows a user to log in using their email and password.
- *     parameters:
- *       - in: body
- *         name: user
- *         description: User login credentials
- *         required: true
- *         schema:
- *           type: object
- *           required:
- *             - email
- *             - password
- *           properties:
- *             email:
- *               type: string
- *               format: email
- *               example: "zatoloye@gmail.com"
- *             password:
- *               type: string
- *               format: password
- *               example: "Ade&20b"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "johndoe@gmail.com"
+ *               password:
+ *                 type: string
+ *                 example: "StrongPass123"
  *     responses:
  *       200:
  *         description: Login successful
  *       400:
- *         description: Bad Request
- *       404:
- *         description: Account not found
+ *         description: Invalid email or password
+ *       500:
+ *         description: Internal Server Error
  */
-router.post('/login/user', loginSchema, logInUser);
-
+router.post("/login/user", loginSchema, logInUser);
 /**
  * @swagger
  * /api/v1/forgot-password/user:
  *   post:
+ *     summary: Request password reset
+ *     description: Sends a password reset link to the user's email.
  *     tags:
  *       - Users
- *     summary: Forgot password
- *     description: This endpoint sends a password reset link to the user's email.
- *     parameters:
- *       - in: body
- *         name: user
- *         description: User's email to receive reset link
- *         required: true
- *         schema:
- *           type: object
- *           required:
- *             - email
- *           properties:
- *             email:
- *               type: string
- *               format: email
- *               example: "zatoloye@gmail.com"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: "johndoe@example.com"
  *     responses:
  *       200:
- *         description: Reset password link sent successfully
+ *         description: Password reset link sent successfully
  *       404:
  *         description: Account not found
+ *       500:
+ *         description: Internal Server Error
  */
-router.post('/forgot-password/user', forgotPasswordSchema, forgotUserPassword);
+router.post("/forgot-password/user", forgotPasswordSchema, forgotUserPassword);
 
 /**
  * @swagger
  * /api/v1/reset-password/user/{token}:
  *   post:
+ *     summary: Reset user password
+ *     description: Resets a user's password using a valid reset token.
  *     tags:
  *       - Users
- *     summary: Reset password
- *     description: This endpoint allows a user to reset their password using a valid token.
  *     parameters:
  *       - in: path
  *         name: token
- *         description: Token for resetting password
- *         required: true
- *         type: string
- *       - in: body
- *         name: passwords
- *         description: New password details
  *         required: true
  *         schema:
- *           type: object
- *           required:
- *             - newPassword
- *             - confirmPassword
- *           properties:
- *             newPassword:
- *               type: string
- *               format: password
- *               example: "Ade&20br"
- *             confirmPassword:
- *               type: string
- *               format: password
- *               example: "Ade&20br"
- *     responses:
- *       200:
- *         description: Password reset successfully
- *       400:
- *         description: Passwords do not match
- *       404:
- *         description: User not found
- */
-router.post('/reset-password/user/:token', resetPasswordSchema, resetUserPassword);
-
-/**
- * @swagger
- * /api/v1/change/password/user/{id}:
- *   post:
- *     tags:
- *       - Users
- *     summary: Change user password
- *     description: This endpoint allows a user to change their current password.
- *     parameters:
- *       - in: path
- *         name: id
- *         description: User's ID
- *         required: true
- *         type: string
- *       - in: body
- *         name: passwords
- *         description: User's current password and new password
- *         required: true
- *         schema:
- *           type: object
- *           required:
- *             - currentPassword
- *             - newPassword
- *             - confirmPassword
- *           properties:
- *             currentPassword:
- *               type: string
- *               format: password
- *               example: "Ade&20br"
- *             newPassword:
- *               type: string
- *               format: password
- *               example: "Ade&20br1"
- *             confirmPassword:
- *               type: string
- *               format: password
- *               example: "Ade&20br1"
+ *           type: string
+ *         description: JWT token for password reset
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               newPassword:
+ *                 type: string
+ *                 example: "NewStrongPass123"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "NewStrongPass123"
  *     responses:
  *       200:
  *         description: Password changed successfully
  *       400:
- *         description: Incorrect password or passwords do not match
+ *         description: Invalid or expired token, or passwords do not match
  *       404:
- *         description: User not found
+ *         description: Account not found
+ *       500:
+ *         description: Internal Server Error
  */
-router.post('/change/password/user/:id', authenticate, changeUserPasswordSchema, changeUserPassword);
+router.post("/reset-password/user/:token", resetPasswordSchema, resetUserPassword);
+
+/**
+ * @swagger
+ * /api/v1/change-password/user/{id}:
+ *   post:
+ *     summary: Change user password
+ *     description: Changes a user's password after verifying their current password.
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID for password change
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               currentPassword:
+ *                 type: string
+ *                 example: "OldPass123"
+ *               newPassword:
+ *                 type: string
+ *                 example: "NewStrongPass123"
+ *               confirmPassword:
+ *                 type: string
+ *                 example: "NewStrongPass123"
+ *     responses:
+ *       200:
+ *         description: Password changed successfully
+ *       400:
+ *         description: Incorrect current password or passwords do not match
+ *       404:
+ *         description: Account not found
+ *       500:
+ *         description: Internal Server Error
+ */
+router.post("/change-password/user/:id", changeUserPasswordSchema, changeUserPassword);
 
 /**
  * @swagger
