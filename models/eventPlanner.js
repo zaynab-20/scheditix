@@ -3,18 +3,19 @@ const eventPlannerSchema = mongoose.Schema({
   fullname: {
    type: String,
    required: true,
-   lowercase: true,
-    unique: true
+   trim: true
   },
   email: {
     type: String,
     required: true,
-    lowercase: true
+    lowercase: true,
+    trim: true
   },
   phoneNo: {
     type: String,
     required: true,
-    unique: true
+    unique: true,
+    trim: true
   },
   password: {
     type: String,
