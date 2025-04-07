@@ -182,7 +182,7 @@ router.put('/update/event/:id', authenticate, upload.array('image'), validateEve
 
 /**
  * @swagger
- * api/v1/delete/event/{eventId}:
+ * /api/v1/delete/event/{eventId}:
  *   delete:
  *     summary: Delete an event
  *     description: Deletes an event and its associated images from the database and Cloudinary.
