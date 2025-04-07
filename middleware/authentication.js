@@ -26,7 +26,7 @@ exports.authenticate = async (req, res, next) => {
       return res.status(401).json({message: 'Unauthorized'})
     }
     req.user = {
-      userId: user._id,
+      eventPlannerId: eventPlanner._id,
       isAdmin: user.isAdmin,
       isLoggedIn: user.isLoggedIn
     };  
