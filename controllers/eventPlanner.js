@@ -6,15 +6,11 @@ const { send_mail } = require("../middleware/nodemailer");
 
 exports.registerUser = async (req, res) => {
   try {
-    const { fullname, email, password, phoneNo, confirmPassword } =
-      req.body;
-    const full_name = fullname.split(" ");
-    const nameFormat = full_name
-      .map((e) => {
+    const { fullname, email, password, phoneNo, confirmPassword } = req.body;
+    const full_name = fullname.split(" ").map((e) => {
         return e.slice(0, 1).toUpperCase() + e.slice(1).toLowerCase();
-      })
-      .join(" ");
-
+      }).join(" ");
+      
     if (password !== confirmPassword) {
       return res.status(400).json({
         message: "Password does not match",
@@ -24,7 +20,6 @@ exports.registerUser = async (req, res) => {
     const existingEmail = await eventPlannerModel.findOne({
       email: email.toLowerCase(),
     });
-    console.log(existingEmail);
     if (existingEmail) {
       return res.status(400).json({
         message: `${email.toLowerCase()} already exist`,
@@ -34,17 +29,23 @@ exports.registerUser = async (req, res) => {
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
 
-    const eventPlanner = await new eventPlannerModel({
-      fullname: nameFormat,
+    const eventPlanner = new eventPlannerModel({
+      fullname: full_name,
       email,
       phoneNo: "234" + phoneNo,
       password: hashedPassword,
       confirmPassword: hashedPassword,
     });
+    console.log('check ',eventPlanner);
+    
 
-    const token = jwt.sign({ eventPlannerId: eventPlanner._id }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
+    const token = jwt.sign(
+      { eventPlannerId: eventPlanner._id },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "1h",
+      }
+    );
     const link = `${req.protocol}://${req.get(
       "host"
     )}/api/v1/verify/user/${token}`;
@@ -66,7 +67,7 @@ exports.registerUser = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: "internal Server Error " + error.message,
+      message: "internal Server Error ",
     });
   }
 };
@@ -121,7 +122,9 @@ exports.verifyUser = async (req, res) => {
           });
         }
       } else {
-        const eventPlanner = await eventPlannerModel.findById(payload.eventPlannerId);
+        const eventPlanner = await eventPlannerModel.findById(
+          payload.eventPlannerId
+        );
 
         if (!eventPlanner) {
           return res.status(404).json({
@@ -273,7 +276,7 @@ exports.forgotUserPassword = async (req, res) => {
     });
     const link = `${req.protocol}://${req.get(
       "host"
-    )}/api/v1/reset-password/user/${token}`; 
+    )}/api/v1/reset-password/user/${token}`;
     const firstName = user.fullname.split(" ")[0];
 
     const mailOptions = {
@@ -415,12 +418,13 @@ exports.getAllUser = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "Successfully Getting All EventPlanners", 
-      data: eventPlanners 
-    });
+      .json({
+        message: "Successfully Getting All EventPlanners",
+        data: eventPlanners,
+      });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "internal server error:" + error.message});
+    res.status(500).json({ message: "internal server error:" + error.message });
   }
 };
 
@@ -436,68 +440,75 @@ exports.getOneUser = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: `kindly find the eventPlanner below`, data: eventPlanner });
+      .json({
+        message: `kindly find the eventPlanner below`,
+        data: eventPlanner,
+      });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "internal server error" + error.message });
   }
 };
 
-exports.updateEventPlanner = async (req, res) =>{
+exports.updateEventPlanner = async (req, res) => {
   try {
-      const {eventPlannerId} = req.params
-      const {fullname, email, password, phoneNo  } = req.body
+    const { eventPlannerId } = req.params;
+    const { fullname, email, password, phoneNo } = req.body;
 
-      const eventPlanner = await eventPlannerModel.findById(eventPlannerId)
-      if (!eventPlanner) {
-          return res.status(404).json({
-              message: 'EventPlanner not found'
-          })
-      }
-      const data = {
-          fullname,
-          email,
-          password, 
-          phoneNo 
-      }
-      const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(eventPlannerId, data, {new: true})        
-      res.status(200).json({
-          message: 'EventPlanner updated successfully',
-          data: updateEventPlanner
-      })
+    const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+    if (!eventPlanner) {
+      return res.status(404).json({
+        message: "EventPlanner not found",
+      });
+    }
+    const data = {
+      fullname,
+      email,
+      password,
+      phoneNo,
+    };
+    const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
+      eventPlannerId,
+      data,
+      { new: true }
+    );
+    res.status(200).json({
+      message: "EventPlanner updated successfully",
+      data: updateEventPlanner,
+    });
   } catch (error) {
-      console.log(error.message)
-      res.status(500).json({
-          message: 'internal server error:' + error.message
-      })
+    console.log(error.message);
+    res.status(500).json({
+      message: "internal server error:" + error.message,
+    });
   }
 };
 
-exports.deleteEventPlanner = async (req, res) =>{
+exports.deleteEventPlanner = async (req, res) => {
   try {
-      const {eventPlannerId} = req.params
-      const eventPlanner = eventPlannerModel.findById(eventPlannerId)
-      if (!eventPlanner) {
-          return res.status(404).json({
-              message: 'EventPlanner not found'
-          })
-      }
-      const deleteEventPlanner = await eventPlannerModel.findByIdAndDelete(eventPlannerId)
-      if(!deleteEventPlanner){
-          return res.status(404).json({
-              message: 'EventPlanner has already been deleted'
-          })
-      }
-      res.status(200).json({
-          message: 'EventPlanner deleted successfully',
-          data: deleteEventPlanner
-      })
+    const { eventPlannerId } = req.params;
+    const eventPlanner = eventPlannerModel.findById(eventPlannerId);
+    if (!eventPlanner) {
+      return res.status(404).json({
+        message: "EventPlanner not found",
+      });
+    }
+    const deleteEventPlanner = await eventPlannerModel.findByIdAndDelete(
+      eventPlannerId
+    );
+    if (!deleteEventPlanner) {
+      return res.status(404).json({
+        message: "EventPlanner has already been deleted",
+      });
+    }
+    res.status(200).json({
+      message: "EventPlanner deleted successfully",
+      data: deleteEventPlanner,
+    });
   } catch (error) {
-      console.log(error.message)        
-      res.status(500).json({
-          message: 'Internal server error:' + error.message
-      })
+    console.log(error.message);
+    res.status(500).json({
+      message: "Internal server error:" + error.message,
+    });
   }
 };
-
-
