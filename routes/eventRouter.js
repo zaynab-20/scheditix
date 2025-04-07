@@ -1,4 +1,4 @@
-const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent} = require('../controllers/eventController');
+const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents} = require('../controllers/eventController');
 const {validateEvent} = require('../middleware/validation');
 const { authenticate } = require('../middleware/authentication');
 const upload = require('../utils/multer');
@@ -204,5 +204,21 @@ router.put('/update/event/:id', authenticate, upload.array('image'), validateEve
  *         description: Internal Server Error
  */
 router.delete('/delete/event/:id', authenticate, deleteEvent);
+
+/**
+ * @swagger
+ * /api/v1/event/recent:
+ *   get:
+ *     summary: Get recent events
+ *     description: Retrieves the 10 most recent events sorted by start date and includes status, ticket sales, revenue, and check-in data.
+ *     tags:
+ *       - Event Management
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved recent events
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/event/recent',getRecentEvents)
 
 module.exports = router;
