@@ -33,7 +33,7 @@ exports.createEvent = async (req, res) => {
           imagePublicId: result.public_id,
         }
         image.push(imagePath)
-      }
+      } 
       
     }
 
