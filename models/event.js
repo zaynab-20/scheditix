@@ -14,6 +14,7 @@ const eventSchema = new mongoose.Schema({
     type: String, 
     require: true
   },
+
   eventLocation: {
     type: String,
     require:true
@@ -42,6 +43,10 @@ const eventSchema = new mongoose.Schema({
     type: String,
     require:true
   },
+  category: [{ 
+    type: mongoose.SchemaTypes.ObjectId, 
+    ref: 'category' 
+}],
   image: [{
     imageUrl: {
       type: String,
@@ -52,10 +57,13 @@ const eventSchema = new mongoose.Schema({
       require: true
     }
   }],
+createdBy:{
   eventPlannerId: {
     type:mongoose.SchemaTypes.ObjectId,
-    ref: 'eventPlanners',
+    ref: 'eventPlanner',
+    required:true
   },
+},
   totalTableNumber: {
     type: Number,
     require: true

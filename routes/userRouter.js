@@ -45,7 +45,7 @@ const router = require('express').Router()
 router.post("/register/User", registerSchema, registerUser);
 
 /**
- * @swagger
+ * @swagger 
  * /api/v1/verify/user/{token}:
  *   get:
  *     summary: Verify user account
