@@ -24,7 +24,7 @@ const router = require('express').Router()
  *                 example: "John Doe"
  *               email:
  *                 type: string
- *                 example: "johndoe@sample.com"
+ *                 example: "johndoe@gmail.com"
  *               phoneNo:
  *                 type: string
  *                 example: "8123456789"
