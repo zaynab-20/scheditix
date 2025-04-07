@@ -33,7 +33,7 @@ exports.createEvent = async (req, res) => {
           imagePublicId: result.public_id,
         }
         image.push(imagePath)
-      } 
+      }
       
     }
 
@@ -53,13 +53,6 @@ exports.createEvent = async (req, res) => {
       image: image
     });
     await event.save();
-
-    // const sharableLink = `${req.protocol}://${req.get(
-    //   "host"
-    // )}/api/v1/event/${eventCategory}/${eventId}`;
-    // event.sharableLink = sharableLink;
-    // await event.save();
-
     res
       .status(201)
       .json({ message: "Event Created Successfully", data: event });
@@ -130,13 +123,6 @@ exports.updateEvent = async (req, res) => {
       totalSeatNumber
     };
 
-    // If the event type or sharable link should be updated, include it
-    // if (req.body.eventCategory) {
-    //   data.sharableLink = `${req.protocol}://${req.get(
-    //     "host"
-    //   )}/api/v1/event/${eventCategory}/${eventId}`;
-    // }
-
     if(req.files && req.file[0]){
       for(const image of event.images){
         await cloudinary.uploader.destroy(image.imagePublicId)
@@ -167,6 +153,49 @@ exports.updateEvent = async (req, res) => {
     res
       .status(500)
       .json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+
+exports.getRecentEvents = async (req, res) => {
+  try {
+    // Get current date
+    const currentDate = new Date();
+
+    const events = await eventModel.find()
+      .sort({ startDate: -1 }) 
+      .limit(10);
+
+    const recentEvents = events.map(event => {
+      let status;
+      if (new Date(event.endDate) < currentDate) {
+        status = 'completed';
+      } else if (new Date(event.startDate) <= currentDate && new Date(event.endDate) >= currentDate) {
+        status = 'ongoing';
+      } else {
+        status = 'upcoming';
+      }
+
+      return {
+        eventName: event.eventTitle,
+        ticketSold: `${event.ticketSold || 0}/${event.totalTicketNumber || 0}`, 
+        totalAttendee: event.totalAttendee || 0, 
+        revenueGenerated: event.revenueGenerated || 0, 
+        checkins: event.checkins || 0, 
+        status: status
+      };
+    });
+
+    res.status(200).json({
+      message: "Successfully retrieved recent events",
+      data: recentEvents
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ 
+      message: "Internal Server Error",
+      error: error.message 
+    });
   }
 };
 

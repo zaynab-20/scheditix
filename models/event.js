@@ -72,8 +72,26 @@ createdBy:{
     type: Number,
     require: true
   },
-  sharableLink: {
-    type: String
+  ticketSold: { 
+    type: Number, 
+    default: 0 
+  },
+  totalAttendee: { 
+    type: Number, 
+    default: 0 
+  },
+  revenueGenerated: { 
+    type: Number, 
+    default: 0 
+  },
+  checkins: { 
+    type: Number, 
+    default: 0 
+  },
+  status: { 
+    type: String, 
+    enum: ['upcoming', 'ongoing', 'completed'], 
+    default: 'upcoming' 
   }
 },{
   timestamps: true
