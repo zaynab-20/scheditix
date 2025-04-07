@@ -1,4 +1,4 @@
-const userModel = require("../models/eventPlanner");
+const eventPlannerModel = require("../models/eventPlanner");
 const jwt = require("jsonwebtoken");
 
 exports.authenticate = async (req, res, next) => {
@@ -16,7 +16,7 @@ exports.authenticate = async (req, res, next) => {
       });
     }
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await userModel.findById(decodedToken.userId);
+    const user = await eventPlannerModel.findById(decodedToken.userId);
     if (!user) {
       return res.status(404).json({
         message: "Authentication Failed: User not found",
@@ -27,7 +27,6 @@ exports.authenticate = async (req, res, next) => {
     }
     req.user = {
       userId: user._id,
-      role: user.role,
       isAdmin: user.isAdmin,
       isLoggedIn: user.isLoggedIn
     };  
@@ -64,7 +63,7 @@ exports.adminAuth = async (req, res, next) => {
     }
 
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await userModel.findById(decodedToken.userId);
+    const user = await eventPlannerModel.findById(decodedToken.userId);
     if (!user) {
       return res.status(404).json({
         message: "Authentication Failed: User not found",
