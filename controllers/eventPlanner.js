@@ -194,7 +194,7 @@ exports.logInUser = async (req, res) => {
 
     if (user.isVerified === false) {
       const token = jwt.sign(
-        { userId: user._id, isLoggedIn: user.isLoggedIn, role: user.role },
+        { eventPlannerId: eventPlanner._id, isLoggedIn: eventPlanner.isLoggedIn},
         process.env.JWT_SECRET,
         {
           expiresIn: "5mins",
@@ -219,7 +219,7 @@ exports.logInUser = async (req, res) => {
 
     user.isLoggedIn = true;
     const token = jwt.sign(
-      { userId: user._id, isLoggedIn: user.isLoggedIn },
+      { eventPlannerId: eventPlanner._id, isLoggedIn: eventPlanner.isLoggedIn },
       process.env.JWT_SECRET,
       { expiresIn: "1day" }
     );
