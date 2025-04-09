@@ -7,7 +7,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/create/event:
+ * /api/v1/create/event/{categoryNameId}:
  *   post:
  *     summary: Create a new event
  *     description: Allows an authenticated user to create a new event, including uploading images.
@@ -15,6 +15,13 @@ const router = express.Router();
  *       - Event Management
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: categoryNameId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the category to which the event belongs
  *     requestBody:
  *       required: true
  *       content:
@@ -28,9 +35,6 @@ const router = express.Router();
  *               eventDescription:
  *                 type: string
  *                 example: "A gathering of tech enthusiasts to explore emerging trends."
- *               eventCategory:
- *                 type: string
- *                 example: "Technology"
  *               eventLocation:
  *                 type: string
  *                 example: "Lagos, Nigeria"
@@ -67,6 +71,7 @@ const router = express.Router();
  *                 items:
  *                   type: string
  *                   format: binary
+ *                   description: Upload one or more event images
  *     responses:
  *       201:
  *         description: Event created successfully
@@ -75,13 +80,14 @@ const router = express.Router();
  *       500:
  *         description: Internal Server Error
  */
-router.post("/create/event", authenticate, upload.array('image'), validateEvent, createEvent);
+router.post("/create/event/:categoryNameId", authenticate, upload.array('image'), validateEvent, createEvent);
+
 /**
  * @swagger
  * /api/v1/event/{eventId}:
  *   get:
- *     summary: Get one event
- *     description: Retrieves the details of a specific event by ID.
+ *     summary: Retrieve a single event by its ID
+ *     description: Fetches the details of a specific event, including its category name.
  *     tags:
  *       - Event Management
  *     parameters:
@@ -93,7 +99,18 @@ router.post("/create/event", authenticate, upload.array('image'), validateEvent,
  *         description: The ID of the event to retrieve
  *     responses:
  *       200:
- *         description: Event found and returned successfully
+ *         description: Event retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Kindly find the event below"
+ *                 data:
+ *                   type: object
+ *                   description: The event details
  *       404:
  *         description: Event not found
  *       500:
@@ -101,17 +118,31 @@ router.post("/create/event", authenticate, upload.array('image'), validateEvent,
  */
 router.get("/event/:eventId", getOneEvent);
 
+
 /**
  * @swagger
  * /api/v1/events:
  *   get:
- *     summary: Get all events
- *     description: Retrieves a list of all available events.
+ *     summary: Retrieve all events
+ *     description: Fetches a list of all events, including their associated category name.
  *     tags:
  *       - Event Management
  *     responses:
  *       200:
- *         description: Events retrieved successfully
+ *         description: Successfully retrieved all events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Successfully Getting All Events"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     description: Event details
  *       500:
  *         description: Internal Server Error
  */
@@ -119,10 +150,10 @@ router.get("/events", getAllEvent);
 
 /**
  * @swagger
- * /api/v1/update/event/{eventId}:
- *   patch:
- *     summary: Update an event
- *     description: Updates an existing event and replaces images if new ones are uploaded.
+ * /api/v1/update/event/{eventId}/{categoryNameId}:
+ *   put:
+ *     summary: Update an existing event
+ *     description: Allows an authenticated user to update an event, including modifying its details and uploading new images.
  *     tags:
  *       - Event Management
  *     security:
@@ -133,9 +164,15 @@ router.get("/events", getAllEvent);
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the event to update
+ *         description: The ID of the event to be updated
+ *       - in: path
+ *         name: categoryNameId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the category to update the event with
  *     requestBody:
- *       required: false
+ *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
@@ -143,28 +180,33 @@ router.get("/events", getAllEvent);
  *             properties:
  *               eventTitle:
  *                 type: string
+ *                 example: "Tech Summit 2025"
  *               eventDescription:
  *                 type: string
- *               eventCategory:
- *                 type: string
+ *                 example: "A gathering of tech enthusiasts to explore emerging trends."
  *               eventLocation:
  *                 type: string
+ *                 example: "Lagos, Nigeria"
  *               startTime:
  *                 type: string
+ *                 format: time
+ *                 example: "09:00"
  *               endTime:
  *                 type: string
+ *                 format: time
+ *                 example: "17:00"
  *               eventAgenda:
  *                 type: string
+ *                 example: "Talks, Panels, Networking"
  *               eventRule:
  *                 type: string
- *               startDate:
- *                 type: string
- *               endDate:
- *                 type: string
+ *                 example: "No refunds after registration."
  *               totalTableNumber:
  *                 type: integer
+ *                 example: 50
  *               totalSeatNumber:
  *                 type: integer
+ *                 example: 300
  *               image:
  *                 type: array
  *                 items:
@@ -173,52 +215,118 @@ router.get("/events", getAllEvent);
  *     responses:
  *       200:
  *         description: Event updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event Updated Successfully"
+ *                 data:
+ *                   type: object
+ *                   description: Updated event details
+ *       400:
+ *         description: Bad request, invalid input
  *       404:
  *         description: Event not found
  *       500:
  *         description: Internal Server Error
  */
-router.put('/update/event/:id', authenticate, upload.array('image'), validateEvent, updateEvent);
+router.put("/update/event/:eventId/:categoryNameId", authenticate, upload.array('image'), updateEvent);
+
 
 /**
  * @swagger
  * /api/v1/delete/event/{eventId}:
  *   delete:
  *     summary: Delete an event
- *     description: Deletes an event and its associated images from the database and Cloudinary.
+ *     description: Allows an authenticated user to delete an event by its ID, including its associated images.
  *     tags:
  *       - Event Management
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: eventId
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the event to delete
+ *         description: The ID of the event to be deleted
  *     responses:
  *       200:
  *         description: Event deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event deleted successfully"
+ *                 data:
+ *                   type: object
+ *                   description: Deleted event details
  *       404:
  *         description: Event not found
  *       500:
  *         description: Internal Server Error
  */
-router.delete('/delete/event/:id', authenticate, deleteEvent);
+router.delete("/delete/event/:eventId", authenticate, deleteEvent);
+
 
 /**
  * @swagger
- * /api/v1/event/recent:
+ * /api/v1/recent/events:
  *   get:
- *     summary: Get recent events
- *     description: Retrieves the 10 most recent events sorted by start date and includes status, ticket sales, revenue, and check-in data.
+ *     summary: Get the most recent events
+ *     description: Retrieves the most recent events, including their status (upcoming, ongoing, completed), ticket sold, total attendees, revenue generated, and check-ins.
  *     tags:
  *       - Event Management
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully retrieved recent events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Successfully retrieved recent events"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       eventName:
+ *                         type: string
+ *                         example: "Tech Summit 2025"
+ *                       ticketSold:
+ *                         type: string
+ *                         example: "150/300"
+ *                       totalAttendee:
+ *                         type: integer
+ *                         example: 150
+ *                       revenueGenerated:
+ *                         type: number
+ *                         format: float
+ *                         example: 500000
+ *                       checkins:
+ *                         type: integer
+ *                         example: 100
+ *                       status:
+ *                         type: string
+ *                         enum: [upcoming, ongoing, completed]
+ *                         example: "ongoing"
+ *                       eventCategory:
+ *                         type: string
+ *                         example: "Technology"
  *       500:
  *         description: Internal Server Error
  */
-router.get('/event/recent',getRecentEvents)
+router.get("/recent/events", authenticate, getRecentEvents);
 
 module.exports = router;

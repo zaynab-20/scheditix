@@ -1,4 +1,3 @@
-const { string } = require('joi');
 const mongoose = require('mongoose')
 
 const eventSchema = new mongoose.Schema({
@@ -10,11 +9,11 @@ const eventSchema = new mongoose.Schema({
     type: String,
     require:true
   },
-  eventCategory: {
-    type: String, 
-    require: true
-  },
-
+  eventCategory: [{ 
+    type: mongoose.SchemaTypes.ObjectId, 
+    ref: 'EventCategories',
+    require: true 
+  }],
   eventLocation: {
     type: String,
     require:true
@@ -43,10 +42,6 @@ const eventSchema = new mongoose.Schema({
     type: String,
     require:true
   },
-  category: [{ 
-    type: mongoose.SchemaTypes.ObjectId, 
-    ref: 'category' 
-  }],
   image: [{
     imageUrl: {
       type: String,
@@ -57,13 +52,13 @@ const eventSchema = new mongoose.Schema({
       require: true
     }
   }],
-createdBy:{
+// createdBy:{
   eventPlannerId: {
     type:mongoose.SchemaTypes.ObjectId,
     ref: 'eventPlanner',
     required:true
   },
-},
+// },
   totalTableNumber: {
     type: Number,
     require: true
