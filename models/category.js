@@ -4,13 +4,13 @@ const eventCategorySchema = new mongoose.Schema({
       type:String,
       enum:['wedding','techEvent','birthdayParty','namingCeremony','comedy','getTogether']
     },
-    createdBy: {
-        eventPlannerId: { 
-        type: mongoose.SchemaTypes.ObjectId, 
-        ref: 'eventPlanner', 
-        required: true 
-      }
-    }
+    // createdBy: {
+    //     eventPlannerId: { 
+    //     type: mongoose.SchemaTypes.ObjectId, 
+    //     ref: 'eventPlanner', 
+    //     required: true 
+    //   }
+    // }
 },{ timestamps: true });
 
 const categoryModel = mongoose.model('EventCategories',eventCategorySchema)
