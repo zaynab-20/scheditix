@@ -1,13 +1,14 @@
 const eventModel = require("../models/event");
 const cloudinary = require('../config/cloudinary');
+const categoryModel = require("../models/category")
 const fs = require("fs");
 
 exports.createEvent = async (req, res) => {
   try {
     // const organizerId = req.user.userId;
+    const {categoryNameId} = req.params;
     const {eventTitle,
            eventDescription,
-           eventCategory,
            eventLocation,
            startTime,
            endTime,
@@ -40,7 +41,7 @@ exports.createEvent = async (req, res) => {
     const event = new eventModel({
       eventTitle,
       eventDescription,
-      eventCategory,
+      eventCategory: categoryNameId,
       eventLocation,
       startTime,
       endTime,
@@ -69,7 +70,7 @@ exports.getOneEvent = async (req, res) => {
   try {
     const { eventId } = req.params;
 
-    const event = await eventModel.findById(eventId);
+    const event = await eventModel.findById(eventId).populate('eventCategory','categoryNamr');
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -86,7 +87,7 @@ exports.getOneEvent = async (req, res) => {
 
 exports.getAllEvent = async (req, res) => {
   try {
-    const events = await eventModel.find();
+    const events = await eventModel.find().populate('eventCategory','categoryName');
 
     res
       .status(200)
@@ -100,8 +101,8 @@ exports.getAllEvent = async (req, res) => {
 exports.updateEvent = async (req, res) => {
   try {
     // const organizerId = req.user.userId;
-    const { eventId } = req.params;
-    const {eventTitle,eventDescription,eventCategory,eventLocation,startTime,endTime,eventAgenda,eventRule,totalTableNumber,totalSeatNumber,
+    const { eventId,categoryNameId} = req.params;
+    const {eventTitle,eventDescription,eventLocation,startTime,endTime,eventAgenda,eventRule,totalTableNumber,totalSeatNumber,
     } = req.body;
 
     const event = await eventModel.findById(eventId);
@@ -112,7 +113,7 @@ exports.updateEvent = async (req, res) => {
     const data = {
       eventTitle,
       eventDescription,
-      eventCategory,
+      eventCategory: categoryNameId,
       eventLocation,
       startTime,
       endTime,
@@ -144,7 +145,7 @@ exports.updateEvent = async (req, res) => {
 
     const updatedEvent = await eventModel.findByIdAndUpdate(eventId, data, {
       new: true,
-    });
+    }).populate('eventCategory','categoryName');
 
     res
       .status(200)
@@ -163,7 +164,7 @@ exports.getRecentEvents = async (req, res) => {
     // Get current date
     const currentDate = new Date();
 
-    const events = await eventModel.find()
+    const events = await eventModel.find().populate('eventCategory','categoryName')
       .sort({ startDate: -1 }) 
       .limit(10);
 
@@ -179,11 +180,12 @@ exports.getRecentEvents = async (req, res) => {
 
       return {
         eventName: event.eventTitle,
-        ticketSold: `${event.ticketSold || 0}/${event.totalTicketNumber || 0}`, 
+        ticketSold: `${event.ticketSold || 0}/${event.totalSeatNumber || 0}`, 
         totalAttendee: event.totalAttendee || 0, 
         revenueGenerated: event.revenueGenerated || 0, 
         checkins: event.checkins || 0, 
-        status: status
+        status: status,
+        eventCategory: event.eventCategory.categoryName
       };
     });
 

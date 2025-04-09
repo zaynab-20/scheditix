@@ -1,22 +1,18 @@
 const mongoose = require('mongoose')
-const categorySchema = new mongoose.Schema({
-    category:{
-        type:string,
-        enum:['wedding','techEvent','birthdayParty','namingCeremony','comedy','getTogether']
-    },
-    event: {
-        type: mongoose.SchemaTypes.ObjectId, 
-        ref: 'event',
-        required: true
+const eventCategorySchema = new mongoose.Schema({
+    categoryName:{
+      type:String,
+      enum:['wedding','techEvent','birthdayParty','namingCeremony','comedy','getTogether']
     },
     createdBy: {
         eventPlannerId: { 
-            type: mongoose.SchemaTypes.ObjectId, ref: 'eventPlanner', 
-            required: true 
-        }
+        type: mongoose.SchemaTypes.ObjectId, 
+        ref: 'eventPlanner', 
+        required: true 
+      }
     }
 },{ timestamps: true });
 
-const categoryModel = mongoose.model('categories',categorySchema)
+const categoryModel = mongoose.model('EventCategories',eventCategorySchema)
 
 module.exports = categoryModel
