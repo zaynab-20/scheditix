@@ -202,8 +202,6 @@ router.get('/oneCategory/:id',getOneCategory)
  *     description: Updates the name of an existing event category using its ID.
  *     tags:
  *       - Category Management
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -281,8 +279,6 @@ router.put('/updateCategory/:id',authenticate,updateCategory)
  *     description: Deletes a specific event category by its ID.
  *     tags:
  *       - Category Management
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
@@ -340,6 +336,6 @@ router.put('/updateCategory/:id',authenticate,updateCategory)
  *                   type: string
  *                   example: Cast to ObjectId failed
  */
-router.delete('/deleteCategory',authenticate,deleteCategory)
+router.delete('/deleteCategory/:id',authenticate,deleteCategory)
 
 module.exports = router
