@@ -5,7 +5,7 @@ const router = require('express').Router()
 
 /**
  * @swagger
- * /cate:
+ * /api/v1/category:
  *   post:
  *     summary: Create a new event category
  *     description: Allows an authenticated user to create a new event category.
@@ -75,11 +75,11 @@ const router = require('express').Router()
  *                   type: string
  *                   example: Validation failed
  */
-router.post('/cate',authenticate,createCategory)
+router.post('/category',authenticate,createCategory)
 
 /**
  * @swagger
- * /allCate:
+ * /api/v1/allCategories:
  *   get:
  *     summary: Retrieve all event categories
  *     description: Fetches a list of all available event categories from the database.
@@ -127,11 +127,11 @@ router.post('/cate',authenticate,createCategory)
  *                   type: string
  *                   example: Database connection failed
  */
-router.get('/allCate',getAllCategories)
+router.get('/allCategories',getAllCategories)
 
 /**
  * @swagger
- * /oneCate/{id}:
+ * /api/v1/oneCategory/{id}:
  *   get:
  *     summary: Get a single category by ID
  *     description: Retrieves details of a specific event category using its ID.
@@ -194,11 +194,11 @@ router.get('/allCate',getAllCategories)
  *                   type: string
  *                   example: Cast to ObjectId failed
  */
-router.get('/oneCate/:id',getOneCategory)
+router.get('/oneCategory/:id',getOneCategory)
 
 /**
  * @swagger
- * /updateCate/{id}:
+ * /api/v1/updateCategory/{id}:
  *   put:
  *     summary: Update a category
  *     description: Updates the name of an existing event category using its ID.
@@ -273,11 +273,11 @@ router.get('/oneCate/:id',getOneCategory)
  *                   type: string
  *                   example: Cast to ObjectId failed
  */
-router.put('/updateCate/:id',authenticate,updateCategory)
+router.put('/updateCategory/:id',authenticate,updateCategory)
 
 /**
  * @swagger
- * /delCate/{id}:
+ * /api/v1/deleteCategory/{id}:
  *   delete:
  *     summary: Delete a category
  *     description: Deletes a specific event category by its ID.
@@ -342,6 +342,6 @@ router.put('/updateCate/:id',authenticate,updateCategory)
  *                   type: string
  *                   example: Cast to ObjectId failed
  */
-router.delete('/delCate',authenticate,deleteCategory)
+router.delete('/deleteCategory',authenticate,deleteCategory)
 
 module.exports = router
