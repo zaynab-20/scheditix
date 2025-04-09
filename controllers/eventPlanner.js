@@ -25,6 +25,17 @@ exports.registerUser = async (req, res) => {
         message: `${email.toLowerCase()} already exist`,
       });
     }
+    const existingPhoneNo = await eventPlannerModel.findOne({
+      phoneNo: "234" + phoneNo
+      })
+
+      if (existingPhoneNo) {
+        return res.status(400).json({
+          message: `${phoneNo} already exist`,
+        });
+        
+      }
+
 
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
@@ -36,7 +47,6 @@ exports.registerUser = async (req, res) => {
       password: hashedPassword,
       confirmPassword: hashedPassword,
     });
-    console.log('check ',eventPlanner);
     
 
     const token = jwt.sign(
@@ -174,7 +184,7 @@ exports.logInUser = async (req, res) => {
         message: "Please your password",
       });
     }
-    const eventPlanner = await eventPlannerModel.findOne({
+    const user = await eventPlannerModel.findOne({
       email: email.toLowerCase(),
     });
 
@@ -217,7 +227,7 @@ exports.logInUser = async (req, res) => {
       });
     }
 
-    eventPlanner.isLoggedIn = true;
+    user.isLoggedIn = true;
     const token = jwt.sign(
       { userId: user._id, isLoggedIn: user.isLoggedIn },
       process.env.JWT_SECRET,
