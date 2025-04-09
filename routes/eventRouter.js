@@ -7,7 +7,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/create/event/{categoryNameId}:
+ * /api/v1/create/event/{categoryId}:
  *   post:
  *     summary: Create a new event
  *     description: Allows an authenticated user to create a new event, including uploading images.
@@ -15,7 +15,7 @@ const router = express.Router();
  *       - Event Management
  *     parameters:
  *       - in: path
- *         name: categoryNameId
+ *         name: categoryId
  *         required: true
  *         schema:
  *           type: string
@@ -78,7 +78,7 @@ const router = express.Router();
  *       500:
  *         description: Internal Server Error
  */
-router.post("/create/event/:categoryNameId", authenticate, upload.array('image'), validateEvent, createEvent);
+router.post("/create/event/:categoryId", authenticate, upload.array('image'), validateEvent, createEvent);
 
 /**
  * @swagger
@@ -148,7 +148,7 @@ router.get("/events", getAllEvent);
 
 /**
  * @swagger
- * /api/v1/update/event/{eventId}/{categoryNameId}:
+ * /api/v1/update/event/{eventId}/{categoryId}:
  *   put:
  *     summary: Update an existing event
  *     description: Allows an authenticated user to update an event, including modifying its details and uploading new images.
@@ -162,7 +162,7 @@ router.get("/events", getAllEvent);
  *           type: string
  *         description: The ID of the event to be updated
  *       - in: path
- *         name: categoryNameId
+ *         name: categoryId
  *         required: true
  *         schema:
  *           type: string
@@ -229,7 +229,7 @@ router.get("/events", getAllEvent);
  *       500:
  *         description: Internal Server Error
  */
-router.put("/update/event/:eventId/:categoryNameId", authenticate, upload.array('image'), updateEvent);
+router.put("/update/event/:eventId/:categoryId", authenticate, upload.array('image'), updateEvent);
 
 
 /**

@@ -1,14 +1,15 @@
-const categoryModel = require('../models/category')
+const categoryModel = require('../models/category');
+
 // Create a new category
 exports.createCategory = async (req, res) => {
   try {
-    const {categoryName} = req.body;
+    const { categoryName } = req.body;
 
     if (!categoryName) {
       return res.status(400).json({ message: 'Category is required' });
     }
 
-    const category = new categoryModel({categoryName});
+    const category = new categoryModel({ categoryName });
     await category.save();
 
     res.status(201).json({
@@ -16,7 +17,7 @@ exports.createCategory = async (req, res) => {
       data: category,
     });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
     res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
 };
@@ -37,8 +38,8 @@ exports.getAllCategories = async (req, res) => {
 // Get a single category by ID
 exports.getOneCategory = async (req, res) => {
   try {
-    const { categoryNameId } = req.params;
-    const category = await categoryModel.findById(categoryNameId);
+    const { categoryId } = req.params;  
+    const category = await categoryModel.findById(categoryId);  
 
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
@@ -56,13 +57,17 @@ exports.getOneCategory = async (req, res) => {
 // Update a category
 exports.updateCategory = async (req, res) => {
   try {
-    const { categoryNameId } = req.params;
-    const {categoryName} = req.body;
+    const { categoryId } = req.params;  
+    const { categoryName } = req.body;
+
+    if (!categoryName) {
+      return res.status(400).json({ message: 'Category name is required' });
+    }
 
     const category = await categoryModel.findByIdAndUpdate(
-      categoryId,
-      categoryName,
-      { new: true}
+      categoryId, 
+      { categoryName },
+      { new: true }
     );
 
     if (!category) {
@@ -81,8 +86,8 @@ exports.updateCategory = async (req, res) => {
 // Delete a category
 exports.deleteCategory = async (req, res) => {
   try {
-    const { categoryNameId } = req.params;
-    const category = await categoryModel.findByIdAndDelete(categoryId);
+    const { categoryId } = req.params;  
+    const category = await categoryModel.findByIdAndDelete(categoryId);  
 
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
