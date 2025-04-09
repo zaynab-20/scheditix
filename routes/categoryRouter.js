@@ -11,8 +11,6 @@ const router = require('express').Router()
  *     description: Allows an authenticated user to create a new event category.
  *     tags:
  *       - Category Management
- *     security:
- *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
