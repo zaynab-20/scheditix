@@ -184,7 +184,7 @@ exports.logInUser = async (req, res) => {
         message: "Please your password",
       });
     }
-    const eventPlanner = await eventPlannerModel.findOne({
+    const user = await eventPlannerModel.findOne({
       email: email.toLowerCase(),
     });
 
@@ -227,7 +227,7 @@ exports.logInUser = async (req, res) => {
       });
     }
 
-    eventPlanner.isLoggedIn = true;
+    user.isLoggedIn = true;
     const token = jwt.sign(
       { userId: user._id, isLoggedIn: user.isLoggedIn },
       process.env.JWT_SECRET,
