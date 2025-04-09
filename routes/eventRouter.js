@@ -13,8 +13,6 @@ const router = express.Router();
  *     description: Allows an authenticated user to create a new event, including uploading images.
  *     tags:
  *       - Event Management
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: categoryNameId
@@ -156,8 +154,6 @@ router.get("/events", getAllEvent);
  *     description: Allows an authenticated user to update an event, including modifying its details and uploading new images.
  *     tags:
  *       - Event Management
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: eventId
@@ -244,8 +240,6 @@ router.put("/update/event/:eventId/:categoryNameId", authenticate, upload.array(
  *     description: Allows an authenticated user to delete an event by its ID, including its associated images.
  *     tags:
  *       - Event Management
- *     security:
- *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: eventId
@@ -283,8 +277,6 @@ router.delete("/delete/event/:eventId", authenticate, deleteEvent);
  *     description: Retrieves the most recent events, including their status (upcoming, ongoing, completed), ticket sold, total attendees, revenue generated, and check-ins.
  *     tags:
  *       - Event Management
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully retrieved recent events
