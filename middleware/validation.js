@@ -106,9 +106,6 @@ const eventValidationSchema = Joi.object({
     "string.min": "Description must be at least 10 characters",
     "string.max": "Description cannot exceed 3000 characters",
   }),
-  eventCategory: Joi.string().trim().required().messages({
-    "string.empty": "Event category is required",
-  }),
   eventLocation: Joi.string().trim().min(3).max(200).required().messages({
     "string.empty": "Location is required",
     "string.min": "Location must be at least 3 characters",
