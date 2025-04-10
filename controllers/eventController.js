@@ -6,7 +6,7 @@ const fs = require("fs");
 exports.createEvent = async (req, res) => {
   try {
     // const organizerId = req.user.userId;
-    const {categoryNameId} = req.params;
+    const {categoryId} = req.params;
     const {eventTitle,
            eventDescription,
            eventLocation,
@@ -41,7 +41,7 @@ exports.createEvent = async (req, res) => {
     const event = new eventModel({
       eventTitle,
       eventDescription,
-      eventCategory: categoryNameId,
+      eventCategory: categoryId,
       eventLocation,
       startTime,
       endTime,
@@ -70,7 +70,7 @@ exports.getOneEvent = async (req, res) => {
   try {
     const { eventId } = req.params;
 
-    const event = await eventModel.findById(eventId).populate('eventCategory','categoryNamr');
+    const event = await eventModel.findById(eventId).populate('eventCategory','categoryName');
 
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
@@ -101,7 +101,7 @@ exports.getAllEvent = async (req, res) => {
 exports.updateEvent = async (req, res) => {
   try {
     // const organizerId = req.user.userId;
-    const { eventId,categoryNameId} = req.params;
+    const { eventId,categoryId} = req.params;
     const {eventTitle,eventDescription,eventLocation,startTime,endTime,eventAgenda,eventRule,totalTableNumber,totalSeatNumber,
     } = req.body;
 
@@ -113,7 +113,7 @@ exports.updateEvent = async (req, res) => {
     const data = {
       eventTitle,
       eventDescription,
-      eventCategory: categoryNameId,
+      eventCategory: categoryId,
       eventLocation,
       startTime,
       endTime,

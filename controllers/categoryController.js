@@ -38,8 +38,8 @@ exports.getAllCategories = async (req, res) => {
 // Get a single category by ID
 exports.getOneCategory = async (req, res) => {
   try {
-    const { categoryId } = req.params;  
-    const category = await categoryModel.findById(categoryId);  
+    const { id } = req.params; 
+    const category = await categoryModel.findById(id);
 
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
@@ -54,10 +54,11 @@ exports.getOneCategory = async (req, res) => {
   }
 };
 
+
 // Update a category
 exports.updateCategory = async (req, res) => {
   try {
-    const { categoryId } = req.params;  
+    const { id } = req.params;  
     const { categoryName } = req.body;
 
     if (!categoryName) {
@@ -65,7 +66,7 @@ exports.updateCategory = async (req, res) => {
     }
 
     const category = await categoryModel.findByIdAndUpdate(
-      categoryId, 
+      id, 
       { categoryName },
       { new: true }
     );
@@ -83,11 +84,12 @@ exports.updateCategory = async (req, res) => {
   }
 };
 
+
 // Delete a category
 exports.deleteCategory = async (req, res) => {
   try {
-    const { categoryId } = req.params;  
-    const category = await categoryModel.findByIdAndDelete(categoryId);  
+    const {id} = req.params;  
+    const category = await categoryModel.findByIdAndDelete(id);  
 
     if (!category) {
       return res.status(404).json({ message: 'Category not found' });
