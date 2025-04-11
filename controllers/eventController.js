@@ -52,7 +52,7 @@ exports.createEvent = async (req, res) => {
       totalTableNumber,
       totalSeatNumber,
       image: image,
-      eventPlannerId: req.user.eventPlannerId
+      eventPlannerId:req.user.userId
     });
     await event.save();
     res

@@ -9,11 +9,11 @@ const eventSchema = new mongoose.Schema({
     type: String,
     require:true
   },
-  eventCategory: [{ 
+  eventCategory: { 
     type: mongoose.SchemaTypes.ObjectId, 
     ref: 'EventCategories',
     require: true 
-  }],
+  },
   eventLocation: {
     type: String,
     require:true
