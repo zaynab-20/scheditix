@@ -87,6 +87,10 @@ const eventSchema = new mongoose.Schema({
     type: String, 
     enum: ['upcoming', 'ongoing', 'completed'], 
     default: 'upcoming' 
+  },
+  featured: {
+    type: Boolean,
+    default: false
   }
 },{
   timestamps: true

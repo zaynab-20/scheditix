@@ -1,4 +1,4 @@
-const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents} = require('../controllers/eventController');
+const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEvents, getTrendingEvents, getOverview} = require('../controllers/eventController');
 const {validateEvent} = require('../middleware/validation');
 const { authenticate } = require('../middleware/authentication');
 const upload = require('../utils/multer');
@@ -150,8 +150,8 @@ router.get("/events", getAllEvent);
  * @swagger
  * /api/v1/update/event/{eventId}/{categoryId}:
  *   put:
- *     summary: Update an existing event
- *     description: Allows an authenticated user to update an event, including modifying its details and uploading new images.
+ *     summary: Update event time, date, location, and images
+ *     description: Allows an authenticated user to update the event's time, date, location, and optionally upload new images.
  *     tags:
  *       - Event Management
  *     parameters:
@@ -174,12 +174,6 @@ router.get("/events", getAllEvent);
  *           schema:
  *             type: object
  *             properties:
- *               eventTitle:
- *                 type: string
- *                 example: "Tech Summit 2025"
- *               eventDescription:
- *                 type: string
- *                 example: "A gathering of tech enthusiasts to explore emerging trends."
  *               eventLocation:
  *                 type: string
  *                 example: "Lagos, Nigeria"
@@ -191,23 +185,20 @@ router.get("/events", getAllEvent);
  *                 type: string
  *                 format: time
  *                 example: "17:00"
- *               eventAgenda:
+ *               startDate:
  *                 type: string
- *                 example: "Talks, Panels, Networking"
- *               eventRule:
+ *                 format: date
+ *                 example: "2025-06-01"
+ *               endDate:
  *                 type: string
- *                 example: "No refunds after registration."
- *               totalTableNumber:
- *                 type: integer
- *                 example: 50
- *               totalSeatNumber:
- *                 type: integer
- *                 example: 300
+ *                 format: date
+ *                 example: "2025-06-03"
  *               image:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
+ *                 description: Optional new event images to upload
  *     responses:
  *       200:
  *         description: Event updated successfully
@@ -220,8 +211,7 @@ router.get("/events", getAllEvent);
  *                   type: string
  *                   example: "Event Updated Successfully"
  *                 data:
- *                   type: object
- *                   description: Updated event details
+ *                   $ref: '#/components/schemas/Event'
  *       400:
  *         description: Bad request, invalid input
  *       404:
@@ -320,5 +310,213 @@ router.delete("/delete/event/:eventId", authenticate, deleteEvent);
  *         description: Internal Server Error
  */
 router.get("/recent/events", authenticate, getRecentEvents);
+
+/**
+ * @swagger
+ * /api/v1/events/{categoryId}:
+ *   get:
+ *     summary: Retrieve all events under a specific category
+ *     description: Fetches a list of all events that belong to a specific category using the category ID. Each event includes its associated category name.
+ *     tags:
+ *       - Event Management
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event category
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved events by category ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Successfully Getting Events for Category ID"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: Event ID
+ *                       title:
+ *                         type: string
+ *                         description: Event title
+ *                       eventCategory:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           categoryName:
+ *                             type: string
+ *                       date:
+ *                         type: string
+ *                         format: date
+ *                       time:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/events/:categoryId',getAllEventCategory)
+
+
+/**
+ * @swagger
+ * /api/v1/events/featured-events:
+ *   get:
+ *     summary: Retrieve all featured events
+ *     description: Fetches a list of all events that are marked as featured. Each event includes its associated category name.
+ *     tags:
+ *       - Event Management
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved featured events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Successfully retrieved featured events"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: Event ID
+ *                       title:
+ *                         type: string
+ *                         description: Event title
+ *                       eventCategory:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           categoryName:
+ *                             type: string
+ *                       date:
+ *                         type: string
+ *                         format: date
+ *                       time:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       featured:
+ *                         type: boolean
+ *                         example: true
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/featured-events',getFeaturedEvents)
+
+
+/**
+ * @swagger
+ * /api/v1/events/trending-events:
+ *   get:
+ *     summary: Retrieve top trending events
+ *     description: Fetches a list of the top 5 trending events based on the number of tickets sold. Each event includes its associated category name.
+ *     tags:
+ *       - Event Management
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved trending events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Successfully retrieved trending events"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: Event ID
+ *                       title:
+ *                         type: string
+ *                         description: Event title
+ *                       eventCategory:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           categoryName:
+ *                             type: string
+ *                       date:
+ *                         type: string
+ *                         format: date
+ *                       time:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *                       ticketSold:
+ *                         type: integer
+ *                         description: Number of tickets sold
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/trending-events',getTrendingEvents)
+
+/**
+ * @swagger
+ * /api/v1/events/Overview:
+ *   get:
+ *     summary: Retrieve event platform overview statistics
+ *     description: Fetches overall platform statistics including total tickets sold, total revenue generated, and total number of unique event organizers.
+ *     tags:
+ *       - Event Management
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved dashboard statistics
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Successfully retrieved dashboard statistics"
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalTicketSold:
+ *                       type: integer
+ *                       description: Total number of tickets sold across all events
+ *                       example: 4520
+ *                     totalRevenue:
+ *                       type: number
+ *                       format: float
+ *                       description: Total revenue generated from all events
+ *                       example: 1895000.75
+ *                     totalEventOrganizers:
+ *                       type: integer
+ *                       description: Total number of unique event organizers
+ *                       example: 87
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/Overview',getOverview)
 
 module.exports = router;
