@@ -313,66 +313,7 @@ router.get("/recent/events", authenticate, getRecentEvents);
 
 /**
  * @swagger
- * /api/v1/events/{categoryId}:
- *   get:
- *     summary: Retrieve all events under a specific category
- *     description: Fetches a list of all events that belong to a specific category using the category ID. Each event includes its associated category name.
- *     tags:
- *       - Event Management
- *     parameters:
- *       - in: path
- *         name: categoryId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the event category
- *     responses:
- *       200:
- *         description: Successfully retrieved events by category ID
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Successfully Getting Events for Category ID"
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         description: Event ID
- *                       title:
- *                         type: string
- *                         description: Event title
- *                       eventCategory:
- *                         type: object
- *                         properties:
- *                           _id:
- *                             type: string
- *                           categoryName:
- *                             type: string
- *                       date:
- *                         type: string
- *                         format: date
- *                       time:
- *                         type: string
- *                       location:
- *                         type: string
- *                       description:
- *                         type: string
- *       500:
- *         description: Internal Server Error
- */
-router.get('/events/:categoryId',getAllEventCategory)
-
-
-/**
- * @swagger
- * /api/v1/events/featured-events:
+ * /api/v1/featured-events:
  *   get:
  *     summary: Retrieve all featured events
  *     description: Fetches a list of all events that are marked as featured. Each event includes its associated category name.
@@ -427,7 +368,7 @@ router.get('/featured-events',getFeaturedEvents)
 
 /**
  * @swagger
- * /api/v1/events/trending-events:
+ * /api/v1/trending-events:
  *   get:
  *     summary: Retrieve top trending events
  *     description: Fetches a list of the top 5 trending events based on the number of tickets sold. Each event includes its associated category name.
@@ -481,7 +422,65 @@ router.get('/trending-events',getTrendingEvents)
 
 /**
  * @swagger
- * /api/v1/events/Overview:
+ * /api/v1/event/{categoryId}:
+ *   get:
+ *     summary: Retrieve all events under a specific category
+ *     description: Fetches a list of all events that belong to a specific category using the category ID. Each event includes its associated category name.
+ *     tags:
+ *       - Event Management
+ *     parameters:
+ *       - in: path
+ *         name: categoryId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event category
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved events by category ID
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Successfully Getting Events for Category ID"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: Event ID
+ *                       title:
+ *                         type: string
+ *                         description: Event title
+ *                       eventCategory:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           categoryName:
+ *                             type: string
+ *                       date:
+ *                         type: string
+ *                         format: date
+ *                       time:
+ *                         type: string
+ *                       location:
+ *                         type: string
+ *                       description:
+ *                         type: string
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/event/:categoryId',getAllEventCategory)
+
+/**
+ * @swagger
+ * /api/v1/Overview:
  *   get:
  *     summary: Retrieve event platform overview statistics
  *     description: Fetches overall platform statistics including total tickets sold, total revenue generated, and total number of unique event organizers.
