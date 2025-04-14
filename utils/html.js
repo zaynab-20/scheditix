@@ -184,3 +184,127 @@ exports.reset = (link, firstName) => {
 
   `
 }
+
+
+
+
+
+
+
+
+
+
+// exports.verify = (link, firstName) => {
+//     return `
+//     <!DOCTYPE html>
+// <html lang="en">
+// <head>
+//   <meta charset="UTF-8" />
+//   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+//   <title>Email Verification</title>
+//   <style>
+//     body, html {
+//       margin: 0;
+//       padding: 0;
+//       font-family: sans-serif;
+//       background-color: #ffffff;
+//     }
+
+//     .container {
+//       width: 100%;
+//       min-height: 100vh;
+//       display: flex;
+//       justify-content: center;
+//       align-items: center;
+//       padding: 20px;
+//     }
+
+//     .email-body {
+//       width: 100%;
+//       max-width: 500px;
+//       padding: 24px;
+//       border-radius: 16px;
+//       display: flex;
+//       flex-direction: column;
+//       align-items: center;
+//       background-color: #fff;
+//     }
+
+//     .email-header {
+//       text-align: center;
+//       font-size: 24px;
+//       font-weight: bold;
+//       margin-bottom: 10px;
+//     }
+
+//     .email-text {
+//       text-align: center;
+//       font-size: 18px;
+//       margin-bottom: 16px;
+//       line-height: 1.6;
+//     }
+
+//     .highlight {
+//       color: #ff5722;
+//       font-weight: 600;
+//     }
+
+//     .email-button {
+//       background-color: #ff5722;
+//       color: #fff;
+//       padding: 14px 24px;
+//       border-radius: 10px;
+//       border: none;
+//       font-size: 16px;
+//       cursor: pointer;
+//       margin-top: 10px;
+//     }
+
+//     .code-box {
+//       display: flex;
+//       flex-direction: column;
+//       align-items: center;
+//       margin-top: 10px;
+//     }
+
+//     @media screen and (max-width: 480px) {
+//       .email-body {
+//         padding: 16px;
+//       }
+
+//       .email-header {
+//         font-size: 20px;
+//       }
+
+//       .email-text {
+//         font-size: 16px;
+//       }
+
+//       .email-button {
+//         font-size: 14px;
+//         padding: 12px 20px;
+//       }
+//     }
+//   </style>
+// </head>
+// <body>
+//   <div class="container">
+//     <div class="email-body">
+//       <h2 class="email-header">Welcome to ShediTix!</h2>
+//       <p class="email-text">
+//         Congratulations <strong>${firstName}</strong>! You’re officially part of the SchediTix family! 🙌 We’re so
+//         excited to help you create, manage, and promote amazing events.
+//       </p>
+//       <p class="email-text">
+//         Before you dive in, we just need you to <span class="highlight">verify your email</span> to activate your account.
+//         It’s super quick, just click the button below and you’re good to go! 🥰
+//       </p>
+//       <div href="${link}" class="code-box">
+//         <button class="email-button">Verify email address</button>
+//       </div>
+//     </div>
+//   </div>
+// </body>
+// </html>
+//     `
+// }
