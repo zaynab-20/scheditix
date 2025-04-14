@@ -5,7 +5,7 @@ const generator = require("otp-generator");
 exports.createTicket = async (req, res) => {
   try {
     const { eventId } = req.params;
-    const { totalTicketNumber, ticketType, ticketPrice } = req.body;
+    const { totalTicketNumber,ticketPrice } = req.body;
 
     const event = await eventModel.findById(eventId);
 
@@ -49,7 +49,6 @@ exports.createTicket = async (req, res) => {
       eventId: event._id,
       eventTitle: event.title,
       totalTicketNumber,
-      ticketType,
       ticketPrice,
       tableNumber, 
       seatNumber,
@@ -68,9 +67,6 @@ exports.createTicket = async (req, res) => {
     })
   }
 };
-
-
-
 
 exports.getAllTickets = async (req, res) => {
   try {
@@ -123,28 +119,36 @@ exports.getTicketById = async (req, res) => {
 exports.updateTicket = async (req, res) => {
   try {
     const { ticketId } = req.params;
-    const updateFields = req.body;  
+    const { totalTicketNumber, ticketPrice } = req.body;
 
-    if (updateFields.checkInCode) {
-      return res.status(400).json({
-        message: "checkInCode cannot be updated",
-      });
-    }
-
-    // Update the ticket, excluding the checkInCode
-    const ticket = await ticketModel.findByIdAndUpdate(ticketId, updateFields, { new: true });
-
+    // Check if the ticket exists
+    const ticket = await ticketModel.findById(ticketId);
     if (!ticket) {
       return res.status(404).json({ message: "Ticket not found" });
     }
 
+    if (req.body.checkInCode !== undefined) {
+      return res.status(400).json({ message: "checkInCode cannot be updated" });
+    }
+
+    const Data = {
+      totalTicketNumber, 
+      ticketPrice
+    };
+    
+    // Update the ticket
+    const updatedTicket = await ticketModel.findByIdAndUpdate(ticketId, Data, { new: true });
+
+    if (!updatedTicket) {
+      return res.status(500).json({ message: "Failed to update ticket" }); 
+    }
+
     res.status(200).json({
       message: "Ticket updated successfully",
-      data: ticket,
+      data: updatedTicket,
     });
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ message: 'Error updating ticket' });
+    res.status(500).json({ message: 'Internal Server Error', error: error.message }); 
   }
 };
 

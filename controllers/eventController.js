@@ -38,6 +38,11 @@ exports.createEvent = async (req, res) => {
       
     }
 
+    let isFeatured = false;
+    if (req.user && req.user.plan === 'premium') {
+      isFeatured = true;
+    }
+
     const event = new eventModel({
       eventTitle,
       eventDescription,
@@ -52,7 +57,8 @@ exports.createEvent = async (req, res) => {
       totalTableNumber,
       totalSeatNumber,
       image: image,
-      eventPlannerId:req.user.userId
+      eventPlannerId:req.user.userId,
+      featured: isFeatured
     });
     await event.save();
     res
@@ -98,12 +104,28 @@ exports.getAllEvent = async (req, res) => {
   }
 };
 
+
+exports.getAllEventCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    const events = await eventModel.find({ eventCategory: categoryId }).populate('eventCategory', 'categoryName');
+
+    res.status(200).json({
+      message: `Successfully Getting Events for Category ID`,
+      data: events,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
 exports.updateEvent = async (req, res) => {
   try {
     // const organizerId = req.user.userId;
     const { eventId,categoryId} = req.params;
-    const {eventTitle,eventDescription,eventLocation,startTime,endTime,eventAgenda,eventRule,totalTableNumber,totalSeatNumber,
-    } = req.body;
+    const {eventLocation,startTime,endTime,startDate,endDate} = req.body;
 
     const event = await eventModel.findById(eventId);
     if (!event) {
@@ -111,18 +133,11 @@ exports.updateEvent = async (req, res) => {
     }
 
     const data = {
-      eventTitle,
-      eventDescription,
-      eventCategory: categoryId,
       eventLocation,
       startTime,
       endTime,
-      eventAgenda,
-      eventRule,
       startDate,
       endDate,
-      totalTableNumber,
-      totalSeatNumber
     };
 
     if(req.files && req.file[0]){
@@ -223,5 +238,72 @@ exports.deleteEvent = async (req, res) => {
   } catch (error) {
     console.error(error.message);
     res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
+exports.getFeaturedEvents = async (req, res) => {
+  try {
+      const featuredEvents = await eventModel.find({ featured: true }).populate('eventCategory', 'categoryName');
+      res.status(200).json({
+          message: "Successfully retrieved featured events",
+          data: featuredEvents
+      });
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+
+exports.getTrendingEvents = async (req, res) => {
+  try {
+      const trendingEvents = await eventModel.find()
+          .sort({ ticketSold: -1 }) // Sort in descending order based on ticketSold
+          .limit(5) // Limit to, say, the top 10 trending events
+          .populate('eventCategory', 'categoryName');
+
+      res.status(200).json({
+          message: "Successfully retrieved trending events",
+          data: trendingEvents
+      });
+  } catch (error) {
+      console.error(error.message);
+      res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+
+exports.getOverview = async (req, res) => {
+  try {
+      // 1. Get all the events from your database
+      const allEvents = await eventModel.find();
+
+      const dashboard = allEvents.reduce((accumulator, currentEvent) => {
+          accumulator.totalTicketSold += currentEvent.ticketSold || 0;
+          accumulator.totalRevenue += currentEvent.revenueGenerated || 0;
+
+          return accumulator;
+      }, {
+          totalTicketSold: 0,
+          totalRevenue: 0
+      });
+
+      // 3. Get the total number of unique event organizers
+      const totalEventOrganizers = await eventModel.distinct('eventPlannerId').countDocuments();
+
+      // 4. Combine all the stats into one object
+      const overview = {
+          totalTicketSold: dashboard.totalTicketSold,
+          totalRevenue: dashboard.totalRevenue,
+          totalEventOrganizers: totalEventOrganizers
+      };
+      res.status(200).json({
+          message: "Successfully retrieved dashboard statistics",
+          data: overview
+      });
+
+  } catch (error) {
+      console.error("Error fetching dashboard stats:", error);
+      res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };

@@ -77,32 +77,7 @@ router.get('/tickets/:eventId', getAllTickets);
 /**
  * @swagger
  * /api/v1/ticket/{ticketId}:
- *   get:
- *     summary: Get ticket by ID
- *     description: Retrieve a specific ticket by its unique ID.
- *     tags:
- *       - Ticket Management
- *     parameters:
- *       - in: path
- *         name: ticketId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the ticket
- *     responses:
- *       200:
- *         description: Ticket retrieved successfully
- *       404:
- *         description: Ticket not found
- *       500:
- *         description: Error retrieving ticket
- */
-router.get('/ticket/:ticketId', getTicketById);
-
-/**
- * @swagger
- * /api/v1/ticket/{ticketId}:
- *   patch:
+ *   put:
  *     summary: Update a ticket
  *     description: Update ticket details excluding the check-in code.
  *     tags:
@@ -124,22 +99,64 @@ router.get('/ticket/:ticketId', getTicketById);
  *               totalTicketNumber:
  *                 type: integer
  *                 example: 300
- *               ticketType:
- *                 type: string
- *                 example: "Regular"
  *               ticketPrice:
  *                 type: number
  *                 format: float
  *                 example: 3000
+ *             required:
+ *               - totalTicketNumber
+ *               - ticketPrice
  *     responses:
  *       200:
  *         description: Ticket updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ticket updated successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     totalTicketNumber:
+ *                       type: integer
+ *                       example: 300
+ *                     ticketPrice:
+ *                       type: number
+ *                       format: float
+ *                       example: 3000
  *       400:
- *         description: Invalid update (e.g. checkInCode modification)
+ *         description: Invalid update (e.g. checkInCode modification attempt)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: checkInCode cannot be updated
  *       404:
  *         description: Ticket not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ticket not found
  *       500:
  *         description: Error updating ticket
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Failed to update ticket
  */
 router.put('/ticket/:ticketId', validateTicket, updateTicket);
 
