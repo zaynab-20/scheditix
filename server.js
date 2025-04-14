@@ -11,6 +11,7 @@ const eventRouter = require("./routes/eventRouter");
 const ticketRouter = require("./routes/ticket")
 const paymentRouter = require("./routes/payment")
 const categoryRouter = require('./routes/categoryRouter')
+const attendeeRouter = require('./routes/attendeeRouter')
 const app = express();
 
 app.use(express.json())
@@ -21,6 +22,7 @@ app.use('/api/v1',eventRouter);
 app.use('/api/v1',ticketRouter);
 app.use('/api/v1',paymentRouter);
 app.use('/api/v1',categoryRouter);
+app.use('/api/v1',attendeeRouter)
 
 app.use((error, req, res, next) => {
   if(error){
