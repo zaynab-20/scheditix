@@ -77,7 +77,7 @@ exports.registerUser = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: "internal Server Error ",
+      message: "internal Server Error:" + error.message,
     });
   }
 };
@@ -160,7 +160,7 @@ exports.verifyUser = async (req, res) => {
     console.log(error.message);
     if (error instanceof jwt.JsonWebTokenError) {
       return res.status(400).json({
-        message: "Session expired: link has been sent to email address",
+        message: "Session expired: link has been sent to email address:" + error.message,
       });
     }
     res.status(500).json({
@@ -263,7 +263,7 @@ exports.logInUser = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: "internal Server Error",
+      message: "internal Server Error:" + error.message,
     });
   }
 };
@@ -282,7 +282,7 @@ exports.forgotUserPassword = async (req, res) => {
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "5mins",
+      expiresIn: "10mins",
     });
     const link = `${req.protocol}://${req.get(
       "host"
@@ -396,7 +396,7 @@ exports.changeUserPassword = async (req, res) => {
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
-      message: "Error Changing Password",
+      message: "Error Changing Password" ,
     });
   }
 };
@@ -414,10 +414,10 @@ exports.logOut = async (req, res) => {
     res.status(200).json({
       message: "User logout Successfully",
     });
-  } catch (err) {
+  } catch (error) {
     console.log(err.message);
     res.status(500).json({
-      message: "Internal Server Error",
+      message: "Internal Server Error:" + error.message,
     });
   }
 };
