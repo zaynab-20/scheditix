@@ -140,7 +140,7 @@ exports.updateEvent = async (req, res) => {
       endDate,
     };
 
-    if(req.files && req.file[0]){
+    if(req.files && req.files.length > 0){
       for(const image of event.images){
         await cloudinary.uploader.destroy(image.imagePublicId)
       }
