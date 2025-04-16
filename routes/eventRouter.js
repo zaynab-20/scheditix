@@ -10,7 +10,7 @@ const router = express.Router();
  * /api/v1/create/event/{categoryId}:
  *   post:
  *     summary: Create a new event
- *     description: Allows an authenticated user to create a new event, including uploading images.
+ *     description: Allows an authenticated user to create a new event, including uploading images and setting event details like ticket prices and quantity.
  *     tags:
  *       - Event Management
  *     parameters:
@@ -64,6 +64,19 @@ const router = express.Router();
  *               totalSeatNumber:
  *                 type: integer
  *                 example: 300
+ *               ticketPrice:
+ *                 type: number
+ *                 format: float
+ *                 example: 5000
+ *               ticketQuantity:
+ *                 type: integer
+ *                 example: 100
+ *               ticketPurchaseLimit:
+ *                 type: integer
+ *                 example: 3
+ *               parkingAccess:
+ *                 type: boolean
+ *                 example: true
  *               image:
  *                 type: array
  *                 items:
@@ -75,6 +88,10 @@ const router = express.Router();
  *         description: Event created successfully
  *       400:
  *         description: Bad request, invalid input
+ *       403:
+ *         description: Basic plan limit exceeded
+ *       404:
+ *         description: Event planner not found
  *       500:
  *         description: Internal Server Error
  */
@@ -151,7 +168,7 @@ router.get("/events", getAllEvent);
  * /api/v1/update/event/{eventId}/{categoryId}:
  *   put:
  *     summary: Update event time, date, location, and images
- *     description: Allows an authenticated user to update the event's time, date, location, and optionally upload new images.
+ *     description: Allows an authenticated user to update the event's time, date, location, and optionally upload new images. It will replace the old images with the new ones if provided.
  *     tags:
  *       - Event Management
  *     parameters:

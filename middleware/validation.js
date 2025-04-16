@@ -161,40 +161,40 @@ exports.validateEvent = (req, res, next) => {
 };
 
 
-const ticketValidationSchema = Joi.object({
-  totalTicketNumber: Joi.number().integer().positive().required().messages({
-    "number.base": "Total ticket number must be a valid number",
-    "number.positive": "Total ticket number must be greater than zero",
-    "any.required": "Total ticket number is required",
-  }),
-  ticketType: Joi.string().trim().min(3).max(100).required().messages({
-    "string.empty": "Ticket type is required",
-    "string.min": "Ticket type must be at least 3 characters",
-    "string.max": "Ticket type cannot exceed 100 characters",
-  }),
-  ticketPrice: Joi.number().positive().required().messages({
-    "number.base": "Ticket price must be a valid number",
-    "number.positive": "Ticket price must be greater than zero",
-    "any.required": "Ticket price is required",
-  }),
-  tableNumber: Joi.number().integer().positive().required().messages({
-    "number.base": "Table number must be a valid number",
-    "number.positive": "Table number must be greater than zero",
-    "any.required": "Table number is required",
-  }),
-  seatNumber: Joi.number().integer().positive().required().messages({
-    "number.base": "Seat number must be a valid number",
-    "number.positive": "Seat number must be greater than zero",
-    "any.required": "Seat number is required",
-  }),
-});
+// const ticketValidationSchema = Joi.object({
+//   totalTicketNumber: Joi.number().integer().positive().required().messages({
+//     "number.base": "Total ticket number must be a valid number",
+//     "number.positive": "Total ticket number must be greater than zero",
+//     "any.required": "Total ticket number is required",
+//   }),
+//   ticketType: Joi.string().trim().min(3).max(100).required().messages({
+//     "string.empty": "Ticket type is required",
+//     "string.min": "Ticket type must be at least 3 characters",
+//     "string.max": "Ticket type cannot exceed 100 characters",
+//   }),
+//   ticketPrice: Joi.number().positive().required().messages({
+//     "number.base": "Ticket price must be a valid number",
+//     "number.positive": "Ticket price must be greater than zero",
+//     "any.required": "Ticket price is required",
+//   }),
+//   tableNumber: Joi.number().integer().positive().required().messages({
+//     "number.base": "Table number must be a valid number",
+//     "number.positive": "Table number must be greater than zero",
+//     "any.required": "Table number is required",
+//   }),
+//   seatNumber: Joi.number().integer().positive().required().messages({
+//     "number.base": "Seat number must be a valid number",
+//     "number.positive": "Seat number must be greater than zero",
+//     "any.required": "Seat number is required",
+//   }),
+// });
 
-exports.validateTicket = (req, res, next) => {
-  const { error } = ticketValidationSchema.validate(req.body, { abortEarly: false });
-  if (error) {
-    return res.status(400).json({
-      message: error.details.map(err => err.message)
-    });
-  }
-  next();
-};
+// exports.validateTicket = (req, res, next) => {
+//   const { error } = ticketValidationSchema.validate(req.body, { abortEarly: false });
+//   if (error) {
+//     return res.status(400).json({
+//       message: error.details.map(err => err.message)
+//     });
+//   }
+//   next();
+// };

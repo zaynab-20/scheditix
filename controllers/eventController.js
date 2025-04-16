@@ -300,7 +300,7 @@ exports.getTrendingEvents = async (req, res) => {
 
 exports.getOverview = async (req, res) => {
   try {
-      // 1. Get all the events from your database
+      
       const allEvents = await eventModel.find();
 
       const dashboard = allEvents.reduce((accumulator, currentEvent) => {
@@ -313,10 +313,10 @@ exports.getOverview = async (req, res) => {
           totalRevenue: 0
       });
 
-      // 3. Get the total number of unique event organizers
+      // Get the total number of unique event organizers
       const totalEventOrganizers = await eventModel.distinct('eventPlannerId').countDocuments();
 
-      // 4. Combine all the stats into one object
+      // Combine all the stats into one object
       const overview = {
           totalTicketSold: dashboard.totalTicketSold,
           totalRevenue: dashboard.totalRevenue,
