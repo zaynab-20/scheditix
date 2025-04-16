@@ -33,8 +33,27 @@ const eventPlannerSchema = mongoose.Schema({
   isLoggedIn: {
     type: Boolean,
     default: false
+  },
+  plan:{
+    type:String,
+    enum: ['Basic','Pro','Premium'],
+    default:'Basic'
+  },
+  userTickets:{
+    type:Number,
+    default:0
+  },
+  profilePic:{
+    imageUrl:{
+      type:String,
+      require:true
+    },
+    publicId:{
+      type:String,
+      require:true
+    }
   }
-}, {timestamps: true})
+},{timestamps: true})
 
 const eventPlannerModel = mongoose.model("eventPlanners", eventPlannerSchema)
 
