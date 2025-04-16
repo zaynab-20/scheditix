@@ -56,7 +56,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    const link = `http://localhost:5173/email-verification/${token}`;
+    const link = `https://scheditix.onrender.com/email-verification/${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
@@ -113,7 +113,7 @@ exports.verifyUser = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "10mins" }
           );
-          const link = `http://localhost:5173/email-verification/${newToken}`;
+          const link = `https://scheditix.onrender.com/email-verification/${newToken}`;
           const firstName = eventPlanner.fullname.split(" ")[0];
 
           const mailOptions = {
