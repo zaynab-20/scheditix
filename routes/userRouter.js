@@ -228,50 +228,50 @@ router.post("/change-password/user/:id", changeUserPasswordSchema, changeUserPas
  */
 router.post('/logout', authenticate, logOut);
 
-/**
- * @swagger
- * /api/v1/update/user/{id}:
- *   put:
- *     tags:
- *       - Users
- *     summary: Update user details
- *     description: This endpoint allows an event planner to update their details.
- *     parameters:
- *       - in: path
- *         name: id
- *         description: User's ID
- *         required: true
- *         type: string
- *       - in: body
- *         name: user
- *         description: Updated user details
- *         required: true
- *         schema:
- *           type: object
- *           properties:
- *             fullName:
- *               type: string
- *               example: "John Doe"
- *             email:
- *               type: string
- *               format: email
- *               example: "zatoloye@gmail.com"
- *             phoneNo:
- *               type: string
- *               example: "9123456789"
- *             password:
- *               type: string
- *               format: password
- *               example: "Ade&20br1"
- *     responses:
- *       200:
- *         description: User details updated successfully
- *       404:
- *         description: User not found
- *       500:
- *         description: Internal Server Error
- */
-router.put('/update/user/:id', authenticate, updateEventPlanner);
+// /**
+//  * @swagger
+//  * /api/v1/update/user/{id}:
+//  *   put:
+//  *     tags:
+//  *       - Users
+//  *     summary: Update user details
+//  *     description: This endpoint allows an event planner to update their details.
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         description: User's ID
+//  *         required: true
+//  *         type: string
+//  *       - in: body
+//  *         name: user
+//  *         description: Updated user details
+//  *         required: true
+//  *         schema:
+//  *           type: object
+//  *           properties:
+//  *             fullName:
+//  *               type: string
+//  *               example: "John Doe"
+//  *             email:
+//  *               type: string
+//  *               format: email
+//  *               example: "zatoloye@gmail.com"
+//  *             phoneNo:
+//  *               type: string
+//  *               example: "9123456789"
+//  *             password:
+//  *               type: string
+//  *               format: password
+//  *               example: "Ade&20br1"
+//  *     responses:
+//  *       200:
+//  *         description: User details updated successfully
+//  *       404:
+//  *         description: User not found
+//  *       500:
+//  *         description: Internal Server Error
+//  */
+// router.put('/update/user/:eventPlannerId', authenticate, updateEventPlanner);
 
 /**
  * @swagger
@@ -325,28 +325,28 @@ router.get('/getAll/user', getAllUser)
  */
 router.get('/getOneUser/:id', getOneUser)
 
-/**
- * @swagger
- * /api/v1/delete/user/{id}:
- *   delete:
- *     tags:
- *       - Users
- *     summary: Delete a user
- *     description: This endpoint allows an admin to delete a user from the system.
- *     parameters:
- *       - in: path
- *         name: id
- *         description: User's ID
- *         required: true
- *         type: string
- *     responses:
- *       200:
- *         description: User deleted successfully
- *       404:
- *         description: User not found
- *       500:
- *         description: Internal Server Error
- */
-router.delete('/delete/user/:id', authenticate, deleteEventPlanner);
+// /**
+//  * @swagger
+//  * /api/v1/delete/user/{id}:
+//  *   delete:
+//  *     tags:
+//  *       - Users
+//  *     summary: Delete a user
+//  *     description: This endpoint allows an admin to delete a user from the system.
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         description: User's ID
+//  *         required: true
+//  *         type: string
+//  *     responses:
+//  *       200:
+//  *         description: User deleted successfully
+//  *       404:
+//  *         description: User not found
+//  *       500:
+//  *         description: Internal Server Error
+//  */
+// router.delete('/delete/user/:id', authenticate, deleteEventPlanner);
 
 module.exports = router;
