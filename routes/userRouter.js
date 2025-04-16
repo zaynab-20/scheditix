@@ -271,7 +271,7 @@ router.post('/logout', authenticate, logOut);
 //  *       500:
 //  *         description: Internal Server Error
 //  */
-// router.put('/update/user/:eventPlannerId', authenticate, updateEventPlanner);
+router.put('/update/user/:eventPlannerId', authenticate, updateEventPlanner);
 
 /**
  * @swagger
@@ -325,28 +325,28 @@ router.get('/getAll/user', getAllUser)
  */
 router.get('/getOneUser/:id', getOneUser)
 
-// /**
-//  * @swagger
-//  * /api/v1/delete/user/{id}:
-//  *   delete:
-//  *     tags:
-//  *       - Users
-//  *     summary: Delete a user
-//  *     description: This endpoint allows an admin to delete a user from the system.
-//  *     parameters:
-//  *       - in: path
-//  *         name: id
-//  *         description: User's ID
-//  *         required: true
-//  *         type: string
-//  *     responses:
-//  *       200:
-//  *         description: User deleted successfully
-//  *       404:
-//  *         description: User not found
-//  *       500:
-//  *         description: Internal Server Error
-//  */
-// router.delete('/delete/user/:id', authenticate, deleteEventPlanner);
+/**
+ * @swagger
+ * /api/v1/delete/user/{id}:
+ *   delete:
+ *     tags:
+ *       - Users
+ *     summary: Delete a user
+ *     description: This endpoint allows an admin to delete a user from the system.
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: User's ID
+ *         required: true
+ *         type: string
+ *     responses:
+ *       200:
+ *         description: User deleted successfully
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
+ */
+router.delete('/delete/user/:id', authenticate, deleteEventPlanner);
 
 module.exports = router;

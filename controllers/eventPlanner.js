@@ -57,7 +57,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    const link = `https://schedi-tix-front-end.vercel.app/email-verification${token}`;
+    const link = `https://schedi-tix-front-end.vercel.app/email-verification/ ${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
@@ -457,107 +457,80 @@ exports.getOneUser = async (req, res) => {
   }
 };
 
-// exports.updateEventPlanner = async (req, res) => {
-//   try {
-//     const { eventPlannerId } = req.params;
-//     const { fullname,  password } = req.body;
-//     const  result = await cloudinary.uploader.upload(req.file.path)
+exports.updateEventPlanner = async (req, res) => {
+  try {
+    const { eventPlannerId } = req.params;
+    const { fullname,  password } = req.body;
+    const  result = await cloudinary.uploader.upload(req.file.path)
 
 
-//     const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
-//     if (!eventPlanner) {
-//       return res.status(404).json({
-//         message: "EventPlanner not found",
-//       });
-//     }
-//     const data = {
-//       fullname,
-//       password,
-//       profilePic:{
-//         imageUrl:result.secure_url, 
-//         publicId: result.public_id
-//       }
+    const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+    if (!eventPlanner) {
+      return res.status(404).json({
+        message: "EventPlanner not found",
+      });
+    }
+    const data = {
+      fullname,
+      password,
+      profilePic:{
+        imageUrl:result.secure_url, 
+        publicId: result.public_id
+      }
 
-//     };
-//     const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
-//       eventPlannerId,
-//       data,
-//       { new: true }
-//     );
-//     res.status(200).json({
-//       message: "EventPlanner updated successfully",
-//       data: updateEventPlanner,
-//     });
-//   } catch (error) {
-//     console.log(error.message);
+    };
+    const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
+      eventPlannerId,
+      data,
+      { new: true }
+    );
+    res.status(200).json({
+      message: "EventPlanner updated successfully",
+      data: updateEventPlanner,
+    });
+  } catch (error) {
+    console.log(error.message);
 
-//     if (error instanceof jwt.JsonWebTokenError) {
-//       return res.status(400).json({
-//         message: 'Session expired, please login to continue'
-//       });
-//     }
-//     res.status(500).json({
-//       message: "internal server error:" + error.message,
-//     });
-//   }
-// };
+    if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(400).json({
+        message: 'Session expired, please login to continue'
+      });
+    }
+    res.status(500).json({
+      message: "internal server error:" + error.message,
+    });
+  }
+};
 
-// exports.updateEventPlanner = async (req, res) => {
-//   try {
-//     const { eventPlannerId } = req.params;
-//     const { fullname, password } = req.body;
+exports.deleteEventPlanner = async (req, res) => {
+  try {
+    const { eventPlannerId } = req.params;
 
-//     // Check if a file was uploaded
-//     if (!req.file) {
-//       return res.status(400).json({
-//         message: "Profile picture is required",
-//       });
-//     }
+    // Await the result of findById
+    const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+    if (!eventPlanner) {
+      return res.status(404).json({
+        message: "EventPlanner not found",
+      });
+    }
 
-//     // Upload the file to Cloudinary
-//     const result = await cloudinary.uploader.upload(req.file.path);
+    const deleteEventPlanner = await eventPlannerModel.findByIdAndDelete(eventPlannerId);
+    if (!deleteEventPlanner) {
+      return res.status(404).json({
+        message: "EventPlanner has already been deleted",
+      });
+    }
 
-//     // Find the event planner by ID
-//     const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
-//     if (!eventPlanner) {
-//       return res.status(404).json({
-//         message: "EventPlanner not found",
-//       });
-//     }
-
-//     // Hash the password if provided
-//     let hashedPassword = eventPlanner.password; // Keep the existing password if not updated
-//     if (password) {
-//       hashedPassword = await bcrypt.hash(password, 10);
-//     }
-
-//     // Prepare the updated data
-//     const data = {
-//       fullname,
-//       password: hashedPassword,
-//       profilePic: {
-//         imageUrl: result.secure_url,
-//         publicId: result.public_id,
-//       },
-//     };
-
-//     // Update the event planner
-//     const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
-//       eventPlannerId,
-//       data,
-//       { new: true } // Return the updated document
-//     );
-
-//     res.status(200).json({
-//       message: "EventPlanner updated successfully",
-//       data: updateEventPlanner,
-//     });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({
-//       message: "Internal server error: " + error.message,
-//     });
-//   }
-// };
+    res.status(200).json({
+      message: "EventPlanner deleted successfully",
+      data: deleteEventPlanner,
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({
+      message: "Internal server error: " + error.message,
+    });
+  }
+};
 
 
