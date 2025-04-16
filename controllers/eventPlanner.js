@@ -57,7 +57,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    const link = `https://schedi-tix-front-end.vercel.app/email-verification/ ${token}`;
+    const link = `https://schedi-tix-front-end.vercel.app/email-verification/${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {

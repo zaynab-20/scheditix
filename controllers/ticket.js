@@ -200,7 +200,7 @@ exports.purchaseTicket = async (req, res) => {
   try {
     const { eventId } = req.params;
     const { quantity } = req.body; 
-    const userId = req.user.userId; // Authenticated user
+    const userId = req.user.userId; 
 
     
     const event = await eventModel.findById(eventId);
