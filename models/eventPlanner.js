@@ -33,7 +33,17 @@ const eventPlannerSchema = mongoose.Schema({
   isLoggedIn: {
     type: Boolean,
     default: false
-  }
+  },
+  profilePic: {
+    imageUrl: {
+        type: String,
+        require: true
+    },
+    publicId: {
+        type: String,
+        require: true
+    }
+}
 }, {timestamps: true})
 
 const eventPlannerModel = mongoose.model("eventPlanners", eventPlannerSchema)
