@@ -1,6 +1,7 @@
 const eventModel = require("../models/event");
 const cloudinary = require('../config/cloudinary');
 const categoryModel = require("../models/category")
+const eventPlannerModel = require("../models/eventPlanner")
 const fs = require("fs");
 
 exports.createEvent = async (req, res) => {
@@ -17,9 +18,28 @@ exports.createEvent = async (req, res) => {
            startDate,
            endDate,
            totalTableNumber,
-           totalSeatNumber
+           totalSeatNumber,
+           ticketPrice,
+           ticketQuantity, 
+           ticketPurchaseLimit,
+           parkingAccess
     } = req.body;
     const files = req.files;
+
+
+    const eventPlanner = await eventPlannerModel.findById(req.user.userId);
+    if (!eventPlanner) {
+      return res.status(404).json({ message: "Event Planner not found" });
+    }
+
+    if (eventPlanner.plan === 'Basic') {
+      const eventsCreated = await eventModel.countDocuments({ eventPlannerId: req.user.userId });
+    
+      if (eventsCreated == 2) {
+        return res.status(403).json({ message: "Basic plan limit: You can only create 2 events." });
+      }
+    }
+    
     
     let result;
     let imagePath = {};
@@ -39,7 +59,7 @@ exports.createEvent = async (req, res) => {
     }
 
     let isFeatured = false;
-    if (req.user && req.user.plan === 'premium') {
+    if (req.user && req.user.plan === 'Premium') {
       isFeatured = true;
     }
 
@@ -56,6 +76,11 @@ exports.createEvent = async (req, res) => {
       endDate,
       totalTableNumber,
       totalSeatNumber,
+      totalTicketNumber,   
+      ticketPrice,
+      ticketQuantity, 
+      ticketPurchaseLimit,     
+      parkingAccess,
       image: image,
       eventPlannerId:req.user.userId,
       featured: isFeatured
@@ -121,7 +146,7 @@ exports.getAllEventCategory = async (req, res) => {
   }
 };
 
-exports.updateEvent = async (req, res) => {
+exports.updateEvent = async (req, res) => {   
   try {
     // const organizerId = req.user.userId;
     const { eventId,categoryId} = req.params;
@@ -303,7 +328,6 @@ exports.getOverview = async (req, res) => {
       });
 
   } catch (error) {
-      console.error("Error fetching dashboard stats:", error);
       res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };

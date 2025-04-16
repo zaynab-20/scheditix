@@ -28,7 +28,8 @@ exports.authenticate = async (req, res, next) => {
     req.user = {
       userId: user._id,
       isAdmin: user.isAdmin,
-      isLoggedIn: user.isLoggedIn
+      isLoggedIn: user.isLoggedIn,
+      plan: user.plan
     };  
 
     next();

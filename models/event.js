@@ -52,13 +52,12 @@ const eventSchema = new mongoose.Schema({
       require: true
     }
   }],
-// createdBy:{
   eventPlannerId: {
     type:mongoose.SchemaTypes.ObjectId,
     ref: 'eventPlanner',
     required:true
   },
-// },
+
   totalTableNumber: {
     type: Number,
     require: true
@@ -91,6 +90,27 @@ const eventSchema = new mongoose.Schema({
   featured: {
     type: Boolean,
     default: false
+  },
+  ticketPrice: {
+    type: Number,
+    required: true
+  },
+  totalTicketNumber: {
+    type: Number,
+    required: true
+  },
+  ticketQuantity: {
+    type: Number,
+    required: true,
+    default: 0 
+  },
+  ticketPurchaseLimit: {
+    type: Number
+  },
+  parkingAccess: {
+    type: String,
+    enum: ["yes", "no"],
+    default: "no"
   }
 },{
   timestamps: true
