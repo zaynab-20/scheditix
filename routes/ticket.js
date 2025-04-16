@@ -1,5 +1,5 @@
 const { createTicket, getAllTickets, getTicketById, updateTicket, deleteTicket } = require('../controllers/ticket');
-const { validateTicket } = require('../middleware/validation'); 
+// const { validateTicket } = require('../middleware/validation'); 
 const express = require('express');
 const router = express.Router();
 
@@ -8,7 +8,7 @@ const router = express.Router();
  * /api/v1/create/ticket/{eventId}:
  *   post:
  *     summary: Create a ticket for an event
- *     description: Generates a ticket for a specific event if one doesn't already exist.
+ *     description: Generates a ticket for a specific event if one doesn't already exist. The ticket details such as total ticket number, price, etc., are derived from the event.
  *     tags:
  *       - Ticket Management
  *     security:
@@ -20,34 +20,30 @@ const router = express.Router();
  *         schema:
  *           type: string
  *         description: The ID of the event to create a ticket for
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               totalTicketNumber:
- *                 type: integer
- *                 example: 200
- *               ticketType:
- *                 type: string
- *                 example: "VIP"
- *               ticketPrice:
- *                 type: number
- *                 format: float
- *                 example: 5000
  *     responses:
  *       201:
  *         description: Ticket created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Ticket created successfully"
+ *                 data:
+ *                   $ref: '#/components/schemas/Ticket'
  *       400:
- *         description: Ticket already exists or invalid input
+ *         description: Ticket already exists for the event
+ *       403:
+ *         description: Plan limit exceeded (for "Basic" and "Pro" plans)
  *       404:
- *         description: Event not found
+ *         description: Event or Event Planner not found
  *       500:
  *         description: Error creating ticket
  */
-router.post('/create/ticket/:eventId', validateTicket, createTicket);
+router.post('/create/ticket/:eventId',createTicket);
+// router.post('/create/ticket/:eventId', validateTicket, createTicket);
 
 /**
  * @swagger
@@ -76,12 +72,14 @@ router.get('/tickets/:eventId', getAllTickets);
 
 /**
  * @swagger
- * /api/v1/ticket/{ticketId}:
+ * /api/v1/update/ticket/{ticketId}:
  *   put:
- *     summary: Update a ticket
- *     description: Update ticket details excluding the check-in code.
+ *     summary: Update ticket information
+ *     description: Allows the update of ticket properties such as `totalTicketNumber` and `ticketPrice`.
  *     tags:
  *       - Ticket Management
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: ticketId
@@ -98,14 +96,11 @@ router.get('/tickets/:eventId', getAllTickets);
  *             properties:
  *               totalTicketNumber:
  *                 type: integer
- *                 example: 300
+ *                 example: 250
  *               ticketPrice:
  *                 type: number
  *                 format: float
- *                 example: 3000
- *             required:
- *               - totalTicketNumber
- *               - ticketPrice
+ *                 example: 6000
  *     responses:
  *       200:
  *         description: Ticket updated successfully
@@ -116,49 +111,18 @@ router.get('/tickets/:eventId', getAllTickets);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Ticket updated successfully
+ *                   example: "Ticket updated successfully"
  *                 data:
- *                   type: object
- *                   properties:
- *                     totalTicketNumber:
- *                       type: integer
- *                       example: 300
- *                     ticketPrice:
- *                       type: number
- *                       format: float
- *                       example: 3000
+ *                   $ref: '#/components/schemas/Ticket'
  *       400:
- *         description: Invalid update (e.g. checkInCode modification attempt)
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: checkInCode cannot be updated
+ *         description: Invalid update request (e.g., trying to update `checkInCode`)
  *       404:
- *         description: Ticket not found
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Ticket not found
+ *         description: Ticket or Event not found
  *       500:
  *         description: Error updating ticket
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Failed to update ticket
  */
-router.put('/ticket/:ticketId', validateTicket, updateTicket);
+router.put('/update/ticket/:ticketId', updateTicket);
+// router.put('/ticket/:ticketId', validateTicket, updateTicket);
 
 /**
  * @swagger
