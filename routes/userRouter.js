@@ -1,4 +1,4 @@
-const { registerUser, verifyUser, logInUser, forgotUserPassword, resetUserPassword, changeUserPassword, logOut,  updateEventPlanner, deleteEventPlanner } = require('../controllers/eventPlanner')
+const { registerUser, verifyUser, logInUser, forgotUserPassword, resetUserPassword, changeUserPassword, logOut,  updateEventPlanner, deleteEventPlanner, getAllUser, getOneUser } = require('../controllers/eventPlanner')
 const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, changeUserPasswordSchema } = require('../middleware/validation')
 const { authenticate } = require('../middleware/authentication')
 
@@ -272,6 +272,58 @@ router.post('/logout', authenticate, logOut);
  *         description: Internal Server Error
  */
 router.put('/update/user/:id', authenticate, updateEventPlanner);
+
+/**
+ * @swagger
+ * /api/v1/Users:
+ *   get:
+ *     tags:
+ *       - Users
+ *     summary: Get all users
+ *     description: Retrieve a list of all users
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *         schema:
+ *           type: array
+ *           users:
+ *             type: object
+ *             properties:
+ *               id:
+ *                 type: string
+ *                 example: "12345"
+ *               name:
+ *                 type: string
+ *                 example: "Sample Item"
+ *               description:
+ *                 type: string
+ *                 example: "This is a sample item"
+ *       500:
+ *         description: Internal Server Error
+ */
+router.get('/getAll/user', getAllUser)
+
+/** 
+ * @swagger
+ * /api/v1/getOneUser/{id}:
+ *   get:
+ *     summary: Get one user
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User retrieved successfully
+ *       400:
+ *         description: Invalid user ID
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/getOneUser/:id', getOneUser)
 
 /**
  * @swagger

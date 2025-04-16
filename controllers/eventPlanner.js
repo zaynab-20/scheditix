@@ -56,9 +56,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    const link = `${req.protocol}://${req.get(
-      "host"
-    )}/api/v1/verify/user/${token}`;
+    const link = `http://localhost:5173/email-verification/${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
@@ -113,11 +111,9 @@ exports.verifyUser = async (req, res) => {
           const newToken = jwt.sign(
             { eventPlannerId: eventPlanner._id },
             process.env.JWT_SECRET,
-            { expiresIn: "5mins" }
+            { expiresIn: "10mins" }
           );
-          const link = `${req.protocol}://${req.get(
-            "host"
-          )}/api/v1/verify/user/${newToken}`;
+          const link = `http://localhost:5173/email-verification/${newToken}`;
           const firstName = eventPlanner.fullname.split(" ")[0];
 
           const mailOptions = {
@@ -519,6 +515,99 @@ exports.deleteEventPlanner = async (req, res) => {
     console.log(error.message);
     res.status(500).json({
       message: "Internal server error:" + error.message,
+    });
+  }
+};
+
+
+exports.uploadImage = async (req, res) => {
+  try {
+    const { eventPlannerId } = req.params;
+
+    if (!eventPlannerId) {
+      return res.status(400).json({
+        message: "User ID is required",
+      });
+    }
+
+   // Handle multer validation errors here
+   if (req.fileValidationError) {
+    return res.status(400).json({
+      message: req.fileValidationError,
+    });
+  }
+
+  if (!req.file) {
+    return res.status(400).json({
+      message: "Image is required",
+    });
+  }
+  console.log("File path to delete:", req.file.path);
+    // Define compressed file path
+    const compressedFilePath = path.join(
+      __dirname,
+      "../uploads/compressed-" + req.file.filename
+    );
+
+    let result; //
+
+    try {
+      // Compress the image using sharp
+      await sharp(req.file.path)
+      .resize(400, 400, { 
+        fit: sharp.fit.inside,  // Ensures the image fits inside the specified dimensions while maintaining aspect ratio
+        withoutEnlargement: true  // Prevents enlarging small images
+      })
+        // .jpeg({ quality: 70 }) // Compress JPEG to 70% quality
+        .toFile(compressedFilePath);
+
+      result = await cloudinary.uploader.upload(compressedFilePath, {
+        folder: "Image Folder",
+        use_filename: true,
+      });
+
+      // Delete the original image after upload
+      await fs.unlink(req.file.path);
+      console.log("Original image deleted successfully");
+
+      // Delete the compressed image after upload
+      await fs.unlink(compressedFilePath);
+      console.log("Compressed image deleted successfully");
+
+    } catch (error) {
+      console.log("Error uploading image to Cloudinary:", error.message);
+      return res.status(500).json({
+        message: "Image upload failed",
+        error: error.message,
+      });
+    }
+
+    const updatedStudent = await studentModel.findByIdAndUpdate(
+      studentId,
+      {
+        image: {
+          public_id: result.public_id,
+          imageUrl: result.secure_url,
+        },
+      },
+      { new: true }
+    );
+
+    if (!updatedStudent) {
+      return res.status(404).json({
+        message: "Student not found",
+      });
+    }
+
+    return res.status(200).json({
+      message: "Image uploaded and student updated successfully",
+      data: updatedStudent,
+    });
+  } catch (error) {
+    console.log("Error uploading image:", error);
+    return res.status(500).json({
+      message: "Image upload failed",
+      error: error.message,
     });
   }
 };
