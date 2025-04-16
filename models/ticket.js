@@ -6,10 +6,6 @@ const ticketSchema = new mongoose.Schema({
     type: mongoose.SchemaTypes.ObjectId,
     ref: 'events'
   },
-  eventTitle: {
-    type: String,
-    ref: 'events'
-  },
   totalTicketNumber: {
     type: Number,
     require: true
@@ -20,10 +16,6 @@ const ticketSchema = new mongoose.Schema({
   },
   ticketPrice: {
     type: Number,
-    require: true
-  },
-  ticketType: {
-    type: String,
     require: true
   },
   tableNumber: {
