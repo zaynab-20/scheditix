@@ -40,12 +40,13 @@ exports.registerUser = async (req, res) => {
     const saltedRound = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, saltedRound);
 
+
     const eventPlanner = new eventPlannerModel({
       fullname: full_name,
       email,
       phoneNo: "234" + phoneNo,
       password: hashedPassword,
-      confirmPassword: hashedPassword,
+      confirmPassword: hashedPassword
     });
     
 
@@ -56,7 +57,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    const link = `https://scheditix.onrender.com/email-verification/${token}`;
+    const link = `https://schedi-tix-front-end.vercel.app/email-verification${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
@@ -68,7 +69,7 @@ exports.registerUser = async (req, res) => {
     await send_mail(mailOptions);
     await eventPlanner.save();
     res.status(201).json({
-      message: "Account registered successfully",
+      message: `Account registered successfully check your gmail ${email} to verify ` ,
       data: eventPlanner,
       token,
     });
@@ -456,158 +457,107 @@ exports.getOneUser = async (req, res) => {
   }
 };
 
-exports.updateEventPlanner = async (req, res) => {
-  try {
-    const { eventPlannerId } = req.params;
-    const { fullname, email, password, phoneNo } = req.body;
-
-    const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
-    if (!eventPlanner) {
-      return res.status(404).json({
-        message: "EventPlanner not found",
-      });
-    }
-    const data = {
-      fullname,
-      email,
-      password,
-      phoneNo,
-    };
-    const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
-      eventPlannerId,
-      data,
-      { new: true }
-    );
-    res.status(200).json({
-      message: "EventPlanner updated successfully",
-      data: updateEventPlanner,
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: "internal server error:" + error.message,
-    });
-  }
-};
-
-exports.deleteEventPlanner = async (req, res) => {
-  try {
-    const { eventPlannerId } = req.params;
-    const eventPlanner = eventPlannerModel.findById(eventPlannerId);
-    if (!eventPlanner) {
-      return res.status(404).json({
-        message: "EventPlanner not found",
-      });
-    }
-    const deleteEventPlanner = await eventPlannerModel.findByIdAndDelete(
-      eventPlannerId
-    );
-    if (!deleteEventPlanner) {
-      return res.status(404).json({
-        message: "EventPlanner has already been deleted",
-      });
-    }
-    res.status(200).json({
-      message: "EventPlanner deleted successfully",
-      data: deleteEventPlanner,
-    });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({
-      message: "Internal server error:" + error.message,
-    });
-  }
-};
+// exports.updateEventPlanner = async (req, res) => {
+//   try {
+//     const { eventPlannerId } = req.params;
+//     const { fullname,  password } = req.body;
+//     const  result = await cloudinary.uploader.upload(req.file.path)
 
 
-exports.uploadImage = async (req, res) => {
-  try {
-    const { eventPlannerId } = req.params;
+//     const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+//     if (!eventPlanner) {
+//       return res.status(404).json({
+//         message: "EventPlanner not found",
+//       });
+//     }
+//     const data = {
+//       fullname,
+//       password,
+//       profilePic:{
+//         imageUrl:result.secure_url, 
+//         publicId: result.public_id
+//       }
 
-    if (!eventPlannerId) {
-      return res.status(400).json({
-        message: "User ID is required",
-      });
-    }
+//     };
+//     const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
+//       eventPlannerId,
+//       data,
+//       { new: true }
+//     );
+//     res.status(200).json({
+//       message: "EventPlanner updated successfully",
+//       data: updateEventPlanner,
+//     });
+//   } catch (error) {
+//     console.log(error.message);
 
-   // Handle multer validation errors here
-   if (req.fileValidationError) {
-    return res.status(400).json({
-      message: req.fileValidationError,
-    });
-  }
+//     if (error instanceof jwt.JsonWebTokenError) {
+//       return res.status(400).json({
+//         message: 'Session expired, please login to continue'
+//       });
+//     }
+//     res.status(500).json({
+//       message: "internal server error:" + error.message,
+//     });
+//   }
+// };
 
-  if (!req.file) {
-    return res.status(400).json({
-      message: "Image is required",
-    });
-  }
-  console.log("File path to delete:", req.file.path);
-    // Define compressed file path
-    const compressedFilePath = path.join(
-      __dirname,
-      "../uploads/compressed-" + req.file.filename
-    );
+// exports.updateEventPlanner = async (req, res) => {
+//   try {
+//     const { eventPlannerId } = req.params;
+//     const { fullname, password } = req.body;
 
-    let result; //
+//     // Check if a file was uploaded
+//     if (!req.file) {
+//       return res.status(400).json({
+//         message: "Profile picture is required",
+//       });
+//     }
 
-    try {
-      // Compress the image using sharp
-      await sharp(req.file.path)
-      .resize(400, 400, { 
-        fit: sharp.fit.inside,  // Ensures the image fits inside the specified dimensions while maintaining aspect ratio
-        withoutEnlargement: true  // Prevents enlarging small images
-      })
-        // .jpeg({ quality: 70 }) // Compress JPEG to 70% quality
-        .toFile(compressedFilePath);
+//     // Upload the file to Cloudinary
+//     const result = await cloudinary.uploader.upload(req.file.path);
 
-      result = await cloudinary.uploader.upload(compressedFilePath, {
-        folder: "Image Folder",
-        use_filename: true,
-      });
+//     // Find the event planner by ID
+//     const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+//     if (!eventPlanner) {
+//       return res.status(404).json({
+//         message: "EventPlanner not found",
+//       });
+//     }
 
-      // Delete the original image after upload
-      await fs.unlink(req.file.path);
-      console.log("Original image deleted successfully");
+//     // Hash the password if provided
+//     let hashedPassword = eventPlanner.password; // Keep the existing password if not updated
+//     if (password) {
+//       hashedPassword = await bcrypt.hash(password, 10);
+//     }
 
-      // Delete the compressed image after upload
-      await fs.unlink(compressedFilePath);
-      console.log("Compressed image deleted successfully");
+//     // Prepare the updated data
+//     const data = {
+//       fullname,
+//       password: hashedPassword,
+//       profilePic: {
+//         imageUrl: result.secure_url,
+//         publicId: result.public_id,
+//       },
+//     };
 
-    } catch (error) {
-      console.log("Error uploading image to Cloudinary:", error.message);
-      return res.status(500).json({
-        message: "Image upload failed",
-        error: error.message,
-      });
-    }
+//     // Update the event planner
+//     const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
+//       eventPlannerId,
+//       data,
+//       { new: true } // Return the updated document
+//     );
 
-    const updatedStudent = await studentModel.findByIdAndUpdate(
-      studentId,
-      {
-        image: {
-          public_id: result.public_id,
-          imageUrl: result.secure_url,
-        },
-      },
-      { new: true }
-    );
+//     res.status(200).json({
+//       message: "EventPlanner updated successfully",
+//       data: updateEventPlanner,
+//     });
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({
+//       message: "Internal server error: " + error.message,
+//     });
+//   }
+// };
 
-    if (!updatedStudent) {
-      return res.status(404).json({
-        message: "Student not found",
-      });
-    }
 
-    return res.status(200).json({
-      message: "Image uploaded and student updated successfully",
-      data: updatedStudent,
-    });
-  } catch (error) {
-    console.log("Error uploading image:", error);
-    return res.status(500).json({
-      message: "Image upload failed",
-      error: error.message,
-    });
-  }
-};
