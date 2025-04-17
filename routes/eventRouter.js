@@ -7,12 +7,11 @@ const router = express.Router();
 
 /**
  * @swagger
- * /create/event/{categoryId}:
+ * /api/v1/create/event/{categoryId}:
  *   post:
  *     summary: Create a new event
- *     tags: [Event]
- *     security:
- *       - bearerAuth: []
+ *     tags:
+ *       - Event Management
  *     parameters:
  *       - in: path
  *         name: categoryId
