@@ -236,7 +236,7 @@ router.get("/events", getAllEvent);
  *       500:
  *         description: Internal Server Error
  */
-router.put("/update/event/:eventId/:categoryId", authenticate, upload.array('image'), updateEvent);
+router.put("/update/event/:eventId/:categoryId", authenticate, upload.array('image'),validateEvent,updateEvent);
 
 
 /**

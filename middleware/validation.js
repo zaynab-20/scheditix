@@ -145,6 +145,23 @@ const eventValidationSchema = Joi.object({
     "number.positive": "Total seat number must be greater than 0",
     "any.required": "Total seat number is required",
   }),
+  ticketPurchaseLimit: Joi.number().integer().min(1).required().messages({
+    "number.base": "Ticket purchase limit must be a number",
+    "any.required": "Ticket purchase limit is required"
+  }),
+  ticketQuantity: Joi.number().integer().min(1).required().messages({
+    "number.base": "Ticket quantity must be a number",
+    "any.required": "Ticket quantity is required"
+  }),
+  parkingAccess: Joi.boolean().required().messages({
+    "boolean.base": "Parking access must be true or false",
+    "any.required": "Parking access is required"
+  }),
+  ticketPrice: Joi.number().positive().required().messages({
+    "number.base": "Ticket price must be a valid number",
+    "number.positive": "Ticket price must be greater than 0",
+    "any.required": "Ticket price is required"
+  }),
   image: Joi.string().uri().optional().messages({
     "string.uri": "Image must be a valid URL"
   })
