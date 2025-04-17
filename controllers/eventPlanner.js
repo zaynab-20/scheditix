@@ -59,7 +59,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    const link = `https://schedi-tix-front-end.vercel.app/login/${token}`;
+    const link = `https://schedi-tix-front-end.vercel.app/email-verification/${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
@@ -435,27 +435,6 @@ exports.getAllUser = async (req, res) => {
   }
 };
 
-// exports.getOneUser = async (req, res) => {
-//   try {
-//     const { eventPlannerId } = req.params;
-
-//     const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
-
-//     if (!eventPlanner) {
-//       return res.status(404).json({ message: "eventPlanner not found" });
-//     }
-
-//     res
-//       .status(200)
-//       .json({
-//         message: `kindly find the eventPlanner below`,
-//         data: eventPlanner,
-//       });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({ message: "internal server error" + error.message });
-//   }
-// };
 
 exports.updateEventPlanner = async (req, res) => {
   try {

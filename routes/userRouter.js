@@ -1,7 +1,7 @@
 const { registerUser, verifyUser, logInUser, forgotUserPassword, resetUserPassword, changeUserPassword, logOut,  updateEventPlanner, deleteEventPlanner, getAllUser, getOneUser } = require('../controllers/eventPlanner')
 const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, changeUserPasswordSchema } = require('../middleware/validation')
 const { authenticate } = require('../middleware/authentication')
-
+const upload = require("../utils/multer")
 const router = require('express').Router()
 
 /**
@@ -271,8 +271,7 @@ router.post('/logout', authenticate, logOut);
 //  *       500:
 //  *         description: Internal Server Error
 //  */
-router.put('/update/user', authenticate, updateEventPlanner);
-
+router.put('/update', upload.single('profilePic'), updateEventPlanner);
 /**
  * @swagger
  * /api/v1/Users:
