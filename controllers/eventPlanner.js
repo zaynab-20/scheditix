@@ -3,7 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { verify, reset } = require("../utils/html");
 const { send_mail } = require("../middleware/nodemailer");
-// const fs = require('fs')
+const fs = require('fs')
 
 
 exports.registerUser = async (req, res) => {
@@ -59,7 +59,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    const link = `https://schedi-tix-front-end.vercel.app/email-verification/${token}`;
+    const link = `https://schedi-tix-front-end.vercel.app/login/${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
