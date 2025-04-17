@@ -75,8 +75,8 @@ const router = express.Router();
  *                 type: integer
  *                 example: 3
  *               parkingAccess:
- *                 type: boolean
- *                 example: true
+ *                 type: string
+ *                 example: yes
  *               image:
  *                 type: array
  *                 items:
