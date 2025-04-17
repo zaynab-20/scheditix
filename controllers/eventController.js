@@ -6,8 +6,7 @@ const fs = require("fs");
 
 exports.createEvent = async (req, res) => {
   try {
-    const {eventPlannerId}= req.params;
-    const {categoryId} = req.params;
+    const {categoryId } = req.params;
     const {eventTitle,
            eventDescription,
            eventLocation,
@@ -25,16 +24,16 @@ exports.createEvent = async (req, res) => {
            parkingAccess
     } = req.body;
     const files = req.files;
+console.log(req.user)
 
-
-    const eventPlanner = await eventPlannerModel.findById(req.user.userId);
+    const eventPlanner = await eventPlannerModel.findById(req.user._id);
 
     if (!eventPlanner) {
       return res.status(404).json({ message: "Event Planner not found" });
     }
 
     if (eventPlanner.plan === 'Basic') {
-      const eventsCreated = await eventModel.countDocuments({ eventPlannerId: req.user.userId });
+      const eventsCreated = await eventModel.countDocuments({ eventPlannerId: req.user._id });
     
       if (eventsCreated == 2) {
         return res.status(403).json({ message: "Basic plan limit: You can only create 2 events." });
@@ -82,7 +81,7 @@ exports.createEvent = async (req, res) => {
       ticketPurchaseLimit,     
       parkingAccess,
       image: image,
-      eventPlannerId:req.user.userId,
+      eventPlannerId:req.user.user._id,
       featured: isFeatured
     });
     await event.save();
