@@ -24,7 +24,7 @@ exports.createEvent = async (req, res) => {
            parkingAccess
     } = req.body;
     const files = req.files;
-console.log(req.user)
+    // console.log(req.user._id)
 
     const eventPlanner = await eventPlannerModel.findById(req.user._id);
 
@@ -81,7 +81,7 @@ console.log(req.user)
       ticketPurchaseLimit,     
       parkingAccess,
       image: image,
-      eventPlannerId:req.user.user._id,
+      eventPlannerId:req.user._id,
       featured: isFeatured
     });
     await event.save();
@@ -94,7 +94,7 @@ console.log(req.user)
       .status(500)
       .json({ message: "Internal Server Error: ", error: error.message });
   }
-};
+}
 
 exports.getOneEvent = async (req, res) => {
   try {
