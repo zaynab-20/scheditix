@@ -75,8 +75,7 @@ exports.createEvent = async (req, res) => {
       startDate,
       endDate,
       totalTableNumber,
-      totalSeatNumber,
-      totalTicketNumber,   
+      totalSeatNumber,   
       ticketPrice,
       ticketQuantity, 
       ticketPurchaseLimit,     
@@ -283,8 +282,8 @@ exports.getFeaturedEvents = async (req, res) => {
 exports.getTrendingEvents = async (req, res) => {
   try {
       const trendingEvents = await eventModel.find()
-          .sort({ ticketSold: -1 }) // Sort in descending order based on ticketSold
-          .limit(5) // Limit to, say, the top 10 trending events
+          .sort({ ticketSold: -1 }) 
+          .limit(5) 
           .populate('eventCategory', 'categoryName');
 
       res.status(200).json({

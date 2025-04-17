@@ -95,10 +95,10 @@ const eventSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  totalTicketNumber: {
-    type: Number,
-    required: true
-  },
+  // totalTicketNumber: {
+  //   type: Number,
+  //   required: true
+  // },
   ticketQuantity: {
     type: Number,
     required: true,
