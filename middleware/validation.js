@@ -146,9 +146,9 @@ const eventValidationSchema = Joi.object({
     "number.positive": "Total seat number must be greater than 0",
     "any.required": "Total seat number is required",
   }),
-  ticketPurchaseLimit: Joi.number().integer().min(1).required().messages({
-    "number.base": "Ticket purchase limit must be a number"
-  }),
+  ticketPurchaseLimit: Joi.number().integer().min(1).optional().messages({
+    "number.base": "Ticket purchase limit must be a number",
+  }),  
   ticketQuantity: Joi.number().integer().min(1).required().messages({
     "number.base": "Ticket quantity must be a number",
     "any.required": "Ticket quantity is required"
