@@ -303,27 +303,27 @@ router.put('/update/user', authenticate, updateEventPlanner);
  */
 router.get('/getAll/user', getAllUser)
 
-/** 
- * @swagger
- * /api/v1/getOneUser/{id}:
- *   get:
- *     summary: Get one user
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: User ID
- *     responses:
- *       200:
- *         description: User retrieved successfully
- *       400:
- *         description: Invalid user ID
- *       500:
- *         description: Internal server error
- */
-router.get('/getOneUser/:id', getOneUser)
+// /** 
+//  * @swagger
+//  * /api/v1/getOneUser/{id}:
+//  *   get:
+//  *     summary: Get one user
+//  *     parameters:
+//  *       - in: path
+//  *         name: id
+//  *         required: true
+//  *         schema:
+//  *           type: string
+//  *         description: User ID
+//  *     responses:
+//  *       200:
+//  *         description: User retrieved successfully
+//  *       400:
+//  *         description: Invalid user ID
+//  *       500:
+//  *         description: Internal server error
+//  */
+// router.get('/getOneUser/:id', getOneUser)
 
 /**
  * @swagger

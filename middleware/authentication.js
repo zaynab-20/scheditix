@@ -10,6 +10,7 @@ exports.authenticate = async (req, res, next) => {
       });
     }
     const token = auth.split(" ")[1];
+    
     if (!token) {
       return res.status(400).json({
         message: "Invalid token",
@@ -17,6 +18,8 @@ exports.authenticate = async (req, res, next) => {
     }
     const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
     const user = await eventPlannerModel.findById(decodedToken.userId);
+    console.log('Auth: ',user);
+    
     if (!user) {
       return res.status(404).json({
         message: "Authentication Failed: User not found",

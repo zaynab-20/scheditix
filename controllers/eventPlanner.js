@@ -3,6 +3,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { verify, reset } = require("../utils/html");
 const { send_mail } = require("../middleware/nodemailer");
+// const fs = require('fs')
+
 
 exports.registerUser = async (req, res) => {
   try {
@@ -433,27 +435,27 @@ exports.getAllUser = async (req, res) => {
   }
 };
 
-exports.getOneUser = async (req, res) => {
-  try {
-    const { eventPlannerId } = req.params;
+// exports.getOneUser = async (req, res) => {
+//   try {
+//     const { eventPlannerId } = req.params;
 
-    const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+//     const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
 
-    if (!eventPlanner) {
-      return res.status(404).json({ message: "eventPlanner not found" });
-    }
+//     if (!eventPlanner) {
+//       return res.status(404).json({ message: "eventPlanner not found" });
+//     }
 
-    res
-      .status(200)
-      .json({
-        message: `kindly find the eventPlanner below`,
-        data: eventPlanner,
-      });
-  } catch (error) {
-    console.log(error.message);
-    res.status(500).json({ message: "internal server error" + error.message });
-  }
-};
+//     res
+//       .status(200)
+//       .json({
+//         message: `kindly find the eventPlanner below`,
+//         data: eventPlanner,
+//       });
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({ message: "internal server error" + error.message });
+//   }
+// };
 
 exports.updateEventPlanner = async (req, res) => {
   try {
@@ -503,7 +505,7 @@ exports.updateEventPlanner = async (req, res) => {
       });
     }
     res.status(500).json({
-      message: "internal server error:" + error.message,
+      message: "internal server error:" + error,
     });
   }
 };
