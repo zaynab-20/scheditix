@@ -2,7 +2,8 @@ const mongoose = require('mongoose')
 const eventCategorySchema = new mongoose.Schema({
     categoryName:{
       type:String,
-      enum:['wedding','techEvent','birthdayParty','namingCeremony','comedy','getTogether']
+      enum:['Wedding','Tech Event','Birthday Party','Naming Ceremony','Comedy','Get Together'],
+      unique: true
     },
     // createdBy: {
     //     eventPlannerId: { 

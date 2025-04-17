@@ -29,13 +29,13 @@ exports.createTicket = async (req, res) => {
     }
 
     
-    if (eventPlanner.plan === "Basic" && totalTicketNumber > 100) {
+    if (eventPlanner.plan === "Basic" && event.totalQuantity > 100){
       return res.status(403).json({
         message: "Basic plan limit: Maximum of 100 tickets per event",
       });
     }
 
-    if (eventPlanner.plan === "Pro" && totalTicketNumber > 1000) {
+    if (eventPlanner.plan === "Pro" && event.totalQuantity > 1000){
       return res.status(403).json({
         message: "Pro plan limit: Maximum of 1000 tickets per event",
       });
@@ -66,7 +66,7 @@ exports.createTicket = async (req, res) => {
     const newTicket = new ticketModel({
       eventId: event._id,
       eventTitle: event.title,
-      totalTicketNumber: event.totalTicketNumber, 
+      totalQuantity: event.totalQuantity, 
       ticketPrice: event.ticketPrice, 
       tableNumber, 
       seatNumber,
@@ -79,9 +79,8 @@ exports.createTicket = async (req, res) => {
       data: newTicket,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
-      message: 'Error creating ticket'
+      message: 'Internal Server Error',error: error.message
     })
   }
 };
@@ -103,9 +102,8 @@ exports.getAllTickets = async (req, res) => {
       data: tickets,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
-      message: 'Error retrieving tickets',
+      message: 'Internal Server Error',error: error.message
     });
   }
 };
@@ -127,9 +125,8 @@ exports.getTicketById = async (req, res) => {
       data: ticket,
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
-      message: 'Error retrieving ticket',
+      message: 'Internal Server Error',error: error.message
     });
   }
 };
@@ -188,9 +185,8 @@ exports.deleteTicket = async (req, res) => {
       message: "Ticket deleted successfully",
     });
   } catch (error) {
-    console.log(error);
     res.status(500).json({
-      message: 'Error deleting ticket',
+      message: 'Error deleting ticket',error: error.message
     });
   }
 };
