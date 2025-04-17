@@ -1,8 +1,9 @@
-const { registerUser, verifyUser, logInUser, forgotUserPassword, resetUserPassword, changeUserPassword, logOut,  updateEventPlanner, deleteEventPlanner, getAllUser, getOneUser } = require('../controllers/eventPlanner')
-const { registerSchema, loginSchema, forgotPasswordSchema, resetPasswordSchema, changeUserPasswordSchema } = require('../middleware/validation')
-const { authenticate } = require('../middleware/authentication')
-const upload = require("../utils/multer")
-const router = require('express').Router()
+const {registerUser,verifyUser,logInUser,forgotUserPassword,resetUserPassword,changeUserPassword,logOut,deleteEventPlanner,getAllUser,updatePrifileImage,} = require("../controllers/eventPlanner");
+const { authenticate } = require("../middleware/authentication");
+const {registerSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema,changeUserPasswordSchema,} = require("../middleware/validation");
+
+const router = require("express").Router();
+const upload = require("../utils/multer");
 
 /**
  * @swagger
@@ -45,7 +46,7 @@ const router = require('express').Router()
 router.post("/register/User", registerSchema, registerUser);
 
 /**
- * @swagger 
+ * @swagger
  * /api/v1/verify/user/{token}:
  *   get:
  *     summary: Verify user account
@@ -167,7 +168,7 @@ router.post("/forgot-password/user", forgotPasswordSchema, forgotUserPassword);
  *       500:
  *         description: Internal Server Error
  */
-router.post("/reset-password/user/:token", resetPasswordSchema, resetUserPassword);
+router.post("/reset-password/user/:token",resetPasswordSchema,resetUserPassword);
 
 /**
  * @swagger
@@ -210,7 +211,7 @@ router.post("/reset-password/user/:token", resetPasswordSchema, resetUserPasswor
  *       500:
  *         description: Internal Server Error
  */
-router.post("/change-password/user/:id", changeUserPasswordSchema, changeUserPassword);
+router.post("/change-password/user/:id",changeUserPasswordSchema,changeUserPassword);
 
 /**
  * @swagger
@@ -226,7 +227,7 @@ router.post("/change-password/user/:id", changeUserPasswordSchema, changeUserPas
  *       500:
  *         description: Internal Server Error
  */
-router.post('/logout', authenticate, logOut);
+router.post("/logout", authenticate, logOut);
 
 // /**
 //  * @swagger
@@ -271,7 +272,7 @@ router.post('/logout', authenticate, logOut);
 //  *       500:
 //  *         description: Internal Server Error
 //  */
-router.put('/update', upload.single('profilePic'), updateEventPlanner);
+router.put("/update",authenticate,upload.single("profilePic"),updatePrifileImage);
 /**
  * @swagger
  * /api/v1/Users:
@@ -300,29 +301,7 @@ router.put('/update', upload.single('profilePic'), updateEventPlanner);
  *       500:
  *         description: Internal Server Error
  */
-router.get('/getAll/user', getAllUser)
-
-// /** 
-//  * @swagger
-//  * /api/v1/getOneUser/{id}:
-//  *   get:
-//  *     summary: Get one user
-//  *     parameters:
-//  *       - in: path
-//  *         name: id
-//  *         required: true
-//  *         schema:
-//  *           type: string
-//  *         description: User ID
-//  *     responses:
-//  *       200:
-//  *         description: User retrieved successfully
-//  *       400:
-//  *         description: Invalid user ID
-//  *       500:
-//  *         description: Internal server error
-//  */
-// router.get('/getOneUser/:id', getOneUser)
+router.get("/getAll/user", getAllUser);
 
 /**
  * @swagger
@@ -346,6 +325,6 @@ router.get('/getAll/user', getAllUser)
  *       500:
  *         description: Internal Server Error
  */
-router.delete('/delete/user/:id', authenticate, deleteEventPlanner);
+router.delete("/delete/user/:id", authenticate, deleteEventPlanner);
 
 module.exports = router;

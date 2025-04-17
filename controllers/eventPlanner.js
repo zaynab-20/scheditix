@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { verify, reset } = require("../utils/html");
 const { send_mail } = require("../middleware/nodemailer");
+const cloudinary = require("../config/cloudinary")
 const fs = require('fs')
 
 
@@ -96,8 +97,8 @@ exports.verifyUser = async (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, async (error, payload) => {
       if (error) {
         if (error instanceof jwt.JsonWebTokenError) {
-          const { eventPlannerId } = jwt.decode(token);
-          const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+          const decoded  = jwt.decode(token);
+          const eventPlanner = await eventPlannerModel.findById(decoded.eventPlannerId);
 
           if (!eventPlanner) {
             return res.status(404).json({
@@ -436,34 +437,38 @@ exports.getAllUser = async (req, res) => {
 };
 
 
-exports.updateEventPlanner = async (req, res) => {
+exports.updatePrifileImage = async (req, res) => {
   try {
+    
     const { userId } = req.user;
     // const { fullname,  password } = req.body;
     
     const eventPlanner = await eventPlannerModel.findById(userId);
-    console.log(eventPlanner);
-    
-    if (!eventPlanner) {
-      return res.status(404).json({
-        message: "EventPlanner not found",
-      });
-    };
 
-    const data = {
-      profilePic: eventPlanner.profilePic
-    };
+if (!eventPlanner) {
+  return res.status(404).json({
+    message: "EventPlanner not found",
+  });
+}
 
-    const file = req.file
-    if (file && file.path) {
-      await cloudinary.uploader.destroy(data.profilePic.public_id)
-      const  result = await cloudinary.uploader.upload(file.path);
-      fs.unlinkSync(req.file.path);
-      
-      data.profilePic = {
-        publicId: result.public_id,
-        imageUrl: result.secure_url
-      }
+const data = {
+  profilePic: eventPlanner.profilePic,
+};
+
+const file = req.file;
+if (file && file.path) {
+  if (data.profilePic && data.profilePic.publicId) {
+    await cloudinary.uploader.destroy(data.profilePic.publicId);
+  }
+
+  const result = await cloudinary.uploader.upload(file.path);
+  fs.unlinkSync(req.file.path);
+
+  data.profilePic = {
+    publicId: result.public_id,
+    imageUrl: result.secure_url,
+  };
+}
       
       const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
         eventPlanner._id,
@@ -472,9 +477,9 @@ exports.updateEventPlanner = async (req, res) => {
       );
       res.status(200).json({
         message: "EventPlanner updated successfully",
-        data: updateEventPlanner,
+        // data: updateEventPlanner,
       });
-    }
+    
   } catch (error) {
     console.log(error.message);
 
@@ -488,6 +493,36 @@ exports.updateEventPlanner = async (req, res) => {
     });
   }
 };
+
+exports.updateUser = async (req, res) =>{
+  try {
+    const {eventPlannerId} = req.params
+
+    const user = await userModel.findById(eventPlannerId)
+    if (!user) {
+      return res.status(404).json({
+        message: 'user not found'
+      })
+    }
+    const { fullname, phoneNo} = req.body
+    
+    const data = { 
+      fullname,
+      phoneNo
+    }
+    const updatedUser = await userModel.findByIdAndUpdate(id, data, {new: true})
+    res.status(200).json({
+      message: 'User has been updated successfully ', 
+      data:updatedUser
+    })
+
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({
+      message: 'internal server error'
+    })
+  }
+}
 
 exports.deleteEventPlanner = async (req, res) => {
   try {
