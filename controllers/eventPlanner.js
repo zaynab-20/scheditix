@@ -228,7 +228,7 @@ exports.logInUser = async (req, res) => {
 
     user.isLoggedIn = true;
     const token = jwt.sign(
-      { userId: user._id, isLoggedIn: user.isLoggedIn,plan: user.plan },
+      { userId: user._id, isLoggedIn: user.isLoggedIn,plan: user.plan,fullname:user.fullname,email:user.email},
       process.env.JWT_SECRET,
       { expiresIn: "1day" }
     );

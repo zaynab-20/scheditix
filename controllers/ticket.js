@@ -6,29 +6,32 @@ const generator = require("otp-generator");
 exports.createTicket = async (req, res) => {
   try {
     const { eventId } = req.params;
+    const attendee = req.user; 
+    const { hasCar } = req.body;
 
     const event = await eventModel.findById(eventId).populate('eventPlannerId');
-
-    if (!event) {
-      return res.status(404).json({
-        message: "Event not found",
-      });
-    };
-
-    const ticket = await ticketModel.findOne({eventId: eventId});
-
-    if (ticket) {
-      return res.status(400).json({
-        message: 'Ticket already exist'
-      })
-    };
+    if (!event){
+      return res.status(404).json({ message: "Event not found" });
+    }
 
     const eventPlanner = await eventPlannerModel.findById(event.eventPlannerId);
     if (!eventPlanner) {
       return res.status(404).json({ message: "Event planner not found" });
     }
 
-    
+    const ticketPurchaseLimit = eventPlanner.ticketPurchaseLimit || 3;  
+
+    const purchasedTickets = await ticketModel.find({
+      eventId,
+      attendeeId: attendee.userId, 
+    });
+
+    if (purchasedTickets.length >= ticketPurchaseLimit) {
+      return res.status(400).json({
+        message: `You have reached the maximum limit of ${ticketPurchaseLimit} tickets for this event`
+      });
+    }
+
     if (eventPlanner.plan === "Basic" && event.totalQuantity > 100){
       return res.status(403).json({
         message: "Basic plan limit: Maximum of 100 tickets per event",
@@ -60,23 +63,31 @@ exports.createTicket = async (req, res) => {
         console.log(`table${t} seat${s}`)
       }
     }
-    
-
 
     const newTicket = new ticketModel({
       eventId: event._id,
-      eventTitle: event.title,
-      totalQuantity: event.totalQuantity, 
-      ticketPrice: event.ticketPrice, 
-      tableNumber, 
-      seatNumber,
-      checkInCode
+        attendeeId: attendee.userId, 
+        attendeeName: attendee.fullname,
+        attendeeEmail: attendee.email,
+        eventTitle: event.title,
+        totalQuantity: event.totalQuantity,
+        ticketPrice: event.ticketPrice,
+        tableNumber,
+        seatNumber,
+        checkInCode,
+        hasCar
     });
 
     await newTicket.save();
     res.status(201).json({
-      message: "ticket created successfully",
-      data: newTicket,
+      message: "Ticket created successfully",
+      data: {
+        name: attendee.fullName,
+        email: attendee.email,
+        seat: `Table ${tableNumber} Seat ${seatNumber}`,
+        checkInCode,
+        carAccess: hasCar
+      },
     });
   } catch (error) {
     res.status(500).json({
@@ -92,9 +103,7 @@ exports.getAllTickets = async (req, res) => {
     const tickets = await ticketModel.find({ eventId });
 
     if (tickets.length === 0) {
-      return res.status(404).json({
-        message: "No tickets found for this event",
-      });
+      return res.status(404).json({ message: "No tickets found for this event" });
     }
 
     res.status(200).json({
@@ -103,21 +112,20 @@ exports.getAllTickets = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: 'Internal Server Error',error: error.message
+      message: "Internal Server Error",
+      error: error.message,
     });
   }
 };
 
-exports.getTicketById = async (req, res) => {
+
+exports.getOneTicketById = async (req, res) => {
   try {
     const { ticketId } = req.params;
 
     const ticket = await ticketModel.findById(ticketId);
-
     if (!ticket) {
-      return res.status(404).json({
-        message: "Ticket not found",
-      });
+      return res.status(404).json({ message: "Ticket not found" });
     }
 
     res.status(200).json({
@@ -126,46 +134,9 @@ exports.getTicketById = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: 'Internal Server Error',error: error.message
+      message: "Internal Server Error",
+      error: error.message,
     });
-  }
-};
-
-exports.updateTicket = async (req, res) => {
-  try {
-    const { ticketId } = req.params;
-    const { totalTicketNumber, ticketPrice } = req.body;
-
-    
-    const ticket = await ticketModel.findById(ticketId);
-    if (!ticket) {
-      return res.status(404).json({ message: "Ticket not found" });
-    }
-
-    if (req.body.checkInCode !== undefined) {
-      return res.status(400).json({ message: "checkInCode cannot be updated" });
-    }
-
-    const Data = {
-      totalTicketNumber: totalTicketNumber || ticket.totalTicketNumber,
-      ticketPrice: ticketPrice || ticket.ticketPrice,
-      tableNumber,
-      seatNumber,
-    };
-    
-    
-    const updatedTicket = await ticketModel.findByIdAndUpdate(ticketId, Data, { new: true });
-
-    if (!updatedTicket) {
-      return res.status(500).json({ message: "Failed to update ticket" }); 
-    }
-
-    res.status(200).json({
-      message: "Ticket updated successfully",
-      data: updatedTicket,
-    });
-  } catch (error) {
-    res.status(500).json({ message: 'Internal Server Error', error: error.message }); 
   }
 };
 
@@ -173,12 +144,9 @@ exports.deleteTicket = async (req, res) => {
   try {
     const { ticketId } = req.params;
 
-    const ticket = await ticketModel.findByIdAndDelete(ticketId);
-
-    if (!ticket) {
-      return res.status(404).json({
-        message: "Ticket not found",
-      });
+    const deletedTicket = await ticketModel.findByIdAndDelete(ticketId);
+    if (!deletedTicket) {
+      return res.status(404).json({ message: "Ticket not found" });
     }
 
     res.status(200).json({
@@ -186,11 +154,11 @@ exports.deleteTicket = async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      message: 'Error deleting ticket',error: error.message
+      message: "Internal Server Error",
+      error: error.message,
     });
   }
 };
-
 
 exports.purchaseTicket = async (req, res) => {
   try {
