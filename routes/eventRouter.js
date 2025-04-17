@@ -19,6 +19,12 @@ const router = express.Router();
  *         schema:
  *           type: string
  *         description: The ID of the event category
+ *       - in: path
+ *         name: eventPlannerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event planner (from logged-in user)
  *     requestBody:
  *       required: true
  *       content:
