@@ -55,7 +55,7 @@ const eventSchema = new mongoose.Schema({
   eventPlannerId: {
     type:mongoose.SchemaTypes.ObjectId,
     ref: 'eventPlanner',
-    required:true
+    require:true
   },
 
   totalTableNumber: {

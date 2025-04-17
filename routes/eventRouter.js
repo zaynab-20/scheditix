@@ -41,39 +41,54 @@ const router = express.Router();
  *             properties:
  *               eventTitle:
  *                 type: string
+ *                 example: Tech Conference
  *               eventDescription:
  *                 type: string
+ *                 example: A conference for tech enthusiasts.
  *               eventLocation:
  *                 type: string
+ *                 example: Landmark Event Center, Lagos
  *               startTime:
  *                 type: string
  *                 format: time
+ *                 example: 10:00AM
  *               endTime:
  *                 type: string
  *                 format: time
+ *                 example: 07:00PM
  *               eventAgenda:
  *                 type: string
+ *                 example: Exploring AI, Web3, and Cloud Computing
  *               eventRule:
  *                 type: string
+ *                 example: No smoking, no food from outside
  *               startDate:
  *                 type: string
  *                 format: date
+ *                 example: 2025-05-10
  *               endDate:
  *                 type: string
  *                 format: date
+ *                 example: 2025-05-11
  *               totalTableNumber:
  *                 type: number
+ *                 example: 10
  *               totalSeatNumber:
  *                 type: number
+ *                 example: 5
  *               ticketPrice:
  *                 type: number
+ *                 example: 1000
  *               ticketQuantity:
  *                 type: number
+ *                 example: 100
  *               ticketPurchaseLimit:
  *                 type: number
+ *                 example: 3
  *               parkingAccess:
  *                 type: string
  *                 enum: [yes, no]
+ *                 example: yes
  *                 description: Indicates if parking access is available
  *               image:
  *                 type: array
@@ -81,7 +96,7 @@ const router = express.Router();
  *                   type: string
  *                   format: binary
  *     responses:
- *       201:
+ *       '201':
  *         description: Event created successfully
  *         content:
  *           application/json:
@@ -93,10 +108,38 @@ const router = express.Router();
  *                   example: Event Created Successfully
  *                 data:
  *                   $ref: '#/components/schemas/Event'
- *       403:
+ *       '403':
  *         description: Event limit reached for basic plan
- *       500:
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Basic plan limit: You can only create 2 events."
+ *       '404':
+ *         description: Event planner not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event Planner not found"
+ *       '500':
  *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ *                 error:
+ *                   type: string
  */
 router.post("/create/event/:categoryId", authenticate, upload.array('image'), validateEvent, createEvent);
 

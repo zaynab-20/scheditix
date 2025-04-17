@@ -6,7 +6,7 @@ const fs = require("fs");
 
 exports.createEvent = async (req, res) => {
   try {
-    // const organizerId = req.user.userId;
+    const {eventPlannerId}= req.params;
     const {categoryId} = req.params;
     const {eventTitle,
            eventDescription,
@@ -28,6 +28,7 @@ exports.createEvent = async (req, res) => {
 
 
     const eventPlanner = await eventPlannerModel.findById(req.user.userId);
+
     if (!eventPlanner) {
       return res.status(404).json({ message: "Event Planner not found" });
     }
