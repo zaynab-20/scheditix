@@ -226,7 +226,7 @@ exports.logInUser = async (req, res) => {
 
     user.isLoggedIn = true;
     const token = jwt.sign(
-      { userId: user._id, isLoggedIn: user.isLoggedIn },
+      { userId: user._id, isLoggedIn: user.isLoggedIn,plan: user.plan },
       process.env.JWT_SECRET,
       { expiresIn: "1day" }
     );
@@ -281,9 +281,7 @@ exports.forgotUserPassword = async (req, res) => {
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
       expiresIn: "10mins",
     });
-    const link = `${req.protocol}://${req.get(
-      "host"
-    )}/api/v1/reset-password/user/${token}`;
+    const link = `https://schedi-tix-front-end.vercel.app/reset-password/${token}`;
     const firstName = user.fullname.split(" ")[0];
 
     const mailOptions = {
@@ -459,35 +457,43 @@ exports.getOneUser = async (req, res) => {
 
 exports.updateEventPlanner = async (req, res) => {
   try {
-    const { eventPlannerId } = req.params;
-    const { fullname,  password } = req.body;
-    const  result = await cloudinary.uploader.upload(req.file.path)
-
-
-    const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+    const { userId } = req.user;
+    // const { fullname,  password } = req.body;
+    
+    const eventPlanner = await eventPlannerModel.findById(userId);
+    console.log(eventPlanner);
+    
     if (!eventPlanner) {
       return res.status(404).json({
         message: "EventPlanner not found",
       });
-    }
-    const data = {
-      fullname,
-      password,
-      profilePic:{
-        imageUrl:result.secure_url, 
-        publicId: result.public_id
-      }
-
     };
-    const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
-      eventPlannerId,
-      data,
-      { new: true }
-    );
-    res.status(200).json({
-      message: "EventPlanner updated successfully",
-      data: updateEventPlanner,
-    });
+
+    const data = {
+      profilePic: eventPlanner.profilePic
+    };
+
+    const file = req.file
+    if (file && file.path) {
+      await cloudinary.uploader.destroy(data.profilePic.public_id)
+      const  result = await cloudinary.uploader.upload(file.path);
+      fs.unlinkSync(req.file.path);
+      
+      data.profilePic = {
+        publicId: result.public_id,
+        imageUrl: result.secure_url
+      }
+      
+      const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
+        eventPlanner._id,
+        data,
+        { new: true }
+      );
+      res.status(200).json({
+        message: "EventPlanner updated successfully",
+        data: updateEventPlanner,
+      });
+    }
   } catch (error) {
     console.log(error.message);
 
@@ -504,10 +510,10 @@ exports.updateEventPlanner = async (req, res) => {
 
 exports.deleteEventPlanner = async (req, res) => {
   try {
-    const { eventPlannerId } = req.params;
+    const { userId } = req.params;
 
     // Await the result of findById
-    const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+    const eventPlanner = await eventPlannerModel.findById(userId);
     if (!eventPlanner) {
       return res.status(404).json({
         message: "EventPlanner not found",

@@ -25,12 +25,7 @@ exports.authenticate = async (req, res, next) => {
     if(user.isLoggedIn !== decodedToken.isLoggedIn){
       return res.status(401).json({message: 'Unauthorized'})
     }
-    req.user = {
-      userId: user._id,
-      isAdmin: user.isAdmin,
-      isLoggedIn: user.isLoggedIn,
-      plan: user.plan
-    };  
+    req.user = decodedToken;  
 
     next();
   } catch (error) {

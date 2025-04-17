@@ -271,7 +271,7 @@ router.post('/logout', authenticate, logOut);
 //  *       500:
 //  *         description: Internal Server Error
 //  */
-router.put('/update/user/:eventPlannerId', authenticate, updateEventPlanner);
+router.put('/update/user', authenticate, updateEventPlanner);
 
 /**
  * @swagger
