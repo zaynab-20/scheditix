@@ -1,4 +1,4 @@
-const { createTicket, getAllTickets, getTicketById, updateTicket, deleteTicket } = require('../controllers/ticket');
+const { createTicket, getAllTickets, getOneTicketById,deleteTicket } = require('../controllers/ticket');
 // const { validateTicket } = require('../middleware/validation'); 
 const express = require('express');
 const router = express.Router();
@@ -7,10 +7,8 @@ const router = express.Router();
  * @swagger
  * /api/v1/create/ticket/{eventId}:
  *   post:
- *     summary: Create a ticket for an event
- *     description: Generates a ticket for a specific event if one doesn't already exist. The ticket details such as total ticket number, price, etc., are derived from the event.
- *     tags:
- *       - Ticket Management
+ *     summary: Create a ticket for a specific event
+ *     tags: [Ticket]
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -19,7 +17,20 @@ const router = express.Router();
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the event to create a ticket for
+ *         description: The ID of the event to purchase a ticket for
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - hasCar
+ *             properties:
+ *               hasCar:
+ *                 type: string
+ *                 enum: [yes, no]
+ *                 description: Indicates whether the attendee has a car for parking access
  *     responses:
  *       201:
  *         description: Ticket created successfully
@@ -30,29 +41,76 @@ const router = express.Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Ticket created successfully"
+ *                   example: Ticket created successfully
  *                 data:
- *                   $ref: '#/components/schemas/Ticket'
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                       example: John Doe
+ *                     email:
+ *                       type: string
+ *                       example: johndoe@example.com
+ *                     seat:
+ *                       type: string
+ *                       example: Table 3 Seat 2
+ *                     checkInCode:
+ *                       type: string
+ *                       example: AB12C
+ *                     carAccess:
+ *                       type: string
+ *                       example: yes
  *       400:
- *         description: Ticket already exists for the event
+ *         description: Ticket purchase limit reached
  *       403:
- *         description: Plan limit exceeded (for "Basic" and "Pro" plans)
+ *         description: Ticket creation not allowed due to plan restrictions
  *       404:
- *         description: Event or Event Planner not found
+ *         description: Event or event planner not found
  *       500:
- *         description: Error creating ticket
+ *         description: Internal server error
  */
 router.post('/create/ticket/:eventId',createTicket);
 // router.post('/create/ticket/:eventId', validateTicket, createTicket);
 
 /**
  * @swagger
+ * /api/v1/getOneTicket/{ticketId}:
+ *   get:
+ *     summary: Retrieve a single ticket by its ID
+ *     tags: [Ticket]
+ *     parameters:
+ *       - in: path
+ *         name: ticketId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the ticket to retrieve
+ *     responses:
+ *       200:
+ *         description: Ticket retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ticket retrieved successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Ticket'
+ *       404:
+ *         description: Ticket not found
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/getOneTicket',getOneTicketById)
+
+/**
+ * @swagger
  * /api/v1/tickets/{eventId}:
  *   get:
- *     summary: Get all tickets for an event
- *     description: Retrieve all tickets that belong to a specific event.
- *     tags:
- *       - Ticket Management
+ *     summary: Get all tickets for a specific event
+ *     tags: [Ticket]
  *     parameters:
  *       - in: path
  *         name: eventId
@@ -63,47 +121,6 @@ router.post('/create/ticket/:eventId',createTicket);
  *     responses:
  *       200:
  *         description: Tickets retrieved successfully
- *       404:
- *         description: No tickets found for this event
- *       500:
- *         description: Error retrieving tickets
- */
-router.get('/tickets/:eventId', getAllTickets);
-
-/**
- * @swagger
- * /api/v1/update/ticket/{ticketId}:
- *   put:
- *     summary: Update ticket information
- *     description: Allows the update of ticket properties such as `totalTicketNumber` and `ticketPrice`.
- *     tags:
- *       - Ticket Management
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: ticketId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the ticket to update
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               totalTicketNumber:
- *                 type: integer
- *                 example: 250
- *               ticketPrice:
- *                 type: number
- *                 format: float
- *                 example: 6000
- *     responses:
- *       200:
- *         description: Ticket updated successfully
  *         content:
  *           application/json:
  *             schema:
@@ -111,27 +128,24 @@ router.get('/tickets/:eventId', getAllTickets);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Ticket updated successfully"
+ *                   example: Tickets retrieved successfully
  *                 data:
- *                   $ref: '#/components/schemas/Ticket'
- *       400:
- *         description: Invalid update request (e.g., trying to update `checkInCode`)
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Ticket'
  *       404:
- *         description: Ticket or Event not found
+ *         description: No tickets found for this event
  *       500:
- *         description: Error updating ticket
+ *         description: Internal server error
  */
-router.put('/update/ticket/:ticketId', updateTicket);
-// router.put('/ticket/:ticketId', validateTicket, updateTicket);
+router.get('/tickets/:eventId', getAllTickets);
 
 /**
  * @swagger
  * /api/v1/ticket/{ticketId}:
  *   delete:
- *     summary: Delete a ticket
- *     description: Delete a ticket by its unique ID.
- *     tags:
- *       - Ticket Management
+ *     summary: Delete a specific ticket
+ *     tags: [Ticket]
  *     parameters:
  *       - in: path
  *         name: ticketId
@@ -142,10 +156,18 @@ router.put('/update/ticket/:ticketId', updateTicket);
  *     responses:
  *       200:
  *         description: Ticket deleted successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ticket deleted successfully
  *       404:
  *         description: Ticket not found
  *       500:
- *         description: Error deleting ticket
+ *         description: Internal server error
  */
 router.delete('/ticket/:ticketId', deleteTicket);
 

@@ -7,93 +7,97 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/create/event/{categoryId}:
+ * /create/event/{categoryId}:
  *   post:
  *     summary: Create a new event
- *     description: Allows an authenticated user to create a new event, including uploading images and setting event details like ticket prices and quantity.
- *     tags:
- *       - Event Management
+ *     tags: [Event]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: categoryId
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the category to which the event belongs
+ *         description: The ID of the event category
  *     requestBody:
  *       required: true
  *       content:
  *         multipart/form-data:
  *           schema:
  *             type: object
+ *             required:
+ *               - eventTitle
+ *               - eventDescription
+ *               - eventLocation
+ *               - startTime
+ *               - endTime
+ *               - startDate
+ *               - endDate
+ *               - totalTableNumber
+ *               - totalSeatNumber
+ *               - ticketPrice
+ *               - ticketQuantity
+ *               - ticketPurchaseLimit
  *             properties:
  *               eventTitle:
  *                 type: string
- *                 example: "Tech Summit 2025"
  *               eventDescription:
  *                 type: string
- *                 example: "A gathering of tech enthusiasts to explore emerging trends."
  *               eventLocation:
  *                 type: string
- *                 example: "Lagos, Nigeria"
  *               startTime:
  *                 type: string
  *                 format: time
- *                 example: "09:00"
  *               endTime:
  *                 type: string
  *                 format: time
- *                 example: "17:00"
  *               eventAgenda:
  *                 type: string
- *                 example: "Talks, Panels, Networking"
  *               eventRule:
  *                 type: string
- *                 example: "No refunds after registration."
  *               startDate:
  *                 type: string
  *                 format: date
- *                 example: "2025-05-01"
  *               endDate:
  *                 type: string
  *                 format: date
- *                 example: "2025-05-03"
  *               totalTableNumber:
- *                 type: integer
- *                 example: 50
+ *                 type: number
  *               totalSeatNumber:
- *                 type: integer
- *                 example: 300
+ *                 type: number
  *               ticketPrice:
  *                 type: number
- *                 format: float
- *                 example: 5000
  *               ticketQuantity:
- *                 type: integer
- *                 example: 100
+ *                 type: number
  *               ticketPurchaseLimit:
- *                 type: integer
- *                 example: 3
+ *                 type: number
  *               parkingAccess:
  *                 type: string
- *                 example: yes
+ *                 enum: [yes, no]
+ *                 description: Indicates if parking access is available
  *               image:
  *                 type: array
  *                 items:
  *                   type: string
  *                   format: binary
- *                   description: Upload one or more event images
  *     responses:
  *       201:
  *         description: Event created successfully
- *       400:
- *         description: Bad request, invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Event Created Successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Event'
  *       403:
- *         description: Basic plan limit exceeded
- *       404:
- *         description: Event planner not found
+ *         description: Event limit reached for basic plan
  *       500:
- *         description: Internal Server Error
+ *         description: Internal server error
  */
 router.post("/create/event/:categoryId", authenticate, upload.array('image'), validateEvent, createEvent);
 

@@ -4,9 +4,23 @@ const mongoose = require('mongoose');
 const ticketSchema = new mongoose.Schema({
   eventId: {
     type: mongoose.SchemaTypes.ObjectId,
-    ref: 'events'
+    ref: 'events',
+    required: true
   },
-  totalTicketNumber: {
+  attendeeId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'user',
+    required: true
+  },
+  attendeeName: {
+    type: String,
+    required: true
+  },
+  attendeeEmail: {
+    type: String,
+    required: true
+  },
+  TicketQuantity: {
     type: Number,
     require: true
   },

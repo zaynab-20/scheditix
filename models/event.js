@@ -105,7 +105,8 @@ const eventSchema = new mongoose.Schema({
     default: 0 
   },
   ticketPurchaseLimit: {
-    type: Number
+    type: Number,
+    default: 3
   },
   parkingAccess: {
     type: String,
