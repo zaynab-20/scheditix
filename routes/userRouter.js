@@ -1,4 +1,4 @@
-const {registerUser,verifyUser,logInUser,forgotUserPassword,resetUserPassword,changeUserPassword,logOut,deleteEventPlanner,getAllUser,updatePrifileImage,} = require("../controllers/eventPlanner");
+const {registerUser,verifyUser,logInUser,forgotUserPassword,resetUserPassword,changeUserPassword,logOut,deleteEventPlanner,getAllUser,updatePrifileImage, updateUser,} = require("../controllers/eventPlanner");
 const { authenticate } = require("../middleware/authentication");
 const {registerSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema,changeUserPasswordSchema,} = require("../middleware/validation");
 
@@ -272,7 +272,9 @@ router.post("/logout", authenticate, logOut);
 //  *       500:
 //  *         description: Internal Server Error
 //  */
-router.put("/update",authenticate,upload.single("profilePic"),updatePrifileImage);
+router.put("/update/profile",authenticate,upload.single("profilePic"),updatePrifileImage);
+
+router.put("/update/user/:id", updateUser)
 /**
  * @swagger
  * /api/v1/Users:
