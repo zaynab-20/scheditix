@@ -54,7 +54,7 @@ const eventSchema = new mongoose.Schema({
   }],
   eventPlannerId: {
     type:mongoose.SchemaTypes.ObjectId,
-    ref: 'eventPlanner',
+    ref: 'eventPlanners',
     require:true
   },
 

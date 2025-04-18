@@ -1,5 +1,5 @@
-const { createTicket, getAllTickets, getOneTicketById,deleteTicket } = require('../controllers/ticket');
-// const { validateTicket } = require('../middleware/validation'); 
+const { createTicket, getAllTickets, getOneTicketById,deleteTicket, updateTicket } = require('../controllers/ticket');
+const { validateTicketPurchase } = require('../middleware/validation'); 
 const express = require('express');
 const router = express.Router();
 
@@ -25,12 +25,31 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - hasCar
+ *               - fullName
+ *               - email
+ *               - numberOfTicket
+ *               - needCarPackingSpace
  *             properties:
- *               hasCar:
+ *               fullName:
+ *                 type: string
+ *                 example: John Doe
+ *               email:
+ *                 type: string
+ *                 example: johndoe@example.com
+ *               numberOfTicket:
+ *                 type: integer
+ *                 minimum: 1
+ *                 maximum: 3
+ *                 example: 2
+ *               needCarPackingSpace:
  *                 type: string
  *                 enum: [yes, no]
- *                 description: Indicates whether the attendee has a car for parking access
+ *                 example: yes
+ *                 description: Indicates whether the attendee needs car parking access
+ *               specialRequest:
+ *                 type: string
+ *                 example: I’d like a seat close to the stage
+ *                 description: Optional special requests for seating, accessibility, etc.
  *     responses:
  *       201:
  *         description: Ticket created successfully
@@ -53,24 +72,29 @@ const router = express.Router();
  *                       example: johndoe@example.com
  *                     seat:
  *                       type: string
- *                       example: Table 3 Seat 2
+ *                       example: Table 1 Seat 1
  *                     checkInCode:
  *                       type: string
- *                       example: AB12C
+ *                       example: A1B2C
+ *                     numberOfTicket:
+ *                       type: integer
+ *                       example: 2
  *                     carAccess:
  *                       type: string
  *                       example: yes
+ *                     specialRequest:
+ *                       type: string
+ *                       example: I’d like a seat close to the stage
  *       400:
  *         description: Ticket purchase limit reached
  *       403:
  *         description: Ticket creation not allowed due to plan restrictions
  *       404:
- *         description: Event or event planner not found
+ *         description: Event not found
  *       500:
  *         description: Internal server error
  */
-router.post('/create/ticket/:eventId',createTicket);
-// router.post('/create/ticket/:eventId', validateTicket, createTicket);
+router.post('/create/ticket/:eventId',validateTicketPurchase,createTicket)
 
 /**
  * @swagger
@@ -142,10 +166,90 @@ router.get('/tickets/:eventId', getAllTickets);
 
 /**
  * @swagger
+ * /api/v1/update/ticket/{ticketId}:
+ *   put:
+ *     summary: Update a ticket by ID
+ *     tags: [Ticket]
+ *     parameters:
+ *       - in: path
+ *         name: ticketId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the ticket to update
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 example: Jane Smith
+ *               email:
+ *                 type: string
+ *                 example: janesmith@example.com
+ *               numberOfTicket:
+ *                 type: integer
+ *                 example: 2
+ *               needCarPackingSpace:
+ *                 type: string
+ *                 enum: [yes, no]
+ *                 example: no
+ *               specialRequest:
+ *                 type: string
+ *                 example: Please provide a seat near the exit
+ *     responses:
+ *       200:
+ *         description: Ticket updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ticket updated successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       example: 661fb9e3f1a3cc152efde9e2
+ *                     eventId:
+ *                       type: string
+ *                       example: 661fb9c9f1a3cc152efde9d1
+ *                     fullName:
+ *                       type: string
+ *                       example: Jane Smith
+ *                     email:
+ *                       type: string
+ *                       example: janesmith@example.com
+ *                     numberOfTicket:
+ *                       type: integer
+ *                       example: 2
+ *                     carAccess:
+ *                       type: string
+ *                       example: no
+ *                     specialRequest:
+ *                       type: string
+ *                       example: Please provide a seat near the exit
+ *       404:
+ *         description: Ticket not found
+ *       500:
+ *         description: Internal server error
+ */
+router.put('/update/ticket/:ticketId',validateTicketPurchase,updateTicket);
+
+/**
+ * @swagger
  * /api/v1/ticket/{ticketId}:
  *   delete:
- *     summary: Delete a specific ticket
+ *     summary: Delete a ticket by ID
  *     tags: [Ticket]
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: ticketId
@@ -166,8 +270,27 @@ router.get('/tickets/:eventId', getAllTickets);
  *                   example: Ticket deleted successfully
  *       404:
  *         description: Ticket not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Ticket not found
  *       500:
- *         description: Internal server error
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error
+ *                 error:
+ *                   type: string
+ *                   example: Some error message
  */
 router.delete('/ticket/:ticketId', deleteTicket);
 
