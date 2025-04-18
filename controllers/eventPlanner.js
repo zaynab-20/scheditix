@@ -56,7 +56,7 @@ exports.registerUser = async (req, res) => {
       { eventPlannerId: eventPlanner._id },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1h",
+        expiresIn: "1day",
       }
     );
     const link = `https://schedi-tix-front-end.vercel.app/login/${token}`;
@@ -114,7 +114,7 @@ exports.verifyUser = async (req, res) => {
           const newToken = jwt.sign(
             { eventPlannerId: eventPlanner._id },
             process.env.JWT_SECRET,
-            { expiresIn: "10mins" }
+            { expiresIn: "1h" }
           );
           const link = `https://scheditix.onrender.com/email-verification/${newToken}`;
           const firstName = eventPlanner.fullname.split(" ")[0];
@@ -510,6 +510,38 @@ exports.updateEventPlanner = async (req, res) => {
   }
 };
 
+exports.updateUser = async (req, res) =>{
+  try {
+    const {userId} = req.params
+    const { fullname, phoneNo} = req.body
+    
+    const data = { 
+      fullname,
+      phoneNo
+    }
+
+    const user = await eventPlannerModel.findById(userId)
+    if (!user) {
+      return res.status(404).json({
+        message: 'user not found'
+      })
+    }
+
+    const updatedUser = await eventPlannerModel.findByIdAndUpdate(userId, data, 
+      {new: true})
+    res.status(200).json({
+      message: 'User has been updated successfully ', 
+      data:updatedUser
+    })
+
+  } catch (error) {
+    console.log(error.message)
+    res.status(500).json({
+      message: 'internal server error:' + error.message
+    })
+  }
+}
+
 exports.deleteEventPlanner = async (req, res) => {
   try {
     const { userId } = req.params;
@@ -522,7 +554,7 @@ exports.deleteEventPlanner = async (req, res) => {
       });
     }
 
-    const deleteEventPlanner = await eventPlannerModel.findByIdAndDelete(eventPlannerId);
+    const deleteEventPlanner = await eventPlannerModel.findByIdAndDelete(userId);
     if (!deleteEventPlanner) {
       return res.status(404).json({
         message: "EventPlanner has already been deleted",

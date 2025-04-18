@@ -229,52 +229,107 @@ router.post("/change-password/user/:id",changeUserPasswordSchema,changeUserPassw
  */
 router.post("/logout", authenticate, logOut);
 
-// /**
-//  * @swagger
-//  * /api/v1/update/user/{id}:
-//  *   put:
-//  *     tags:
-//  *       - Users
-//  *     summary: Update user details
-//  *     description: This endpoint allows an event planner to update their details.
-//  *     parameters:
-//  *       - in: path
-//  *         name: id
-//  *         description: User's ID
-//  *         required: true
-//  *         type: string
-//  *       - in: body
-//  *         name: user
-//  *         description: Updated user details
-//  *         required: true
-//  *         schema:
-//  *           type: object
-//  *           properties:
-//  *             fullName:
-//  *               type: string
-//  *               example: "John Doe"
-//  *             email:
-//  *               type: string
-//  *               format: email
-//  *               example: "zatoloye@gmail.com"
-//  *             phoneNo:
-//  *               type: string
-//  *               example: "9123456789"
-//  *             password:
-//  *               type: string
-//  *               format: password
-//  *               example: "Ade&20br1"
-//  *     responses:
-//  *       200:
-//  *         description: User details updated successfully
-//  *       404:
-//  *         description: User not found
-//  *       500:
-//  *         description: Internal Server Error
-//  */
-// router.put("/update/profile",authenticate,upload.single("profilePic"),updatePrifileImage);
+/**
+ * @swagger
+ * /api/v1/update/profile:
+ *   put:
+ *     summary: Update user profile image
+ *     tags:
+ *       - Users
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - profilePic
+ *             properties:
+ *               profilePic:
+ *                 type: string
+ *                 format: binary
+ *                 description: Profile image file to upload
+ *     responses:
+ *       200:
+ *         description: Profile image updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Profile image updated successfully
+ *                 data:
+ *                   type: object
+ *                   example:
+ *                     profilePicUrl: "https://example.com/uploads/profile.jpg"
+ *       400:
+ *         description: Bad request (e.g., no file uploaded)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No file uploaded
+ *       401:
+ *         description: Unauthorized
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error
+ */
 
-// router.put("/update/user/:id", updateUser)
+router.put("/update/profile",authenticate,upload.single("profilePic"),updatePrifileImage);
+
+/**
+ * @swagger
+ * /api/v1/update/user/{userId}:
+ *   put:
+ *     tags:
+ *       - Users
+ *     summary: Update a user
+ *     description: This endpoint allows you to update a user's fullname and phone number.
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         description: The ID of the user to update
+ *         required: true
+ *         schema:
+ *           type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullname:
+ *                 type: string
+ *                 example: John Doe
+ *               phoneNo:
+ *                 type: string
+ *                 example: 123-456-7890
+ *     responses:
+ *       200:
+ *         description: User has been updated successfully
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Internal Server Error
+ */
+router.put("/update/user/:userId", updateUser)
+
 /**
  * @swagger
  * /api/v1/Users:
@@ -307,7 +362,7 @@ router.get("/getAll/user", getAllUser);
 
 /**
  * @swagger
- * /api/v1/delete/user/{id}:
+ * /api/v1/delete/user/{userId}:
  *   delete:
  *     tags:
  *       - Users
@@ -327,6 +382,6 @@ router.get("/getAll/user", getAllUser);
  *       500:
  *         description: Internal Server Error
  */
-router.delete("/delete/user/:id", authenticate, deleteEventPlanner);
+router.delete("/delete/user/:userId", authenticate, deleteEventPlanner);
 
 module.exports = router;

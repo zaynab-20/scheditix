@@ -1,4 +1,4 @@
-const { createTicket, getAllTickets, getOneTicketById,deleteTicket, updateTicket } = require('../controllers/ticket');
+const { createTicket, getAllTickets, getOneTicketById,deleteTicket,updateTicket } = require('../controllers/ticket');
 const { validateTicketPurchase } = require('../middleware/validation'); 
 const express = require('express');
 const router = express.Router();
@@ -94,7 +94,9 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/create/ticket/:eventId',validateTicketPurchase,createTicket)
+
+router.post('/create/ticket/:eventId', validateTicketPurchase,createTicket);
+// router.post('/create/ticket/:eventId', validateTicket, createTicket);
 
 /**
  * @swagger
@@ -127,7 +129,7 @@ router.post('/create/ticket/:eventId',validateTicketPurchase,createTicket)
  *       500:
  *         description: Internal server error
  */
-router.get('/getOneTicket',getOneTicketById)
+router.get('/getOneTicket/:ticketId',getOneTicketById)
 
 /**
  * @swagger
@@ -240,7 +242,8 @@ router.get('/tickets/:eventId', getAllTickets);
  *       500:
  *         description: Internal server error
  */
-router.put('/update/ticket/:ticketId',validateTicketPurchase,updateTicket);
+
+router.put('/update/ticket/:ticketId', validateTicketPurchase, updateTicket)
 
 /**
  * @swagger
