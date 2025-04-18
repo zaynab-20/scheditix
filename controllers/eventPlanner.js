@@ -3,7 +3,6 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { verify, reset } = require("../utils/html");
 const { send_mail } = require("../middleware/nodemailer");
-const cloudinary = require("../config/cloudinary")
 const fs = require('fs')
 
 
@@ -60,7 +59,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1h",
       }
     );
-    const link = `https://schedi-tix-front-end.vercel.app/email-verification/${token}`;
+    const link = `https://schedi-tix-front-end.vercel.app/login/${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
@@ -96,11 +95,10 @@ exports.verifyUser = async (req, res) => {
 
     jwt.verify(token, process.env.JWT_SECRET, async (error, payload) => {
       if (error) {
-        if (error instanceof jwt.TokenExpiredError) {
-          const decoded  = jwt.decode(token);
-          const eventPlanner = await eventPlannerModel.findById(decoded.eventPlannerId);
-           console.log(error);
-           
+        if (error instanceof jwt.JsonWebTokenError) {
+          const { eventPlannerId } = jwt.decode(token);
+          const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+
           if (!eventPlanner) {
             return res.status(404).json({
               message: "Account not found",
@@ -230,7 +228,7 @@ exports.logInUser = async (req, res) => {
 
     user.isLoggedIn = true;
     const token = jwt.sign(
-      { userId: user._id, isLoggedIn: user.isLoggedIn,plan: user.plan,fullname:user.fullname,email:user.email},
+      { userId: user._id, isLoggedIn: user.isLoggedIn,plan: user.plan},
       process.env.JWT_SECRET,
       { expiresIn: "1day" }
     );
@@ -437,39 +435,56 @@ exports.getAllUser = async (req, res) => {
   }
 };
 
+// exports.getOneUser = async (req, res) => {
+//   try {
+//     const { eventPlannerId } = req.params;
 
-exports.updatePrifileImage = async (req, res) => {
+//     const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+
+//     if (!eventPlanner) {
+//       return res.status(404).json({ message: "eventPlanner not found" });
+//     }
+
+//     res
+//       .status(200)
+//       .json({
+//         message: `kindly find the eventPlanner below`,
+//         data: eventPlanner,
+//       });
+//   } catch (error) {
+//     console.log(error.message);
+//     res.status(500).json({ message: "internal server error" + error.message });
+//   }
+// };
+
+exports.updateEventPlanner = async (req, res) => {
   try {
-    
     const { userId } = req.user;
     // const { fullname,  password } = req.body;
     
     const eventPlanner = await eventPlannerModel.findById(userId);
+    console.log(eventPlanner);
+    
+    if (!eventPlanner) {
+      return res.status(404).json({
+        message: "EventPlanner not found",
+      });
+    };
 
-if (!eventPlanner) {
-  return res.status(404).json({
-    message: "EventPlanner not found",
-  });
-}
+    const data = {
+      profilePic: eventPlanner.profilePic
+    };
 
-const data = {
-  profilePic: eventPlanner.profilePic,
-};
-
-const file = req.file;
-if (file && file.path) {
-  if (data.profilePic && data.profilePic.publicId) {
-    await cloudinary.uploader.destroy(data.profilePic.publicId);
-  }
-
-  const result = await cloudinary.uploader.upload(file.path);
-  fs.unlinkSync(req.file.path);
-
-  data.profilePic = {
-    publicId: result.public_id,
-    imageUrl: result.secure_url,
-  };
-}
+    const file = req.file
+    if (file && file.path) {
+      await cloudinary.uploader.destroy(data.profilePic.public_id)
+      const  result = await cloudinary.uploader.upload(file.path);
+      fs.unlinkSync(req.file.path);
+      
+      data.profilePic = {
+        publicId: result.public_id,
+        imageUrl: result.secure_url
+      }
       
       const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
         eventPlanner._id,
@@ -478,9 +493,9 @@ if (file && file.path) {
       );
       res.status(200).json({
         message: "EventPlanner updated successfully",
-        // data: updateEventPlanner,
+        data: updateEventPlanner,
       });
-    
+    }
   } catch (error) {
     console.log(error.message);
 
@@ -494,36 +509,6 @@ if (file && file.path) {
     });
   }
 };
-
-exports.updateUser = async (req, res) =>{
-  try {
-    const {eventPlannerId} = req.params
-
-    const user = await eventPlannerModel.findById(eventPlannerId)
-    if (!user) {
-      return res.status(404).json({
-        message: 'user not found'
-      })
-    }
-    const { fullname, phoneNo} = req.body
-    
-    const data = { 
-      fullname,
-      phoneNo
-    }
-    const updatedUser = await userModel.findByIdAndUpdate(id, data, {new: true})
-    res.status(200).json({
-      message: 'User has been updated successfully ', 
-      data:updatedUser
-    })
-
-  } catch (error) {
-    console.log(error.message)
-    res.status(500).json({
-      message: 'internal server error:' + error.message
-    })
-  }
-}
 
 exports.deleteEventPlanner = async (req, res) => {
   try {

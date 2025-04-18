@@ -13,7 +13,6 @@ const korapaySecret = process.env.KORA_SECRET_KEY;
 exports.initializePayment = async (req, res) => {
   try {
     const { ticketId } = req.params;
-    const { attendeeName, attendeeEmail} = req.body;
     const ticket = await ticketModel.findById(ticketId);
 
     if (!ticket) {
@@ -22,11 +21,14 @@ exports.initializePayment = async (req, res) => {
       });
     }
 
-    if (ticket.soldTicket >= ticket.totalTicketNumber) {
+    if (ticket.soldTicket >= ticket.totalQuantity) {
       return res.status(400).json({
         message: "All ticket sold out",
       });
     }
+
+    const attendeeName = ticket.fullName;
+    const attendeeEmail = ticket.email;
 
     const paymentDetails = {
       customer: {
@@ -52,7 +54,7 @@ exports.initializePayment = async (req, res) => {
       attendeeEmail,
       attendeeName,
       reference: ref,
-      amount: ticket.ticketPrice,
+      amount: event.ticketPrice,
       paymentDate:formattedData
     })
 

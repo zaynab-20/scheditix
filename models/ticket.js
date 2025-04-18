@@ -7,18 +7,24 @@ const ticketSchema = new mongoose.Schema({
     ref: 'events',
     required: true
   },
-  attendeeId: {
-    type: mongoose.SchemaTypes.ObjectId,
-    ref: 'user',
-    required: true
-  },
-  attendeeName: {
+  fullName: {
     type: String,
     required: true
   },
-  attendeeEmail: {
+  email: {
     type: String,
-    required: true
+    required: true,
+    lowercase: true
+  },
+  numberOfTicket: {
+    type: Number,
+    required: true,
+    min: 1,
+  },
+  needCarPackingSpace: {
+    type: String,
+    enum: ["Yes", "No"],
+    default: "No"
   },
   TicketQuantity: {
     type: Number,
@@ -33,12 +39,12 @@ const ticketSchema = new mongoose.Schema({
     require: true
   },
   tableNumber: {
-    type: Number,
-    required: true
+    type: Number
+    // required: true
   },
   seatNumber: {
-    type: Number,
-    required: true
+    type: Number
+    // required: true
   },
   checkInCode: {
     type: String,
