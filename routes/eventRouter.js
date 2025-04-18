@@ -7,7 +7,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/create/event/{categoryId}:
+ * /api/v1/create-event/{categoryId}:
  *   post:
  *     summary: Create a new event
  *     tags:
@@ -19,12 +19,6 @@ const router = express.Router();
  *         schema:
  *           type: string
  *         description: The ID of the event category
- *       - in: path
- *         name: eventPlannerId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the event planner (from logged-in user)
  *     requestBody:
  *       required: true
  *       content:
@@ -56,11 +50,9 @@ const router = express.Router();
  *                 example: Landmark Event Center, Lagos
  *               startTime:
  *                 type: string
- *                 format: time
  *                 example: 10:00AM
  *               endTime:
  *                 type: string
- *                 format: time
  *                 example: 07:00PM
  *               eventAgenda:
  *                 type: string
@@ -147,7 +139,7 @@ const router = express.Router();
  *                 error:
  *                   type: string
  */
-router.post("/create/event/:categoryId", authenticate, upload.array('image'), validateEvent, createEvent);
+router.post("/create-event/:categoryId", authenticate, upload.array('image'), validateEvent, createEvent);
 
 /**
  * @swagger
@@ -288,8 +280,7 @@ router.get("/events", getAllEvent);
  *       500:
  *         description: Internal Server Error
  */
-router.put("/update/event/:eventId/:categoryId", authenticate, upload.array('image'),validateEvent,updateEvent);
-
+router.put("/update/event/:eventId/:categoryId", authenticate, upload.array('image'),updateEvent);
 
 /**
  * @swagger

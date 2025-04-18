@@ -179,40 +179,42 @@ exports.validateEvent = (req, res, next) => {
 };
 
 
-// const ticketValidationSchema = Joi.object({
-//   totalTicketNumber: Joi.number().integer().positive().required().messages({
-//     "number.base": "Total ticket number must be a valid number",
-//     "number.positive": "Total ticket number must be greater than zero",
-//     "any.required": "Total ticket number is required",
-//   }),
-//   ticketType: Joi.string().trim().min(3).max(100).required().messages({
-//     "string.empty": "Ticket type is required",
-//     "string.min": "Ticket type must be at least 3 characters",
-//     "string.max": "Ticket type cannot exceed 100 characters",
-//   }),
-//   ticketPrice: Joi.number().positive().required().messages({
-//     "number.base": "Ticket price must be a valid number",
-//     "number.positive": "Ticket price must be greater than zero",
-//     "any.required": "Ticket price is required",
-//   }),
-//   tableNumber: Joi.number().integer().positive().required().messages({
-//     "number.base": "Table number must be a valid number",
-//     "number.positive": "Table number must be greater than zero",
-//     "any.required": "Table number is required",
-//   }),
-//   seatNumber: Joi.number().integer().positive().required().messages({
-//     "number.base": "Seat number must be a valid number",
-//     "number.positive": "Seat number must be greater than zero",
-//     "any.required": "Seat number is required",
-//   }),
-// });
+const ticketValidationSchema = Joi.object({
+  fullName: Joi.string().min(3).max(50).required().messages({
+      "string.base": "Full name must be a string",
+      "string.empty": "Full name is required",
+      "string.min": "Full name must be at least 3 characters",
+      "any.required": "Full name is required"
+    }),
 
-// exports.validateTicket = (req, res, next) => {
-//   const { error } = ticketValidationSchema.validate(req.body, { abortEarly: false });
-//   if (error) {
-//     return res.status(400).json({
-//       message: error.details.map(err => err.message)
-//     });
-//   }
-//   next();
-// };
+  email: Joi.string().email().required().messages({
+      "string.email": "Enter a valid email",
+      "any.required": "Email is required"
+    }),
+
+  numberOfTicket: Joi.number().integer().min(1).max(3).required().messages({
+      "number.base": "Number of tickets must be a number",
+      "number.min": "At least 1 ticket must be selected",
+      "any.required": "Number of tickets is required"
+    }),
+    needCarPackingSpace: Joi.string().valid("yes", "no").required().messages({
+      "string.base": "Car parking space must be 'yes' or 'no'",
+      "any.only": "Car parking space must be either 'yes' or 'no'",
+      "any.required": "Car parking space is required"
+    }),
+  specialRequest: Joi.string().max(200).messages({
+      "string.base": "Special request must be text",
+      "string.max": "Special request can’t be more than 200 characters"
+    }),
+});
+
+exports.validateTicketPurchase = (req, res, next) => {
+  const { error } = ticketValidationSchema.validate(req.body, { abortEarly: false });
+  if (error) {
+    return res.status(400).json({
+      message: error.details.map(err => err.message),
+    });
+  }
+  next();
+};
+

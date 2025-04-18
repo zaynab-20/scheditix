@@ -6,7 +6,7 @@ const fs = require("fs");
 
 exports.createEvent = async (req, res) => {
   try {
-    const {categoryId} = req.params;
+    const {categoryId } = req.params;
     const {eventTitle,
            eventDescription,
            eventLocation,
@@ -24,15 +24,13 @@ exports.createEvent = async (req, res) => {
            parkingAccess
     } = req.body;
     const files = req.files;
-    const {userId} = req.user;
+    const { userId } = req.user;
 
     const category = await categoryModel.findById(categoryId);
-    if (!category) {
-      return res.status(404).json({
-        message: "Event category not found"
-      })
-    }
 
+    if (!category) {
+      return res.status(404).json({ message: "Event category not found" });
+    }
 
     const eventPlanner = await eventPlannerModel.findById(userId);
 
@@ -40,15 +38,16 @@ exports.createEvent = async (req, res) => {
       return res.status(404).json({ message: "Event Planner not found" });
     }
 
+
     if (eventPlanner.plan === 'Basic') {
-      const eventsCreated = await eventModel.countDocuments({ eventPlannerId: userId });
+      const eventsCreated = await eventModel.countDocuments({ eventPlannerId: userId});
     
       if (eventsCreated == 2) {
         return res.status(403).json({ message: "Basic plan limit: You can only create 2 events." });
       }
     }
     
-
+    
     let result;
     let imagePath = {};
     let image = []
@@ -61,7 +60,7 @@ exports.createEvent = async (req, res) => {
           imageUrl: result.secure_url,
           imagePublicId: result.public_id,
         }
-        image.push(imagePath)
+        image.push(image)
       }
       
     }
@@ -89,7 +88,7 @@ exports.createEvent = async (req, res) => {
       ticketPurchaseLimit,     
       parkingAccess,
       image: image,
-      eventPlannerId:req.user.userId,
+      eventPlannerId:req.user._id,
       featured: isFeatured
     });
     category.events.push(event._id)
@@ -104,7 +103,7 @@ exports.createEvent = async (req, res) => {
       .status(500)
       .json({ message: "Internal Server Error: ", error: error.message });
   }
-};
+}
 
 exports.getOneEvent = async (req, res) => {
   try {
@@ -118,7 +117,7 @@ exports.getOneEvent = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: `kindly find the event below`, data: event });
+      .json({ message: kindly find the event below, data: event });
   } catch (error) {
     console.log(error.message);
     res.status(500).json({ message: "internal server error" });
@@ -146,7 +145,7 @@ exports.getAllEventCategory = async (req, res) => {
     const events = await eventModel.find({ eventCategory: categoryId }).populate('eventCategory', 'categoryName');
 
     res.status(200).json({
-      message: `Successfully Getting Events for Category ID`,
+      message: Successfully Getting Events for Category ID,
       data: events,
     });
   } catch (error) {
@@ -173,14 +172,14 @@ exports.updateEvent = async (req, res) => {
       startDate,
       endDate,
     };
-    
-    if(req.file && req.file.length > 0){
+
+    if(req.files && req.files.length > 0){
       for(const image of event.images){
         await cloudinary.uploader.destroy(image.imagePublicId)
       }
-      // const image = []
+      const image = []
       
-      for(const image of req.file){
+      for(const image of req.files){
         const result = await cloudinary.uploader.upload(image.path)
         fs.unlinkSync(image.path)
         const photo = {
@@ -229,7 +228,7 @@ exports.getRecentEvents = async (req, res) => {
 
       return {
         eventName: event.eventTitle,
-        ticketSold: `${event.ticketSold || 0}/${event.totalSeatNumber || 0}`, 
+        ticketSold: ${event.ticketSold || 0}/${event.totalSeatNumber || 0}, 
         totalAttendee: event.totalAttendee || 0, 
         revenueGenerated: event.revenueGenerated || 0, 
         checkins: event.checkins || 0, 
@@ -250,7 +249,6 @@ exports.getRecentEvents = async (req, res) => {
     });
   }
 };
-
 
 exports.deleteEvent = async (req, res) => {
   try {

@@ -25,7 +25,7 @@ exports.createCategory = async (req, res) => {
 // Get all categories
 exports.getAllCategories = async (req, res) => {
   try {
-    const categories = await categoryModel.find();
+    const categories = await categoryModel.find().populate('events');
     res.status(200).json({
       message: 'Successfully retrieved all categories',
       data: categories,

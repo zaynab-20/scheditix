@@ -1,3 +1,4 @@
+const { types } = require('joi');
 const mongoose = require('mongoose')
 const eventCategorySchema = new mongoose.Schema({
     categoryName:{
@@ -5,13 +6,13 @@ const eventCategorySchema = new mongoose.Schema({
       enum:['Wedding','Tech Event','Birthday Party','Naming Ceremony','Comedy','Get Together'],
       unique: true
     },
-    // createdBy: {
-    //     eventPlannerId: { 
-    //     type: mongoose.SchemaTypes.ObjectId, 
-    //     ref: 'eventPlanner', 
-    //     required: true 
-    //   }
-    // }
+    events:[
+
+      {type: mongoose.SchemaTypes.ObjectId,
+        ref: 'Events'
+      }
+    ]
+  
 },{ timestamps: true });
 
 const categoryModel = mongoose.model('EventCategories',eventCategorySchema)
