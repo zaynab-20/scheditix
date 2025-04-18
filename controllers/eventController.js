@@ -34,6 +34,7 @@ exports.createEvent = async (req, res) => {
     }
 
 
+
     const eventPlanner = await eventPlannerModel.findById(userId);
 
     if (!eventPlanner) {
@@ -89,7 +90,7 @@ exports.createEvent = async (req, res) => {
       ticketPurchaseLimit,     
       parkingAccess,
       image: image,
-      eventPlannerId:req.user.userId,
+      eventPlannerId:req.user._id,
       featured: isFeatured
     });
     category.events.push(event._id)
@@ -104,7 +105,7 @@ exports.createEvent = async (req, res) => {
       .status(500)
       .json({ message: "Internal Server Error: ", error: error.message });
   }
-};
+}
 
 exports.getOneEvent = async (req, res) => {
   try {

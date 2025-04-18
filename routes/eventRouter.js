@@ -141,6 +141,7 @@ const router = express.Router();
  */
 router.post("/create-event/:categoryId", authenticate, upload.array('image'), validateEvent, createEvent);
 
+
 /**
  * @swagger
  * /api/v1/event/{eventId}:

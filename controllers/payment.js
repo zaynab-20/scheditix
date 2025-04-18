@@ -54,7 +54,7 @@ exports.initializePayment = async (req, res) => {
       attendeeEmail,
       attendeeName,
       reference: ref,
-      amount: ticket.ticketPrice,
+      amount: event.ticketPrice,
       paymentDate:formattedData
     })
 

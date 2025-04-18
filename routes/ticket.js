@@ -94,6 +94,7 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
+
 router.post('/create/ticket/:eventId', validateTicketPurchase,createTicket);
 // router.post('/create/ticket/:eventId', validateTicket, createTicket);
 
@@ -241,7 +242,9 @@ router.get('/tickets/:eventId', getAllTickets);
  *       500:
  *         description: Internal server error
  */
+
 router.put('/update/ticket/:ticketId', validateTicketPurchase, updateTicket)
+
 /**
  * @swagger
  * /api/v1/ticket/{ticketId}:
