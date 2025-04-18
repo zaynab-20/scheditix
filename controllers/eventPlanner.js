@@ -96,10 +96,11 @@ exports.verifyUser = async (req, res) => {
 
     jwt.verify(token, process.env.JWT_SECRET, async (error, payload) => {
       if (error) {
-        if (error instanceof jwt.JsonWebTokenError) {
+        if (error instanceof jwt.TokenExpiredError) {
           const decoded  = jwt.decode(token);
           const eventPlanner = await eventPlannerModel.findById(decoded.eventPlannerId);
-
+           console.log(error);
+           
           if (!eventPlanner) {
             return res.status(404).json({
               message: "Account not found",
@@ -498,7 +499,7 @@ exports.updateUser = async (req, res) =>{
   try {
     const {eventPlannerId} = req.params
 
-    const user = await userModel.findById(eventPlannerId)
+    const user = await eventPlannerModel.findById(eventPlannerId)
     if (!user) {
       return res.status(404).json({
         message: 'user not found'
@@ -519,7 +520,7 @@ exports.updateUser = async (req, res) =>{
   } catch (error) {
     console.log(error.message)
     res.status(500).json({
-      message: 'internal server error'
+      message: 'internal server error:' + error.message
     })
   }
 }
