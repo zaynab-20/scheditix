@@ -38,45 +38,46 @@ const router = express.Router();
  *               - ticketPrice
  *               - ticketQuantity
  *               - ticketPurchaseLimit
+ *               - parkingAccess
  *             properties:
  *               eventTitle:
  *                 type: string
- *                 example: Tech Conference
+ *                 example: "Tech Conference"
  *               eventDescription:
  *                 type: string
- *                 example: A conference for tech enthusiasts.
+ *                 example: "A conference for tech enthusiasts"
  *               eventLocation:
  *                 type: string
- *                 example: Landmark Event Center, Lagos
+ *                 example: "Landmark Event Center, Lagos"
  *               startTime:
  *                 type: string
- *                 example: 10:00AM
+ *                 example: "10:00AM"
  *               endTime:
  *                 type: string
- *                 example: 07:00PM
- *               eventAgenda:
- *                 type: string
- *                 example: Exploring AI, Web3, and Cloud Computing
- *               eventRule:
- *                 type: string
- *                 example: No smoking, no food from outside
+ *                 example: "07:00PM"
  *               startDate:
  *                 type: string
  *                 format: date
- *                 example: 2025-05-10
+ *                 example: "2025-05-10"
  *               endDate:
  *                 type: string
  *                 format: date
- *                 example: 2025-05-11
+ *                 example: "2025-05-11"
+ *               eventAgenda:
+ *                 type: string
+ *                 example: "Talks on AI, Blockchain, Cloud Tech"
+ *               eventRule:
+ *                 type: string
+ *                 example: "No weapons allowed. Dress code: Smart casual."
  *               totalTableNumber:
- *                 type: number
- *                 example: 10
+ *                 type: integer
+ *                 example: 20
  *               totalSeatNumber:
- *                 type: number
- *                 example: 5
+ *                 type: integer
+ *                 example: 100
  *               ticketPrice:
  *                 type: number
- *                 example: 1000
+ *                 example: 2000
  *               ticketQuantity:
  *                 type: number
  *                 example: 100
@@ -87,12 +88,10 @@ const router = express.Router();
  *                 type: string
  *                 enum: [yes, no]
  *                 example: yes
- *                 description: Indicates if parking access is available
  *               image:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
+ *                 type: string
+ *                 format: binary
+ *                 description: Upload event banner image
  *     responses:
  *       '201':
  *         description: Event created successfully
@@ -103,7 +102,7 @@ const router = express.Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Event Created Successfully
+ *                   example: "Event Created Successfully"
  *                 data:
  *                   $ref: '#/components/schemas/Event'
  *       '403':
@@ -117,7 +116,7 @@ const router = express.Router();
  *                   type: string
  *                   example: "Basic plan limit: You can only create 2 events."
  *       '404':
- *         description: Event planner not found
+ *         description: Event Planner or Category not found
  *         content:
  *           application/json:
  *             schema:

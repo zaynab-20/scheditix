@@ -3,6 +3,7 @@ const cloudinary = require('../config/cloudinary');
 const categoryModel = require("../models/category")
 const eventPlannerModel = require("../models/eventPlanner")
 const fs = require("fs");
+const formattedDate = new Date().toLocaleString()
 
 exports.createEvent = async (req, res) => {
   try {
@@ -74,8 +75,8 @@ exports.createEvent = async (req, res) => {
       endTime,
       eventAgenda,
       eventRule,
-      startDate,
-      endDate,
+      startDate:formattedDate,
+      endDate:formattedDate,
       totalTableNumber,
       totalSeatNumber,   
       ticketPrice,
