@@ -1,4 +1,4 @@
-const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview} = require('../controllers/eventController');
+const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview,getPaginatedEvents} = require('../controllers/eventController');
 const {validateEvent} = require('../middleware/validation');
 const { authenticate } = require('../middleware/authentication');
 const upload = require('../utils/multer');
@@ -573,13 +573,13 @@ router.get('/event/:categoryId',getAllEventCategory)
  * @swagger
  * /api/v1/Overview:
  *   get:
- *     summary: Retrieve event platform overview statistics
- *     description: Fetches overall platform statistics including total tickets sold, total revenue generated, and total number of unique event organizers.
+ *     summary: Retrieve event planner's dashboard overview statistics
+ *     description: Fetches the event planner's statistics, including the total events they’ve organized, total tickets sold, and total revenue generated from their events.
  *     tags:
  *       - Event Management
  *     responses:
  *       200:
- *         description: Successfully retrieved dashboard statistics
+ *         description: Successfully retrieved the dashboard overview for the logged-in event planner
  *         content:
  *           application/json:
  *             schema:
@@ -587,26 +587,113 @@ router.get('/event/:categoryId',getAllEventCategory)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Successfully retrieved dashboard statistics"
+ *                   example: "Successfully retrieved your dashboard overview"
  *                 data:
  *                   type: object
  *                   properties:
+ *                     totalEventsOrganized:
+ *                       type: integer
+ *                       description: The total number of events created by the logged-in event planner
+ *                       example: 5
  *                     totalTicketSold:
  *                       type: integer
- *                       description: Total number of tickets sold across all events
- *                       example: 4520
+ *                       description: The total number of tickets sold for events created by the logged-in event planner
+ *                       example: 320
  *                     totalRevenue:
  *                       type: number
  *                       format: float
- *                       description: Total revenue generated from all events
- *                       example: 1895000.75
- *                     totalEventOrganizers:
- *                       type: integer
- *                       description: Total number of unique event organizers
- *                       example: 87
+ *                       description: The total revenue generated from all events created by the logged-in event planner
+ *                       example: 4800.75
+ *       401:
+ *         description: Unauthorized (user not authenticated)
  *       500:
  *         description: Internal Server Error
  */
 router.get('/Overview',getOverview)
+
+/**
+ * @swagger
+ * /api/v1/paginatedEvents:
+ *   get:
+ *     summary: Retrieve events with pagination
+ *     description: Fetches events with pagination support, allowing users to specify the page and limit of results.
+ *     tags:
+ *       - Event Management
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *         description: The page number for pagination (defaults to 1 if not provided).
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           example: 7
+ *         description: The number of events per page (defaults to 7 if not provided).
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved paginated events
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 total:
+ *                   type: integer
+ *                   description: Total number of events available
+ *                   example: 50
+ *                 currentPage:
+ *                   type: integer
+ *                   description: The current page number being displayed
+ *                   example: 1
+ *                 totalPages:
+ *                   type: integer
+ *                   description: Total number of pages based on the number of events and the page limit
+ *                   example: 8
+ *                 data:
+ *                   type: array
+ *                   description: A list of events in the current page
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       eventId:
+ *                         type: string
+ *                         description: The unique ID of the event
+ *                         example: "603f0e2b5b9b1b3c1c3d2b6e"
+ *                       title:
+ *                         type: string
+ *                         description: The title of the event
+ *                         example: "Music Concert"
+ *                       date:
+ *                         type: string
+ *                         format: date
+ *                         description: The event's date
+ *                         example: "2025-05-30"
+ *       404:
+ *         description: No events found (when the skip is beyond the available events)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "events not found"
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ */
+router.get('/paginatedEvents', getPaginatedEvents);
 
 module.exports = router;

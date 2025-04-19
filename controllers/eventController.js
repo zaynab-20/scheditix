@@ -331,34 +331,61 @@ exports.getTrendingEventById = async (req, res) => {
 
 exports.getOverview = async (req, res) => {
   try {
-      
-      const allEvents = await eventModel.find();
+    const eventPlannerId = req.user.userId; // Make sure req.user is set by your auth middleware
 
-      const dashboard = allEvents.reduce((accumulator, currentEvent) => {
-          accumulator.totalTicketSold += currentEvent.ticketSold || 0;
-          accumulator.totalRevenue += currentEvent.revenueGenerated || 0;
+    // Get all events created by the logged-in event planner
+    const myEvents = await eventModel.find({ eventPlannerId });
 
-          return accumulator;
-      }, {
-          totalTicketSold: 0,
-          totalRevenue: 0
-      });
+    const dashboard = myEvents.reduce((accumulator, currentEvent) => {
+      accumulator.totalTicketSold += currentEvent.ticketSold || 0;
+      accumulator.totalRevenue += currentEvent.revenueGenerated || 0;
+      return accumulator;
+    }, {
+      totalTicketSold: 0,
+      totalRevenue: 0
+    });
 
-      // Get the total number of unique event organizers
-      const totalEventOrganizers = await eventModel.distinct('eventPlannerId').countDocuments();
+    const overview = {
+      totalEventsOrganized: myEvents.length,
+      totalTicketSold: dashboard.totalTicketSold,
+      totalRevenue: dashboard.totalRevenue
+    };
 
-      // Combine all the stats into one object
-      const overview = {
-          totalTicketSold: dashboard.totalTicketSold,
-          totalRevenue: dashboard.totalRevenue,
-          totalEventOrganizers: totalEventOrganizers
-      };
-      res.status(200).json({
-          message: "Successfully retrieved dashboard statistics",
-          data: overview
-      });
+    return res.status(200).json({
+      message: "Successfully retrieved your dashboard overview",
+      data: overview
+    });
 
   } catch (error) {
-      res.status(500).json({ message: "Internal Server Error", error: error.message });
+    return res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+
+
+exports. getPaginatedEvents = async (req, res) => {
+  try {
+    const page = req.query.page ? Number(req.query.page) : 1;
+    const limit = req.query.limit ? Number(req.query.limit) : 7;
+    const skip = (page - 1) * limit;
+
+    let query = Event.find();
+    query = query.skip(skip).limit(limit);
+
+    const eventCount = await Event.countDocuments();
+    if (skip >= eventCount) {
+      return res.status(404).json({ message: "events not found" });
+    }
+
+    const events = await query;
+    res.status(200).json({
+      total: eventCount,
+      currentPage: page,
+      totalPages: Math.ceil(eventCount / limit),
+      data: events
+    });
+
+  } catch (error) {
+    res.status(500).json({ message:'Internal Server Error',error:error.message});
   }
 };
