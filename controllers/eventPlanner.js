@@ -60,7 +60,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1day",
       }
     );
-    const link = `https://scheditix.onrender.com/email-verification/${token}`;
+    const link = `https://schedi-tix-front-end.vercel.app/email-verification/${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
@@ -117,7 +117,7 @@ exports.verifyUser = async (req, res) => {
             process.env.JWT_SECRET,
             { expiresIn: "1h" }
           );
-          const link = `https://scheditix.onrender.com/email-verification/${newToken}`;
+          const link = `https://schedi-tix-front-end.vercel.app/email-verification/${newToken}`;
           const firstName = eventPlanner.fullname.split(" ")[0];
 
           const mailOptions = {
@@ -210,9 +210,7 @@ exports.logInUser = async (req, res) => {
           expiresIn: "1hr",
         }
       );
-      const link = `${req.protocol}://${req.get(
-        "host"
-      )}/https://scheditix.onrender.com/email-verification/${token}`;
+      const link = `https://schedi-tix-front-end.vercel.app/email-verification/${token}`;
       const firstName = user.fullname.split(" ")[0];
 
       const mailOptions = {
@@ -509,7 +507,7 @@ exports.updateUser = async (req, res) =>{
  
      const updatedUser = await eventPlannerModel.findByIdAndUpdate(userId, data, 
        {new: true})
-       
+
     res.status(200).json({
       message: 'User has been updated successfully ', 
       data:updatedUser
