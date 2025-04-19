@@ -23,7 +23,7 @@ exports.createEvent = async (req, res) => {
            ticketPurchaseLimit,
            parkingAccess
     } = req.body;
-    const files = req.files;
+    const file = req.file;
     const {userId} = req.user;
 
     const category = await categoryModel.findById(categoryId);
@@ -48,21 +48,16 @@ exports.createEvent = async (req, res) => {
         return res.status(403).json({ message: "Basic plan limit: You can only create 2 events." });
       }
     }
-    
+    let image = {};
 
-    let result;
-    let imagePath = {};
-    let image = []
 
-    if (files && files[0]) {
-      for (const images of files) {
-        result = await cloudinary.uploader.upload(images.path);
-        fs.unlinkSync(images.path);
-        imagePath = {
-          imageUrl: result.secure_url,
-          imagePublicId: result.public_id,
-        }
-        image.push(imagePath)
+    if (file && file.path) {
+      const result = await cloudinary.uploader.upload(file.path);
+      fs.unlinkSync(file.path);
+
+      image = {
+        imageUrl: result.secure_url,
+        imagePublicId: result.public_id
       }
       
     }
@@ -89,7 +84,7 @@ exports.createEvent = async (req, res) => {
       ticketQuantity, 
       ticketPurchaseLimit,     
       parkingAccess,
-      image: image,
+      image,
       eventPlannerId:req.user._id,
       featured: isFeatured
     });
@@ -158,7 +153,6 @@ exports.getAllEventCategory = async (req, res) => {
 
 exports.updateEvent = async (req, res) => {   
   try {
-    // const organizerId = req.user.userId;
     const { eventId,categoryId} = req.params;
     const {eventLocation,startTime,endTime,startDate,endDate} = req.body;
 
@@ -175,12 +169,12 @@ exports.updateEvent = async (req, res) => {
       endDate,
     };
     
-    if(req.file && req.file.length > 0){
-      for(const image of event.images){
+    if(req.file && req.file.path){
+      for(const image of event.image){
         await cloudinary.uploader.destroy(image.imagePublicId)
       }
-      // const image = []
-      
+      const image = []
+    
       for(const image of req.file){
         const result = await cloudinary.uploader.upload(image.path)
         fs.unlinkSync(image.path)

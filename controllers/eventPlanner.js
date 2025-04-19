@@ -3,6 +3,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const { verify, reset } = require("../utils/html");
 const { send_mail } = require("../middleware/nodemailer");
+const cloudinary = require("../config/cloudinary")
 const fs = require('fs')
 
 
@@ -59,7 +60,7 @@ exports.registerUser = async (req, res) => {
         expiresIn: "1day",
       }
     );
-    const link = `https://schedi-tix-front-end.vercel.app/login/${token}`;
+    const link = `https://scheditix.onrender.com/email-verification/${token}`;
     const firstName = eventPlanner.fullname;
 
     const mailOptions = {
@@ -96,8 +97,8 @@ exports.verifyUser = async (req, res) => {
     jwt.verify(token, process.env.JWT_SECRET, async (error, payload) => {
       if (error) {
         if (error instanceof jwt.JsonWebTokenError) {
-          const { eventPlannerId } = jwt.decode(token);
-          const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
+          const decoded  = jwt.decode(token);
+           const eventPlanner = await eventPlannerModel.findById(decoded.eventPlannerId);
 
           if (!eventPlanner) {
             return res.status(404).json({
@@ -206,12 +207,12 @@ exports.logInUser = async (req, res) => {
         { userId: user._id, isLoggedIn: user.isLoggedIn},
         process.env.JWT_SECRET,
         {
-          expiresIn: "5mins",
+          expiresIn: "1hr",
         }
       );
       const link = `${req.protocol}://${req.get(
         "host"
-      )}/api/v1/verify/user/${token}`;
+      )}/https://scheditix.onrender.com/email-verification/${token}`;
       const firstName = user.fullname.split(" ")[0];
 
       const mailOptions = {
@@ -435,56 +436,35 @@ exports.getAllUser = async (req, res) => {
   }
 };
 
-// exports.getOneUser = async (req, res) => {
-//   try {
-//     const { eventPlannerId } = req.params;
 
-//     const eventPlanner = await eventPlannerModel.findById(eventPlannerId);
-
-//     if (!eventPlanner) {
-//       return res.status(404).json({ message: "eventPlanner not found" });
-//     }
-
-//     res
-//       .status(200)
-//       .json({
-//         message: `kindly find the eventPlanner below`,
-//         data: eventPlanner,
-//       });
-//   } catch (error) {
-//     console.log(error.message);
-//     res.status(500).json({ message: "internal server error" + error.message });
-//   }
-// };
-
-exports.updateEventPlanner = async (req, res) => {
-  try {
-    const { userId } = req.user;
-    // const { fullname,  password } = req.body;
-    
+exports.updateProfileImage = async (req, res) => {  try {
+    const { userId } = req.user;    
     const eventPlanner = await eventPlannerModel.findById(userId);
-    console.log(eventPlanner);
-    
+
     if (!eventPlanner) {
       return res.status(404).json({
         message: "EventPlanner not found",
       });
-    };
+    }
 
     const data = {
-      profilePic: eventPlanner.profilePic
+      profilePic: eventPlanner.profilePic,
     };
-
-    const file = req.file
+    
+    const file = req.file;
     if (file && file.path) {
-      await cloudinary.uploader.destroy(data.profilePic.public_id)
-      const  result = await cloudinary.uploader.upload(file.path);
+      if (data.profilePic && data.profilePic.publicId) {
+        await cloudinary.uploader.destroy(data.profilePic.publicId);
+      }
+    
+      const result = await cloudinary.uploader.upload(file.path);
       fs.unlinkSync(req.file.path);
-      
+    
       data.profilePic = {
         publicId: result.public_id,
-        imageUrl: result.secure_url
-      }
+        imageUrl: result.secure_url,
+      };
+    
       
       const updateEventPlanner = await eventPlannerModel.findByIdAndUpdate(
         eventPlanner._id,
@@ -521,14 +501,15 @@ exports.updateUser = async (req, res) =>{
     }
 
     const user = await eventPlannerModel.findById(userId)
-    if (!user) {
-      return res.status(404).json({
-        message: 'user not found'
-      })
-    }
-
-    const updatedUser = await eventPlannerModel.findByIdAndUpdate(userId, data, 
-      {new: true})
+     if (!user) {
+       return res.status(404).json({
+         message: 'user not found'
+       })
+     }
+ 
+     const updatedUser = await eventPlannerModel.findByIdAndUpdate(userId, data, 
+       {new: true})
+       
     res.status(200).json({
       message: 'User has been updated successfully ', 
       data:updatedUser
@@ -537,7 +518,7 @@ exports.updateUser = async (req, res) =>{
   } catch (error) {
     console.log(error.message)
     res.status(500).json({
-      message: 'internal server error:' + error.message
+      message: 'internal server error'
     })
   }
 }
