@@ -112,14 +112,6 @@ const eventValidationSchema = Joi.object({
     "string.min": "Location must be at least 3 characters",
     "string.max": "Location cannot exceed 200 characters",
   }),
-  startDate: Joi.date().iso().required().messages({
-    "date.base": "Start date must be a valid date",
-    "any.required": "Start date is required",
-  }),
-  endDate: Joi.date().iso().required().messages({
-    "date.base": "End date must be a valid date",
-    "any.required": "End date is required",
-  }),
   startTime: Joi.string().required().messages({
     "string.empty": "Start time is required",
   }),
