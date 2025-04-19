@@ -118,7 +118,7 @@ const eventValidationSchema = Joi.object({
     "string.empty": "Start time is required",
   }),
   endTime: Joi.string().required().messages({
-    "string.empty": "End time is required",
+    "string.empty": "End time is required"
   }),
   eventAgenda: Joi.string().trim().min(5).max(1000).required().messages({
     "string.empty": "Agenda is required",
