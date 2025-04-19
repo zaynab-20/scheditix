@@ -96,7 +96,6 @@ const router = express.Router();
  */
 
 router.post('/create/ticket/:eventId', validateTicketPurchase,createTicket);
-// router.post('/create/ticket/:eventId', validateTicket, createTicket);
 
 /**
  * @swagger

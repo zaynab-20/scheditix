@@ -173,47 +173,6 @@ exports.updateTicket = async (req, res) => {
   }
 };
 
-
-exports.deleteTicket = async (req, res) => {
-  try {
-    const { ticketId } = req.params;
-    const {
-      fullName,
-      email,
-      numberOfTicket,
-      needCarPackingSpace,
-      specialRequest
-    } = req.body;
-
-    const data = {
-      fullName,
-      email,
-      numberOfTicket,
-      carAccess: needCarPackingSpace,
-      specialRequest
-    };
-
-    const updatedTicket = await ticketModel.findByIdAndUpdate(
-      ticketId,
-      data,{new: true}
-    );
-
-    if (!updatedTicket) {
-      return res.status(404).json({ message: "Ticket not found" });
-    }
-
-    res.status(200).json({
-      message: "Ticket updated successfully",
-      data: updatedTicket,
-    });
-  } catch (error) {
-    res.status(500).json({
-      message: "Internal Server Error",
-      error: error.message,
-    });
-  }
-};
-
 exports.deleteTicket = async (req, res) => {
   try {
     const { ticketId } = req.params;

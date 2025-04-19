@@ -1,9 +1,9 @@
-const {registerUser,verifyUser,logInUser,forgotUserPassword,resetUserPassword,changeUserPassword,logOut,deleteEventPlanner,getAllUser} = require("../controllers/eventPlanner");
-const { authenticate } = require("../middleware/authentication");
-const {registerSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema,changeUserPasswordSchema,} = require("../middleware/validation");
-
-const router = require("express").Router();
-const upload = require("../utils/multer");
+const {registerUser,verifyUser,logInUser,forgotUserPassword,resetUserPassword,changeUserPassword,logOut,deleteEventPlanner,getAllUser,updatePrifileImage, updateProfileImage, updateUser,} = require("../controllers/eventPlanner");
+ const { authenticate } = require("../middleware/authentication");
+ const {registerSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema,changeUserPasswordSchema,} = require("../middleware/validation");
+ 
+ const router = require("express").Router();
+ const upload = require("../utils/multer");
 
 /**
  * @swagger
@@ -290,7 +290,7 @@ router.post("/logout", authenticate, logOut);
  *                   example: Internal Server Error
  */
 
-router.put("/update/profile",authenticate,upload.single("profilePic"),updatePrifileImage);
+router.put("/update/profile",authenticate,upload.single("profilePic"),updateProfileImage);
 
 /**
  * @swagger
