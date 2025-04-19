@@ -3,7 +3,6 @@ const cloudinary = require('../config/cloudinary');
 const categoryModel = require("../models/category")
 const eventPlannerModel = require("../models/eventPlanner")
 const fs = require("fs");
-const formattedDate = new Date().toLocaleString()
 
 exports.createEvent = async (req, res) => {
   try {
@@ -26,6 +25,18 @@ exports.createEvent = async (req, res) => {
     } = req.body;
     const file = req.file;
     const {userId} = req.user;
+
+    const formattedStartDate = new Date(startDate).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
+
+    const formattedEndDate = new Date(endDate).toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric'
+    });
 
     const category = await categoryModel.findById(categoryId);
     if (!category) {
@@ -75,8 +86,8 @@ exports.createEvent = async (req, res) => {
       endTime,
       eventAgenda,
       eventRule,
-      startDate:formattedDate,
-      endDate:formattedDate,
+      startDate:formattedStartDate,
+      endDate:formattedEndDate,
       totalTableNumber,
       totalSeatNumber,   
       ticketPrice,
