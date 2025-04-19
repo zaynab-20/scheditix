@@ -33,8 +33,6 @@ exports.createEvent = async (req, res) => {
       })
     }
 
-
-
     const eventPlanner = await eventPlannerModel.findById(userId);
 
     if (!eventPlanner) {
@@ -271,34 +269,50 @@ exports.deleteEvent = async (req, res) => {
   }
 };
 
-exports.getFeaturedEvents = async (req, res) => {
+exports.getFeaturedEventById = async (req, res) => {
   try {
-      const featuredEvents = await eventModel.find({ featured: true }).populate('eventCategory', 'categoryName');
-      res.status(200).json({
-          message: "Successfully retrieved featured events",
-          data: featuredEvents
-      });
+    const { eventId } = req.params;
+
+    const featuredEvent = await eventModel.findOne({
+      _id: eventId,
+      featured: true
+    }).populate('eventCategory', 'categoryName');
+
+    if (!featuredEvent) {
+      return res.status(404).json({ message: "Featured event not found" });
+    }
+
+    res.status(200).json({
+      message: "Successfully retrieved featured event",
+      data: featuredEvent
+    });
   } catch (error) {
-      console.error(error.message);
-      res.status(500).json({ message: "Internal Server Error", error: error.message });
+    console.error(error.message);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 
 
-exports.getTrendingEvents = async (req, res) => {
-  try {
-      const trendingEvents = await eventModel.find()
-          .sort({ ticketSold: -1 }) 
-          .limit(5) 
-          .populate('eventCategory', 'categoryName');
 
-      res.status(200).json({
-          message: "Successfully retrieved trending events",
-          data: trendingEvents
-      });
+exports.getTrendingEventById = async (req, res) => {
+  try {
+    const { eventId } = req.params;
+
+    const trendingEvent = await eventModel.findOne({
+      _id: eventId
+    }).populate('eventCategory', 'categoryName');
+
+    if (!trendingEvent) {
+      return res.status(404).json({ message: "Trending event not found" });
+    }
+
+    res.status(200).json({
+      message: "Successfully retrieved trending event",
+      data: trendingEvent
+    });
   } catch (error) {
-      console.error(error.message);
-      res.status(500).json({ message: "Internal Server Error", error: error.message });
+    console.error(error.message);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
 

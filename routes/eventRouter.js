@@ -1,4 +1,4 @@
-const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEvents, getTrendingEvents, getOverview} = require('../controllers/eventController');
+const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview} = require('../controllers/eventController');
 const {validateEvent} = require('../middleware/validation');
 const { authenticate } = require('../middleware/authentication');
 const upload = require('../utils/multer');
@@ -374,15 +374,22 @@ router.get("/recent/events", authenticate, getRecentEvents);
 
 /**
  * @swagger
- * /api/v1/featured-events:
+ * /api/v1/featured/{eventId}:
  *   get:
- *     summary: Retrieve all featured events
- *     description: Fetches a list of all events that are marked as featured. Each event includes its associated category name.
+ *     summary: Retrieve a specific featured event by ID
+ *     description: Fetch a single featured event using its unique ID. The event must be marked as featured.
  *     tags:
  *       - Event Management
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the featured event to retrieve
  *     responses:
  *       200:
- *         description: Successfully retrieved featured events
+ *         description: Successfully retrieved featured event
  *         content:
  *           application/json:
  *             schema:
@@ -390,54 +397,69 @@ router.get("/recent/events", authenticate, getRecentEvents);
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Successfully retrieved featured events"
+ *                   example: Successfully retrieved featured event
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         description: Event ID
- *                       title:
- *                         type: string
- *                         description: Event title
- *                       eventCategory:
- *                         type: object
- *                         properties:
- *                           _id:
- *                             type: string
- *                           categoryName:
- *                             type: string
- *                       date:
- *                         type: string
- *                         format: date
- *                       time:
- *                         type: string
- *                       location:
- *                         type: string
- *                       description:
- *                         type: string
- *                       featured:
- *                         type: boolean
- *                         example: true
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       description: Event ID
+ *                     eventTitle:
+ *                       type: string
+ *                       description: Title of the event
+ *                     eventCategory:
+ *                       type: object
+ *                       properties:
+ *                         _id:
+ *                           type: string
+ *                         categoryName:
+ *                           type: string
+ *                     eventLocation:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                     startTime:
+ *                       type: string
+ *                     endTime:
+ *                       type: string
+ *                     eventDescription:
+ *                       type: string
+ *                     image:
+ *                       type: string
+ *                       format: uri
+ *                       example: https://res.cloudinary.com/your-cloud-name/image/upload/v1710000000/event-image.jpg
+ *                     featured:
+ *                       type: boolean
+ *                       example: true
+ *       404:
+ *         description: Featured event not found
  *       500:
  *         description: Internal Server Error
  */
-router.get('/featured-events',getFeaturedEvents)
-
+router.get('/featured/:eventId', getFeaturedEventById);
 
 /**
  * @swagger
- * /api/v1/trending-events:
+ * /api/v1/trending/{eventId}:
  *   get:
- *     summary: Retrieve top trending events
- *     description: Fetches a list of the top 5 trending events based on the number of tickets sold. Each event includes its associated category name.
+ *     summary: Retrieve a specific trending event by ID
+ *     description: Fetch a single trending event using its unique ID. Trending events are typically those with the highest ticket sales.
  *     tags:
  *       - Event Management
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: The ID of the trending event to retrieve
  *     responses:
  *       200:
- *         description: Successfully retrieved trending events
+ *         description: Successfully retrieved trending event
  *         content:
  *           application/json:
  *             schema:
@@ -445,41 +467,50 @@ router.get('/featured-events',getFeaturedEvents)
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Successfully retrieved trending events"
+ *                   example: Successfully retrieved trending event
  *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       _id:
- *                         type: string
- *                         description: Event ID
- *                       title:
- *                         type: string
- *                         description: Event title
- *                       eventCategory:
- *                         type: object
- *                         properties:
- *                           _id:
- *                             type: string
- *                           categoryName:
- *                             type: string
- *                       date:
- *                         type: string
- *                         format: date
- *                       time:
- *                         type: string
- *                       location:
- *                         type: string
- *                       description:
- *                         type: string
- *                       ticketSold:
- *                         type: integer
- *                         description: Number of tickets sold
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       description: Event ID
+ *                     eventTitle:
+ *                       type: string
+ *                       description: Title of the event
+ *                     eventCategory:
+ *                       type: object
+ *                       properties:
+ *                         _id:
+ *                           type: string
+ *                         categoryName:
+ *                           type: string
+ *                     eventLocation:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                       format: date
+ *                     endDate:
+ *                       type: string
+ *                       format: date
+ *                     startTime:
+ *                       type: string
+ *                     endTime:
+ *                       type: string
+ *                     eventDescription:
+ *                       type: string
+ *                     image:
+ *                       type: string
+ *                       format: uri
+ *                       example: https://res.cloudinary.com/your-cloud-name/image/upload/v1710000000/event-image.jpg
+ *                     ticketSold:
+ *                       type: integer
+ *                       description: Number of tickets sold
+ *       404:
+ *         description: Trending event not found
  *       500:
  *         description: Internal Server Error
  */
-router.get('/trending-events',getTrendingEvents)
+router.get('/trending/:eventId', getTrendingEventById);
 
 /**
  * @swagger
