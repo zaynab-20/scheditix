@@ -125,7 +125,7 @@ const eventValidationSchema = Joi.object({
     "string.min": "Agenda must be at least 5 characters",
     "string.max": "Agenda cannot exceed 1000 characters",
   }),
-  eventRule: Joi.string().trim().min(5).max(500).required().messages({
+  eventRule: Joi.string().trim().min(5).max(1000).required().messages({
     "string.empty": "Event rules are required",
     "string.min": "Event rules must be at least 5 characters",
     "string.max": "Event rules cannot exceed 500 characters",
