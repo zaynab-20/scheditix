@@ -138,7 +138,7 @@ const router = express.Router();
  *                 error:
  *                   type: string
  */
-router.post("/create-event/:categoryId", authenticate, upload.array('image'), validateEvent, createEvent);
+router.post("/create-event/:categoryId", authenticate, upload.single('image'), validateEvent, createEvent);
 
 
 /**
@@ -211,8 +211,8 @@ router.get("/events", getAllEvent);
  * @swagger
  * /api/v1/update/event/{eventId}/{categoryId}:
  *   put:
- *     summary: Update event time, date, location, and images
- *     description: Allows an authenticated user to update the event's time, date, location, and optionally upload new images. It will replace the old images with the new ones if provided.
+ *     summary: Update event time, date, location, and image
+ *     description: Allows an authenticated user to update the event's time, date, location, and optionally upload a new image. It will replace the old image with the new one if provided.
  *     tags:
  *       - Event Management
  *     parameters:
@@ -255,11 +255,9 @@ router.get("/events", getAllEvent);
  *                 format: date
  *                 example: "2025-06-03"
  *               image:
- *                 type: array
- *                 items:
- *                   type: string
- *                   format: binary
- *                 description: Optional new event images to upload
+ *                 type: string
+ *                 format: binary
+ *                 description: Optional new event image to upload (replaces old image)
  *     responses:
  *       200:
  *         description: Event updated successfully
@@ -280,7 +278,7 @@ router.get("/events", getAllEvent);
  *       500:
  *         description: Internal Server Error
  */
-router.put("/update/event/:eventId/:categoryId", authenticate, upload.array('image'),updateEvent);
+router.put("/update/event/:eventId/:categoryId", authenticate, upload.single('image'),updateEvent);
 
 /**
  * @swagger
