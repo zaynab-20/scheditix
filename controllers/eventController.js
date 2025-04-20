@@ -161,10 +161,10 @@ exports.getAllEventCategory = async (req, res) => {
   }
 };
 
-exports.updateEvent = async (req, res) => {   
+exports.updateEvent = async (req, res) => {
   try {
-    const { eventId,categoryId} = req.params;
-    const {eventLocation,startTime,endTime,startDate,endDate} = req.body;
+    const { eventId, categoryId } = req.params;
+    const { eventLocation, startTime, endTime, startDate, endDate } = req.body;
 
     const event = await eventModel.findById(eventId);
     if (!event) {
@@ -178,39 +178,39 @@ exports.updateEvent = async (req, res) => {
       startDate,
       endDate,
     };
-    
-    if(req.file && req.file.path){
-      for(const image of event.image){
-        await cloudinary.uploader.destroy(image.imagePublicId)
+
+    // Handle image update
+    if (req.file && req.file.path) {
+      // Delete the old image from Cloudinary
+      if (event.image && event.image.imagePublicId) {
+        await cloudinary.uploader.destroy(event.image.imagePublicId);
       }
-      const image = []
-    
-      for(const image of req.file){
-        const result = await cloudinary.uploader.upload(image.path)
-        fs.unlinkSync(image.path)
-        const photo = {
-          imageUrl: result.secure_url,
-          imagePublicId: result.public_id
-        }
-        image.push(photo)
-      }
-      data.images = image;
+
+      // Upload new image to Cloudinary
+      const result = await cloudinary.uploader.upload(req.file.path);
+      fs.unlinkSync(req.file.path); // Delete local file
+
+      // Set new image data
+      data.image = {
+        imageUrl: result.secure_url,
+        imagePublicId: result.public_id,
+      };
     }
 
-    const updatedEvent = await eventModel.findByIdAndUpdate(eventId, data, {
-      new: true,
-    }).populate('eventCategory','categoryName');
+    const updatedEvent = await eventModel
+      .findByIdAndUpdate(eventId, data, { new: true })
+      .populate("eventCategory", "categoryName");
 
     res
       .status(200)
       .json({ message: "Event Updated Successfully", data: updatedEvent });
+
   } catch (error) {
     console.log(error.message);
-    res
-      .status(500)
-      .json({ message: "Internal Server Error", error: error.message });
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
   }
 };
+
 
 
 exports.getRecentEvents = async (req, res) => {

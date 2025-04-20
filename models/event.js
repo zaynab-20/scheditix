@@ -42,7 +42,7 @@ const eventSchema = new mongoose.Schema({
     type: String,
     require:true
   },
-  image: [{
+  image: {
     imageUrl: {
       type: String,
       require: true
@@ -51,7 +51,7 @@ const eventSchema = new mongoose.Schema({
       type: String,
       require: true
     }
-  }],
+  },
   eventPlannerId: {
     type:mongoose.SchemaTypes.ObjectId,
     ref: 'eventPlanners',
