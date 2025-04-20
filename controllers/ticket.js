@@ -12,13 +12,17 @@ exports.createTicket = async (req, res) => {
     if (!event){
       return res.status(404).json({ message: "Event not found" });
     }
-    const eventPlanner = event.eventPlannerId;
+    const eventPlanner = await eventPlannerModel.findById(event.eventPlannerId);
+    if (!eventPlanner) {
+      return res.status(404).json({ message: "Event planner not found" });
+    }
+
     const ticketPurchaseLimit = eventPlanner.ticketPurchaseLimit || 3;
 
     const purchasedTickets = await ticketModel.find({
       eventId,
       email,
-    }); 
+    });
 
     if (purchasedTickets.length >= ticketPurchaseLimit) {
       return res.status(400).json({
