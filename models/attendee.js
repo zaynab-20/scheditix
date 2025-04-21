@@ -2,20 +2,13 @@ const mongoose = require('mongoose');
 const attendeeSchema = new mongoose.Schema({
       eventId: {
         type: mongoose.SchemaTypes.ObjectId,
-        ref: 'events'
+        ref: 'events',
+        require:true
       },
-        ticketNumber:{
-        type:String,
-        required:true
-    },
-    packingSpace:{
-        type:String,
-        enum:['yes','no']
-    },
     checkInCode: {
         type: String,
         unique: true, 
-        required: true,  
+        require: true,  
       }
 
 },{timestamps: true})

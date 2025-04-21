@@ -3,7 +3,7 @@ const mongoose = require('mongoose')
 const eventCategorySchema = new mongoose.Schema({
     categoryName:{
       type:String,
-      enum:['Wedding','Tech Event','Birthday Party','Fashion Show','Comedy','Confrence'],
+      enum:['Wedding','Tech Event','Birthday Party','Fashion Show','Comedy','Conference'],
       unique: true
     },
     events:[
