@@ -7,7 +7,7 @@ const router = express.Router();
  * @swagger
  * /api/v1/create/ticket/{eventId}:
  *   post:
- *     summary: Create a ticket for a specific event
+ *     summary: Purchase one or more tickets for a specific event
  *     tags: [Ticket]
  *     security:
  *       - bearerAuth: []
@@ -32,10 +32,10 @@ const router = express.Router();
  *             properties:
  *               fullName:
  *                 type: string
- *                 example: John Doe
+ *                 example: Max Harris
  *               email:
  *                 type: string
- *                 example: johndoe@example.com
+ *                 example: maxharris@example.com
  *               numberOfTicket:
  *                 type: integer
  *                 minimum: 1
@@ -48,53 +48,78 @@ const router = express.Router();
  *                 description: Indicates whether the attendee needs car parking access
  *               specialRequest:
  *                 type: string
- *                 example: I’d like a seat close to the stage
- *                 description: Optional special requests for seating, accessibility, etc.
+ *                 example: Prefer table near stage
+ *                 description: Optional special requests for seating or accessibility
  *     responses:
  *       201:
- *         description: Ticket created successfully
+ *         description: Ticket(s) created successfully
  *         content:
  *           application/json:
  *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Ticket created successfully
- *                 data:
- *                   type: object
+ *               oneOf:
+ *                 - type: object
  *                   properties:
- *                     name:
+ *                     message:
  *                       type: string
- *                       example: John Doe
- *                     email:
+ *                       example: Ticket created successfully
+ *                     data:
+ *                       type: object
+ *                       properties:
+ *                         _id:
+ *                           type: string
+ *                         fullName:
+ *                           type: string
+ *                         email:
+ *                           type: string
+ *                         numberOfTicket:
+ *                           type: integer
+ *                         checkInCode:
+ *                           type: string
+ *                         tableNumber:
+ *                           type: integer
+ *                         seatNumber:
+ *                           type: integer
+ *                         carAccess:
+ *                           type: string
+ *                         specialRequest:
+ *                           type: string
+ *                 - type: object
+ *                   properties:
+ *                     message:
  *                       type: string
- *                       example: johndoe@example.com
- *                     seat:
- *                       type: string
- *                       example: Table 1 Seat 1
- *                     checkInCode:
- *                       type: string
- *                       example: A1B2C
- *                     numberOfTicket:
- *                       type: integer
- *                       example: 2
- *                     carAccess:
- *                       type: string
- *                       example: yes
- *                     specialRequest:
- *                       type: string
- *                       example: I’d like a seat close to the stage
+ *                       example: Ticket created successfully
+ *                     data:
+ *                       type: array
+ *                       items:
+ *                         type: object
+ *                         properties:
+ *                           _id:
+ *                             type: string
+ *                           fullName:
+ *                             type: string
+ *                           email:
+ *                             type: string
+ *                           numberOfTicket:
+ *                             type: integer
+ *                           checkInCode:
+ *                             type: string
+ *                           tableNumber:
+ *                             type: integer
+ *                           seatNumber:
+ *                             type: integer
+ *                           carAccess:
+ *                             type: string
+ *                           specialRequest:
+ *                             type: string
  *       400:
- *         description: Ticket purchase limit reached
+ *         description: Ticket purchase limit reached for this email
  *       403:
- *         description: Ticket creation not allowed due to plan restrictions
+ *         description: Ticket creation restricted due to event planner plan limitations
  *       404:
- *         description: Event not found
+ *         description: Event or event planner not found
  *       500:
  *         description: Internal server error
  */
-
 router.post('/create/ticket/:eventId', validateTicketPurchase,createTicket);
 
 /**

@@ -19,7 +19,6 @@ const ticketSchema = new mongoose.Schema({
   numberOfTicket: {
     type: Number,
     required: true,
-    min: 1,
   },
   needCarPackingSpace: {
     type: String,

@@ -6,6 +6,7 @@ const fs = require("fs");
 
 exports.createEvent = async (req, res) => {
   try {
+    const {userId} = req.user;
     const {categoryId} = req.params;
     const {eventTitle,
            eventDescription,
@@ -24,7 +25,6 @@ exports.createEvent = async (req, res) => {
            parkingAccess
     } = req.body;
     const file = req.file;
-    const {userId} = req.user;
 
     const formattedStartDate = new Date(startDate).toLocaleDateString('en-GB', {
       day: '2-digit',
@@ -89,13 +89,14 @@ exports.createEvent = async (req, res) => {
       startDate:formattedStartDate,
       endDate:formattedEndDate,
       totalTableNumber,
-      totalSeatNumber,   
+      totalSeatNumber,
+      seatPerTable: totalSeatNumber/totalTableNumber,
       ticketPrice,
-      ticketQuantity, 
-      ticketPurchaseLimit,     
+      ticketQuantity,
+      ticketPurchaseLimit,
       parkingAccess,
       image,
-      eventPlannerId:req.user._id,
+      eventPlannerId: eventPlanner._id,
       featured: isFeatured
     });
     category.events.push(event._id)
