@@ -22,7 +22,7 @@ exports.checkInAttendee = async (req,res) => {
         })
     } catch (error) {
         res.status(500).json({
-            message:'Internal Server Error ',error.message
+            message:'Internal Server Error ',error:error.message
         })
     }
 }
@@ -41,7 +41,7 @@ exports.getOneAttendee = async (req,res) =>{
         })
     } catch (error) {
         res.status(500).json({
-            message:'Internal Server Error',error.message
+            message:'Internal Server Error',error:error.message
         })
     }
 }
@@ -54,7 +54,7 @@ exports.getAllAttendees = async (req,res) =>{
         })
     } catch (error) {
         res.status(500).json({
-            message:'Internal Server Error',error.message
+            message:'Internal Server Error',error:error.message
         })
     }
 }
@@ -76,7 +76,7 @@ exports.deletAttendee = async (req,res) => {
         })
     } catch (error) {
         res.status(500).json({
-            message:'Internal Server Error',error.message
+            message:'Internal Server Error',error:error.message
         })
     }
 }
