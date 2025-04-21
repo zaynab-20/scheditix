@@ -9,7 +9,7 @@ const router = express.Router();
  * @swagger
  * /api/v1/create-event/{categoryId}:
  *   post:
- *     summary: Create a new event
+ *     summary: Create a new event under a specific category
  *     tags:
  *       - Event Management
  *     parameters:
@@ -18,7 +18,7 @@ const router = express.Router();
  *         required: true
  *         schema:
  *           type: string
- *         description: The ID of the event category
+ *         description: The ID of the category this event belongs to
  *     requestBody:
  *       required: true
  *       content:
@@ -65,7 +65,7 @@ const router = express.Router();
  *                 example: "2025-05-11"
  *               eventAgenda:
  *                 type: string
- *                 example: "Talks on AI, Blockchain, Cloud Tech"
+ *                 example: "Talks on AI, Blockchain, and Cloud Technologies"
  *               eventRule:
  *                 type: string
  *                 example: "No weapons allowed. Dress code: Smart casual."
@@ -91,7 +91,7 @@ const router = express.Router();
  *               image:
  *                 type: string
  *                 format: binary
- *                 description: Upload event banner image
+ *                 description: Event banner image file
  *     responses:
  *       '201':
  *         description: Event created successfully
@@ -104,9 +104,58 @@ const router = express.Router();
  *                   type: string
  *                   example: "Event Created Successfully"
  *                 data:
- *                   $ref: '#/components/schemas/Event'
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                     eventTitle:
+ *                       type: string
+ *                     eventDescription:
+ *                       type: string
+ *                     eventCategory:
+ *                       type: string
+ *                     eventLocation:
+ *                       type: string
+ *                     startTime:
+ *                       type: string
+ *                     endTime:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                     endDate:
+ *                       type: string
+ *                     eventAgenda:
+ *                       type: string
+ *                     eventRule:
+ *                       type: string
+ *                     totalTableNumber:
+ *                       type: number
+ *                     totalSeatNumber:
+ *                       type: number
+ *                     seatPerTable:
+ *                       type: number
+ *                     ticketPrice:
+ *                       type: number
+ *                     ticketQuantity:
+ *                       type: number
+ *                     ticketPurchaseLimit:
+ *                       type: number
+ *                     parkingAccess:
+ *                       type: string
+ *                     image:
+ *                       type: object
+ *                       properties:
+ *                         imageUrl:
+ *                           type: string
+ *                         imagePublicId:
+ *                           type: string
+ *                     eventPlannerId:
+ *                       type: string
+ *                     featured:
+ *                       type: boolean
+ *                       example: false
  *       '403':
- *         description: Event limit reached for basic plan
+ *         description: Plan limit reached (Basic plan can only create 2 events)
  *         content:
  *           application/json:
  *             schema:
@@ -116,7 +165,7 @@ const router = express.Router();
  *                   type: string
  *                   example: "Basic plan limit: You can only create 2 events."
  *       '404':
- *         description: Event Planner or Category not found
+ *         description: Event category or planner not found
  *         content:
  *           application/json:
  *             schema:
@@ -124,7 +173,7 @@ const router = express.Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Event Planner not found"
+ *                   example: "Event category not found"
  *       '500':
  *         description: Internal server error
  *         content:
