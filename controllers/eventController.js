@@ -434,3 +434,40 @@ exports.getSingleEvent = async (req, res) => {
     res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };
+
+
+
+
+exports.searchEvents = async(req,res) => {
+  try{
+    const {categoryName} = req.body
+    const searchEvent = await eventModel.find({eventCategory:categoryName})
+    if(!searchEvent){
+      return res.status(400).json({message: 'Event category not found'})
+    }
+
+    res.status(200).json({
+      message: 'Event found successfully',
+      data: searchEvent,
+    });
+  }catch(error){
+    res.status(500).json({message: 'Internal Server Error', error:error.message})
+  }
+}
+
+// exports.searchEventTitle = async(req,res) => {
+//   try{
+//     const {eventTitle} = req.body
+//     const searchTitle = await eventModel.findOne({eventTitle:eventTitle})
+//     if(!searchTitle){
+//       return res.status(400).json({message: 'Event Title not found'})
+//     }
+
+//     res.status(200).json({
+//       message: 'Event found successfully',
+//       data: searchTitle,
+//     });
+//   }catch(error){
+//     res.status(500).json({message: 'Internal Server Error', error:error.message})
+//   }
+// }

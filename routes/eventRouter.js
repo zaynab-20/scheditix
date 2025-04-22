@@ -745,7 +745,7 @@ router.get('/paginatedEvents', getPaginatedEvents);
 
 /**
  * @swagger
- * /api/v1/event/getPlannerEvent/{eventPlannerId}:
+ * /api/v1/getPlannerEvent/{eventPlannerId}:
  *   get:
  *     summary: Retrieve all events created by a specific event planner
  *     description: Fetches a list of all events created by a specific event planner using the planner's ID.
@@ -866,7 +866,7 @@ router.get('/getPlannerEvent/:eventPlannerId', eventPlannerEvent)
 
 /**
  * @swagger
- * /api/v1/event/events/{eventPlannerId}/{eventId}:
+ * /api/v1/events/{eventPlannerId}/{eventId}:
  *   get:
  *     summary: Retrieve a single event created by a specific event planner
  *     description: Fetches a single event using the event planner's ID and the event's ID.
@@ -984,7 +984,6 @@ router.get('/getPlannerEvent/:eventPlannerId', eventPlannerEvent)
  *                 error:
  *                   type: string
  */
-
 router.get('/events/:eventPlannerId/:eventId',getSingleEvent);
 
 module.exports = router;
