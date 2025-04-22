@@ -1,21 +1,23 @@
-const { checkInAttendee, getOneAttendee, getAllAttendees,  deletAttendee } = require('../controllers/attendeeController');
+const { checkInAttendee, getOneAttendee, getAllAttendees,  deletAttendee, searchByAttendeeName } = require('../controllers/attendeeController');
 const express = require('express');
 const router = express.Router();
 
 /**
  * @swagger
- * /check-in/{eventId}:
+ * /api/v1/checkin/{eventId}:
  *   post:
- *     summary: Check in an attendee using a check-in code
+ *     summary: Check in an attendee for an event
+ *     description: Verifies a check-in code and updates the attendee's status to "checked in" for a specific event.
  *     tags:
  *       - Attendees
  *     parameters:
  *       - in: path
  *         name: eventId
  *         required: true
+ *         description: The ID of the event where the attendee is checking in
  *         schema:
  *           type: string
- *         description: ID of the event
+ *           example: "6626b46393ad73991cd70c3f"
  *     requestBody:
  *       required: true
  *       content:
@@ -27,7 +29,7 @@ const router = express.Router();
  *             properties:
  *               checkInCode:
  *                 type: string
- *                 description: Unique code used to check in the attendee
+ *                 example: "ABC123XYZ"
  *     responses:
  *       200:
  *         description: Check-in successful
@@ -38,15 +40,41 @@ const router = express.Router();
  *               properties:
  *                 message:
  *                   type: string
+ *                   example: Check-in successful
  *                 data:
- *                   $ref: '#/components/schemas/Attendee'
+ *                   $ref: '#/components/schemas/Ticket'
  *       400:
- *         description: Bad request (e.g. already checked in or missing code)
+ *         description: Bad request - missing or invalid check-in code or already checked in
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Attendee already checked in
  *       404:
  *         description: Event or attendee not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: event not found
  *       500:
  *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error
  */
+
 router.post('/check-in/:eventId', checkInAttendee);
 
 
@@ -160,5 +188,83 @@ router.get('/attendees/:eventId', getAllAttendees);
  *         description: Server error
  */
 router.delete('/deleteattendee/:attendeeId', deletAttendee);
+
+/**
+ * @swagger
+ * /api/v1/searchByAttendeeName/{eventId}:
+ *   get:
+ *     summary: Search for attendees by full name within a specific event
+ *     description: Retrieves attendees for a given event whose full name matches the search query (case-insensitive).
+ *     tags:
+ *       - Attendees
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               fullName:
+ *                 type: string
+ *                 example: "John Doe"
+ *     responses:
+ *       200:
+ *         description: Attendee(s) found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: attendee found
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Ticket'
+ *       400:
+ *         description: Full name not provided
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: full name is required
+ *       404:
+ *         description: No attendees matched the search
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: attendee not found
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error
+ *                 error:
+ *                   type: string
+ *                   example: Error details
+ */
+
+router.get("/searchByAttendeeName/:eventId", searchByAttendeeName);
+
 
 module.exports = router

@@ -96,4 +96,32 @@ exports.deletAttendee = async (req,res) => {
             message:'Internal Server Error',error:error.message
         })
     }
+};
+
+exports.searchByAttendeeName = async (req,res) => {
+    try {
+        const { eventId } = req.params;
+        const {fullName} = req.body;
+        if (!fullName) {
+            return res.status(400).json({
+                message:"full name is required"
+            })
+        }
+        const attendees = await ticketModel.find({eventId, fullName : { $regex: fullName, $options: 'i' }})
+        if(!attendees){
+            return res.status(404).json({
+                message:"attendee not found"
+            })
+        }
+    
+         res.status(200).json({
+            message:"attendee found",
+            data:attendees
+        })
+    } catch (error) {
+        log(error.message)
+        res.status(500).json({
+            message:'Internal Server Error',error:error.message
+        })
+    }
 }
