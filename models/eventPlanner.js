@@ -43,6 +43,10 @@ const eventPlannerSchema = mongoose.Schema({
   //   type:Number,
   //   default:0
   // },
+  favoriteEvents: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Events"
+  }],
   profilePic:{
     imageUrl:{
       type:String,

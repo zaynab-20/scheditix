@@ -6,7 +6,7 @@ exports.checkInAttendee = async (req, res) => {
     try {
         const  { eventId } = req.params
         const { checkInCode } = req.body;
-        const event = await eventModel.find(eventId)
+        const event = await eventModel.findById(eventId)
         if(!event){
             return res.status(404).json({
                 message:"event not found"
@@ -17,16 +17,19 @@ exports.checkInAttendee = async (req, res) => {
         }
 
        
-        const attendee = await attendeeModel.findOne({ checkInCode });
+        const attendee = await ticketModel.findOne({ checkInCode });
 
         if (!attendee) {
             return res.status(404).json({ message: "Invalid check-in code" });
         }
- if (attendee.checkedIn) {
+        if (attendee.checkedIn === "Yes") {
             return res.status(400).json({ message: "Attendee already checked in" });
         }
-        attendee.checkedIn = true;
+        attendee.checkedIn = "Yes";
+        event.noOfCheckings += 1; 
+        // event.revenueGenerated += attendee.ticketPrice; // Add the ticket price to the event's revenue
         await attendee.save();
+        await event.save(); 
 
         res.status(200).json({
             message: "Check-in successful",

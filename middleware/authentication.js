@@ -33,7 +33,8 @@ exports.authenticate = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    req.user = decodedToken; 
+    req.user = decodedToken;
+    req.userId = user._id; // Set userId for use in controllers (like 'FavoriteEvent') 
 
     next();
   } catch (error) {
@@ -80,6 +81,7 @@ exports.adminAuth = async (req, res, next) => {
     }
 
     req.user = decodedToken;
+    req.userId = user._id;
     next();
   } catch (error) {
     if (error instanceof jwt.JsonWebTokenError) {
@@ -94,3 +96,4 @@ exports.adminAuth = async (req, res, next) => {
     });
   }
 };
+
