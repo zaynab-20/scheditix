@@ -232,7 +232,7 @@ exports.getRecentEvents = async (req, res) => {
       } else {
         status = 'upcoming';
       }
-
+      
       return {
         eventName: event.eventTitle,
         ticketSold: `${event.ticketSold || 0}/${event.totalSeatNumber || 0}`, 
