@@ -1,4 +1,4 @@
-const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview,getPaginatedEvents, eventPlannerEvent,getSingleEvent} = require('../controllers/eventController');
+const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview,getPaginatedEvents, eventPlannerEvent,getSingleEvent,searchEventCategory} = require('../controllers/eventController');
 const {validateEvent} = require('../middleware/validation');
 const { authenticate } = require('../middleware/authentication');
 const upload = require('../utils/multer');
@@ -985,5 +985,73 @@ router.get('/getPlannerEvent/:eventPlannerId', eventPlannerEvent)
  *                   type: string
  */
 router.get('/events/:eventPlannerId/:eventId',getSingleEvent);
+
+/**
+ * @swagger
+ * /api/v1/searchCategory:
+ *   get:
+ *     summary: Search events by category
+ *     description: Retrieve all events that match the specified event category name (case-insensitive).
+ *     tags:
+ *       - Event Management
+ *     parameters:
+ *       - in: query
+ *         name: categoryName
+ *         required: true
+ *         schema:
+ *           type: string
+ *           example: wedding
+ *         description: Name of the event category to search for
+ *     responses:
+ *       200:
+ *         description: Events found successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Events found successfully
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Event'
+ *       400:
+ *         description: Category name is required
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Category name is required
+ *       404:
+ *         description: No events found in this category
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No events found in this category
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal Server Error
+ *                 error:
+ *                   type: string
+ *                   example: Something went wrong
+ */
+router.get('/searchCategory', searchEventCategory);
+
 
 module.exports = router;

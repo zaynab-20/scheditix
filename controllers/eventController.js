@@ -435,25 +435,29 @@ exports.getSingleEvent = async (req, res) => {
   }
 };
 
+exports.searchEventCategory = async (req, res) => {
+  try {
+    const { categoryName } = req.query;
 
+    if (!categoryName) {
+      return res.status(404).json({ message: 'Category name not found' });
+    }
 
+    const searchEvent = await eventModel.find({eventCategory: { $regex: categoryName, $options: "i" }});
 
-exports.searchEvents = async(req,res) => {
-  try{
-    const {categoryName} = req.body
-    const searchEvent = await eventModel.find({eventCategory:categoryName})
-    if(!searchEvent){
-      return res.status(400).json({message: 'Event category not found'})
+    if (searchEvent.length === 0) {
+      return res.status(404).json({ message: 'No events found in this category' });
     }
 
     res.status(200).json({
-      message: 'Event found successfully',
+      message: 'Events found successfully',
       data: searchEvent,
     });
-  }catch(error){
-    res.status(500).json({message: 'Internal Server Error', error:error.message})
+  } catch (error) {
+    res.status(500).json({ message: 'Internal Server Error', error: error.message });
   }
-}
+};
+
 
 // exports.searchEventTitle = async(req,res) => {
 //   try{
