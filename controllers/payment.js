@@ -95,9 +95,6 @@ exports.verifyPayment = async (req, res) => {
     if (!payment) {
       return res.status(400).json({ message: "Transaction not found" });
     }
-    const { fullName, email, needCarPackingSpace, specialRequest } = payment; // Assuming fullName is saved in the payment
-
-    const numberOfTicket = payment.numberOfTicket;
 
     const event = await eventModel.findById(payment.eventId);
     const ticket = await ticketModel.findOne({eventId: payment.eventId})
@@ -120,7 +117,29 @@ exports.verifyPayment = async (req, res) => {
       await ticket.save();
       payment.status = 'Successful'
       await payment.save();
+      return res.status(200).json({ message: "Payment successful" });
+      
+        const mailOptions = {
+          email: ticket.email,
+          subject: "Account Verification",
+          html: verify(fullname),
+        };
+            
+        await send_mail(mailOptions);
+    }else{
+      let total = ticket.soldTicket;
+      await ticket.save();
+      payment.status = 'Failed'
+      await payment.save();
       return res.status(400).json({ message: "Payment not successful" });
+      
+        const mailOptions = {
+          email: ticket.email,
+          subject: "Account Verification",
+          html: verify(fullname),
+        };
+            
+        await send_mail(mailOptions);
     }
   }catch(error){
     console.log(error.message)

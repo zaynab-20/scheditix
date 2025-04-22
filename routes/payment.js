@@ -3,7 +3,7 @@ const router = require('express').Router();
 
 /**
  * @swagger
- * /api/v1/payment/initialize/{ticketId}:
+ * /api/v1/payment/{ticketId}:
  *   post:
  *     summary: Initialize payment for a ticket
  *     description: Starts a new payment session for a given ticket.
@@ -48,7 +48,7 @@ router.post('/payment/:ticketId', initializePayment);
 
 /**
  * @swagger
- * /payment/verify:
+ * /api/v1/verify:
  *   get:
  *     summary: Verify payment transaction
  *     description: Verifies the status of a payment transaction using the reference code.

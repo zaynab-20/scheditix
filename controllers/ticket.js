@@ -92,6 +92,7 @@ exports.createTicket = async (req, res) => {
       await newTicket.save();
       response.push(newTicket)
       }
+
       res.status(201).json({
         message: "Ticket created successfully",
         data: response,
