@@ -78,7 +78,7 @@ const eventSchema = new mongoose.Schema({
     type: Number, 
     default: 0 
   },
-  checkins: { 
+  noOfCheckings: { 
     type: Number, 
     default: 0 
   },

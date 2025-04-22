@@ -39,10 +39,10 @@ const eventPlannerSchema = mongoose.Schema({
     enum: ['Basic','Pro','Premium'],
     default:'Basic'
   },
-  userTickets:{
-    type:Number,
-    default:0
-  },
+  // userTickets:{
+  //   type:Number,
+  //   default:0
+  // },
   profilePic:{
     imageUrl:{
       type:String,
