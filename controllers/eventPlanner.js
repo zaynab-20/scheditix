@@ -552,4 +552,52 @@ exports.deleteEventPlanner = async (req, res) => {
   }
 };
 
+exports.FavoriteEvent = async (req, res) => {
+  try {
+    const userId = req.userId; 
+    const { eventId } = req.params;
+
+    const planner = await eventPlannerModel.findById(userId);
+    if (!planner) {
+      return res.status(404).json({ message: "Event planner not found" });
+    }
+
+    const eventIndex = planner.favoriteEvents.indexOf(eventId);
+
+    if (eventIndex === -1) {
+      planner.favoriteEvents.push(eventId);
+      await planner.save();
+      return res.status(200).json({ message: "Event added to favorites" });
+    } else {
+      planner.favoriteEvents.splice(eventIndex, 1);
+      await planner.save();
+      return res.status(200).json({ message: "Event removed from favorites" });
+    }
+
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
+exports.getFavoriteEvents = async (req, res) => {
+  try {
+    const userId = req.userId;
+
+    const planner = await eventPlannerModel.findById(userId).populate("favoriteEvents");
+    if (!planner) {
+      return res.status(404).json({ message: "Event planner not found" });
+    }
+
+    res.status(200).json({
+      message: "Favorite events retrieved successfully",
+      data: planner.favoriteEvents
+    });
+
+  } catch (error) {
+    console.error("Error fetching favorites:", error.message);
+    res.status(500).json({ message: "Internal Server Error", error: error.message });
+  }
+};
+
 

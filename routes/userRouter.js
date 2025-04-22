@@ -1,4 +1,4 @@
-const {registerUser,verifyUser,logInUser,forgotUserPassword,resetUserPassword,changeUserPassword,logOut,deleteEventPlanner,getAllUser,updatePrifileImage, updateProfileImage, updateUser,} = require("../controllers/eventPlanner");
+const {registerUser,verifyUser,logInUser,forgotUserPassword,resetUserPassword,changeUserPassword,logOut,deleteEventPlanner,getAllUser,updatePrifileImage, updateProfileImage, updateUser, FavoriteEvent, getFavoriteEvents,} = require("../controllers/eventPlanner");
  const { authenticate } = require("../middleware/authentication");
  const {registerSchema,loginSchema,forgotPasswordSchema,resetPasswordSchema,changeUserPasswordSchema,} = require("../middleware/validation");
  
@@ -384,4 +384,134 @@ router.get("/getAll/user", getAllUser);
  */
 router.delete("/delete/user/:userId", authenticate, deleteEventPlanner);
 
+/**
+ * @swagger
+ * /api/v1/event-planner/favorite/{eventId}:
+ *   post:
+ *     summary: Add or remove an event from the event planner's favorites
+ *     description: Adds an event to the favorites if not already added, or removes it from favorites if already present.
+ *     tags:
+ *       - Event Planner
+ *     security:
+ *       - BearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         description: The ID of the event to be added or removed from favorites
+ *         schema:
+ *           type: string
+ *           example: "607c72ef86b0d0c1f12f3a1b"
+ *     responses:
+ *       200:
+ *         description: Event added or removed from favorites successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event added to favorites"
+ *       404:
+ *         description: Event planner not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event planner not found"
+ *       401:
+ *         description: Unauthorized, invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ *                 error:
+ *                   type: string
+ *                   example: "Error details"
+ */
+router.post("/favorite/:eventId",authenticate, FavoriteEvent);
+
+/**
+ * @swagger
+ * /api/v1/event-planner/favorites:
+ *   get:
+ *     summary: Retrieve favorite events
+ *     description: Retrieves all favorite events for the authenticated event planner.
+ *     tags:
+ *       - Event Planner
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Favorite events retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Favorite events retrieved successfully"
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Event'
+ *       404:
+ *         description: Event planner not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Event planner not found"
+ *       401:
+ *         description: Unauthorized, invalid or missing token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Internal Server Error"
+ *                 error:
+ *                   type: string
+ *                   example: "Error details"
+ */
+
+router.get("/favorites", authenticate, getFavoriteEvents);
+
 module.exports = router;
+
+
+
