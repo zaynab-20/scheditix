@@ -4,10 +4,18 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/attendees/check-in:
+ * /check-in/{eventId}:
  *   post:
  *     summary: Check in an attendee using a check-in code
- *     description: Validates a unique check-in code and marks the attendee as checked in for their event.
+ *     tags:
+ *       - Attendees
+ *     parameters:
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID of the event
  *     requestBody:
  *       required: true
  *       content:
@@ -19,7 +27,7 @@ const router = express.Router();
  *             properties:
  *               checkInCode:
  *                 type: string
- *                 example: EVT123-JANE
+ *                 description: Unique code used to check in the attendee
  *     responses:
  *       200:
  *         description: Check-in successful
@@ -30,20 +38,12 @@ const router = express.Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Check-in successful
  *                 data:
- *                   type: object
- *                   properties:
- *                     name:
- *                       type: string
- *                     email:
- *                       type: string
- *                     eventId:
- *                       type: string
+ *                   $ref: '#/components/schemas/Attendee'
  *       400:
- *         description: Missing or invalid check-in code, or attendee already checked in
+ *         description: Bad request (e.g. already checked in or missing code)
  *       404:
- *         description: Attendee not found for provided check-in code
+ *         description: Event or attendee not found
  *       500:
  *         description: Server error
  */
@@ -117,7 +117,7 @@ router.get('/check/:attendeeId', getOneAttendee);
  *       500:
  *         description: Server error
  */
-router.get('/attendees', getAllAttendees);
+router.get('/attendees/:eventId', getAllAttendees);
 
 /**
  * @swagger

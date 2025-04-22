@@ -1,5 +1,6 @@
 const eventModel = require('../models/event');
 const attendeeModel = require('../models/attendee');
+const ticketModel = require('../models/ticket');
 
 exports.checkInAttendee = async (req, res) => {
     try {
@@ -59,10 +60,11 @@ exports.getOneAttendee = async (req,res) =>{
 exports.getAllAttendees = async (req,res) =>{
     try {
         const {eventId} = req.params
-        const attendees = await attendeeModel.find({eventId})
+        const attendees = await ticketModel.find({eventId})
         res.status(200).json({
-            message:"all attendees found",
+            message:"all tickets found",
             data:attendees
+            
         })
     } catch (error) {
         res.status(500).json({

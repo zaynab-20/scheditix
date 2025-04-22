@@ -49,6 +49,11 @@ const ticketSchema = new mongoose.Schema({
     type: String,
     unique: true, 
     required: true,  
+  },
+  checkedIn: {
+    type: String,
+    enum: ['Yes', 'No'],
+    default: 'No'  
   }
 }, {timestamps: true});
 
