@@ -4,6 +4,8 @@ const eventModel = require("../models/event")
 const axios = require("axios");
 const formattedData = new Date().toLocaleString()
 const generator = require("otp-generator");
+const { Successful, Failed} = require("../utils/html");
+const { send_mail } = require("../middleware/nodemailer");
 const ref = generator.generate(12, {
   upperCaseAlphabets: true,
   lowerCaseAlphabets: true,
@@ -109,7 +111,7 @@ exports.verifyPayment = async (req, res) => {
 
 
     const { data } = response;
-    console.log(response)
+    // console.log(response)
 
     if (data.status && data.data.status === 'success') {
       let total = ticket.soldTicket;
@@ -117,29 +119,32 @@ exports.verifyPayment = async (req, res) => {
       await ticket.save();
       payment.status = 'Successful'
       await payment.save();
-      return res.status(200).json({ message: "Payment successful" });
-      
+      const firstName = ticket.fullname;
+      const checkInCode = ticket.checkInCode;
+      const tableNumber = ticket.tableNumber;
+      const seatNumber = ticket.seatNumber
         const mailOptions = {
           email: ticket.email,
-          subject: "Account Verification",
-          html: verify(fullname),
+          subject: "Payment Successful",
+          html: Successful(firstName,checkInCode,tableNumber,seatNumber),
         };
             
         await send_mail(mailOptions);
+        return res.status(200).json({ message: "Payment successful",data:payment});
     }else{
       let total = ticket.soldTicket;
       await ticket.save();
       payment.status = 'Failed'
       await payment.save();
-      return res.status(400).json({ message: "Payment not successful" });
-      
+      const firstName = ticket.fullname;
         const mailOptions = {
           email: ticket.email,
-          subject: "Account Verification",
-          html: verify(fullname),
+          subject: "Payment Failed",
+          html: Failed(firstName),
         };
             
         await send_mail(mailOptions);
+        return res.status(400).json({ message: "Payment not successful",data:payment });
     }
   }catch(error){
     console.log(error.message)
