@@ -15,7 +15,7 @@ exports.createEvent = async (req, res) => {
            endTime,
            eventAgenda,
            eventRule,
-           startDate,
+           startDate,   
            endDate,
            totalTableNumber,
            totalSeatNumber,
@@ -388,5 +388,49 @@ exports. getPaginatedEvents = async (req, res) => {
 
   } catch (error) {
     res.status(500).json({ message:'Internal Server Error',error:error.message});
+  }
+};
+
+
+exports.eventPlannerEvent = async (req, res) => {
+  try {
+    const { eventPlannerId } = req.params;
+
+    const events = await eventModel.find({ eventPlannerId });
+
+    if (!events || events.length === 0) {
+      return res.status(404).json({ message: "No events found for this event planner" });
+    }
+
+    res.status(200).json({
+      message: "Events retrieved successfully",
+      count: events.length,
+      data: events
+    });
+  } catch (error) {
+    console.error("Error fetching events:", error.message);
+    res.status(500).json({ message: "Internal server error", error: error.message });
+  }
+};
+
+
+
+exports.getSingleEvent = async (req, res) => {
+  try {
+    const { eventId, eventPlannerId } = req.params;
+
+    const event = await eventModel.findOne({ _id: eventId, eventPlannerId });
+
+    if (!event) {
+      return res.status(404).json({ message: "Event not found for this event planner" });
+    }
+
+    res.status(200).json({
+      message: "Event retrieved successfully",
+      data: event
+    });
+  } catch (error) {
+    console.error("Error fetching event:", error.message);
+    res.status(500).json({ message: "Internal server error", error: error.message });
   }
 };

@@ -1,4 +1,4 @@
-const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview,getPaginatedEvents} = require('../controllers/eventController');
+const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview,getPaginatedEvents, eventPlannerEvent,getSingleEvent} = require('../controllers/eventController');
 const {validateEvent} = require('../middleware/validation');
 const { authenticate } = require('../middleware/authentication');
 const upload = require('../utils/multer');
@@ -742,5 +742,249 @@ router.get('/Overview',getOverview)
  *                   example: "Internal Server Error"
  */
 router.get('/paginatedEvents', getPaginatedEvents);
+
+/**
+ * @swagger
+ * /api/v1/event/getPlannerEvent/{eventPlannerId}:
+ *   get:
+ *     summary: Retrieve all events created by a specific event planner
+ *     description: Fetches a list of all events created by a specific event planner using the planner's ID.
+ *     tags:
+ *       - Event Management
+ *     parameters:
+ *       - in: path
+ *         name: eventPlannerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event planner
+ *     responses:
+ *       200:
+ *         description: Events retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Events retrieved successfully
+ *                 count:
+ *                   type: number
+ *                   example: 3
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                         description: Event ID
+ *                       eventTitle:
+ *                         type: string
+ *                       eventDescription:
+ *                         type: string
+ *                       eventCategory:
+ *                         type: string
+ *                       eventLocation:
+ *                         type: string
+ *                       startDate:
+ *                         type: string
+ *                       endDate:
+ *                         type: string
+ *                       startTime:
+ *                         type: string
+ *                       endTime:
+ *                         type: string
+ *                       eventAgenda:
+ *                         type: string
+ *                       eventRule:
+ *                         type: string
+ *                       image:
+ *                         type: object
+ *                         properties:
+ *                           imageUrl:
+ *                             type: string
+ *                           imagePublicId:
+ *                             type: string
+ *                       eventPlannerId:
+ *                         type: string
+ *                       totalTableNumber:
+ *                         type: number
+ *                       totalSeatNumber:
+ *                         type: number
+ *                       ticketSold:
+ *                         type: number
+ *                       totalAttendee:
+ *                         type: number
+ *                       revenueGenerated:
+ *                         type: number
+ *                       noOfCheckings:
+ *                         type: number
+ *                       status:
+ *                         type: string
+ *                       featured:
+ *                         type: boolean
+ *                       ticketPrice:
+ *                         type: number
+ *                       tableNumber:
+ *                         type: number
+ *                       seatNumber:
+ *                         type: number
+ *                       seatPerTable:
+ *                         type: number
+ *                       ticketQuantity:
+ *                         type: number
+ *                       ticketPurchaseLimit:
+ *                         type: number
+ *                       parkingAccess:
+ *                         type: string
+ *       404:
+ *         description: No events found for this event planner
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No events found for this event planner
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ *                 error:
+ *                   type: string
+ */
+router.get('/getPlannerEvent/:eventPlannerId', eventPlannerEvent)
+
+/**
+ * @swagger
+ * /api/v1/event/events/{eventPlannerId}/{eventId}:
+ *   get:
+ *     summary: Retrieve a single event created by a specific event planner
+ *     description: Fetches a single event using the event planner's ID and the event's ID.
+ *     tags:
+ *       - Event Management
+ *     parameters:
+ *       - in: path
+ *         name: eventPlannerId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event planner
+ *       - in: path
+ *         name: eventId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the event
+ *     responses:
+ *       200:
+ *         description: Event retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Event retrieved successfully
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     _id:
+ *                       type: string
+ *                       description: Event ID
+ *                     eventTitle:
+ *                       type: string
+ *                     eventDescription:
+ *                       type: string
+ *                     eventCategory:
+ *                       type: string
+ *                     eventLocation:
+ *                       type: string
+ *                     startDate:
+ *                       type: string
+ *                     endDate:
+ *                       type: string
+ *                     startTime:
+ *                       type: string
+ *                     endTime:
+ *                       type: string
+ *                     eventAgenda:
+ *                       type: string
+ *                     eventRule:
+ *                       type: string
+ *                     image:
+ *                       type: object
+ *                       properties:
+ *                         imageUrl:
+ *                           type: string
+ *                         imagePublicId:
+ *                           type: string
+ *                     eventPlannerId:
+ *                       type: string
+ *                     totalTableNumber:
+ *                       type: number
+ *                     totalSeatNumber:
+ *                       type: number
+ *                     ticketSold:
+ *                       type: number
+ *                     totalAttendee:
+ *                       type: number
+ *                     revenueGenerated:
+ *                       type: number
+ *                     noOfCheckings:
+ *                       type: number
+ *                     status:
+ *                       type: string
+ *                     featured:
+ *                       type: boolean
+ *                     ticketPrice:
+ *                       type: number
+ *                     tableNumber:
+ *                       type: number
+ *                     seatNumber:
+ *                       type: number
+ *                     seatPerTable:
+ *                       type: number
+ *                     ticketQuantity:
+ *                       type: number
+ *                     ticketPurchaseLimit:
+ *                       type: number
+ *                     parkingAccess:
+ *                       type: string
+ *       404:
+ *         description: Event not found for this event planner
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Event not found for this event planner
+ *       500:
+ *         description: Internal Server Error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ *                 error:
+ *                   type: string
+ */
+
+router.get('/events/:eventPlannerId/:eventId',getSingleEvent);
 
 module.exports = router;
