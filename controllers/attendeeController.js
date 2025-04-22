@@ -2,15 +2,15 @@ const eventModel = require('../models/event');
 const attendeeModel = require('../models/attendee');
 
 exports.checkInAttendee = async (req, res) => {
-    const  { eventId } = req.params
-    const { checkInCode } = req.body;
-    const event = await eventModel.findById(eventId)
-    if(!event){
-        return res.status(404).json({
-            message:"event not found"
-        })
-    }
     try {
+        const  { eventId } = req.params
+        const { checkInCode } = req.body;
+        const event = await eventModel.find(eventId)
+        if(!event){
+            return res.status(404).json({
+                message:"event not found"
+            })
+        }
         if (!checkInCode) {
             return res.status(400).json({ message: "Check-in code is required" });
         }
@@ -58,7 +58,8 @@ exports.getOneAttendee = async (req,res) =>{
 }
 exports.getAllAttendees = async (req,res) =>{
     try {
-        const attendees = await attendeeModel.find()
+        const {eventId} = req.params
+        const attendees = await attendeeModel.find({eventId})
         res.status(200).json({
             message:"all attendees found",
             data:attendees
