@@ -115,6 +115,11 @@ const eventSchema = new mongoose.Schema({
     type: Number,
     default: 3
   },
+  totalEventOrganize:{
+    type: Number,
+    min: 0,
+    default:0
+  },
   parkingAccess: {
     type: String,
     enum: ["yes", "no"],

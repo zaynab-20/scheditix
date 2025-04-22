@@ -4,18 +4,10 @@ const router = express.Router();
 
 /**
  * @swagger
- * /api/v1/check-in/{eventId}:
+ * /api/v1/attendees/check-in:
  *   post:
- *     tags: [Attendees]
- *     summary: Check in an attendee for an event
- *     description: Creates a check-in record for an attendee using the event ID and check-in code.
- *     parameters:
- *       - in: path
- *         name: eventId
- *         required: true
- *         schema:
- *           type: string
- *         description: The ID of the event
+ *     summary: Check in an attendee using a check-in code
+ *     description: Validates a unique check-in code and marks the attendee as checked in for their event.
  *     requestBody:
  *       required: true
  *       content:
@@ -27,10 +19,10 @@ const router = express.Router();
  *             properties:
  *               checkInCode:
  *                 type: string
- *                 example: SCHD12345
+ *                 example: EVT123-JANE
  *     responses:
- *       201:
- *         description: Attendee checked in successfully
+ *       200:
+ *         description: Check-in successful
  *         content:
  *           application/json:
  *             schema:
@@ -38,13 +30,22 @@ const router = express.Router();
  *               properties:
  *                 message:
  *                   type: string
- *                   example: attendee checked in successfully
+ *                   example: Check-in successful
  *                 data:
- *                   $ref: '#/components/schemas/Attendee'
+ *                   type: object
+ *                   properties:
+ *                     name:
+ *                       type: string
+ *                     email:
+ *                       type: string
+ *                     eventId:
+ *                       type: string
+ *       400:
+ *         description: Missing or invalid check-in code, or attendee already checked in
  *       404:
- *         description: Event not found
+ *         description: Attendee not found for provided check-in code
  *       500:
- *         description: Internal server error
+ *         description: Server error
  */
 router.post('/check-in/:eventId', checkInAttendee);
 
