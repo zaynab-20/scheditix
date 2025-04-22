@@ -6,7 +6,6 @@ const generator = require("otp-generator");
 exports.createTicket = async (req, res) => {
   try {
     const { eventId } = req.params;
-    // const ticket = await ticketModel.find()
     const {
       fullName,
       email,
@@ -79,7 +78,7 @@ exports.createTicket = async (req, res) => {
       }
 
       const newTicket = new ticketModel({
-        eventId,
+        eventId: event._id,
         fullName,
         email,
         numberOfTicket,
