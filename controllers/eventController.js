@@ -332,7 +332,7 @@ exports.getTrendingEventById = async (req, res) => {
 
 exports.getOverview = async (req, res) => {
   try {
-    const eventPlannerId = req.user.userId; // Make sure req.user is set by your auth middleware
+    const eventPlannerId = req.userId; // Make sure req.user is set by your auth middleware
 
     // Get all events created by the logged-in event planner
     const myEvents = await eventModel.find({ eventPlannerId });
