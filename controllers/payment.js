@@ -11,8 +11,7 @@ const ref = generator.generate(12, {
   lowerCaseAlphabets: true,
   specialChars: false,
 });
-const korapaySecret = process.env.KORA_SECRET_KEY;
-
+const korapaySecret = process.env.KORA_PAY_SECRET_KEY;
 exports.initializePayment = async (req, res) => {
   try {
     const { ticketId } = req.params;
