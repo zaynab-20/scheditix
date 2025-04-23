@@ -1,7 +1,6 @@
 const Joi = require("joi");
 
-const passwordPattern = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%*?&.#;:_^'\(\)<>=+/"|,{}[\]¬£~-])[A-Za-z\d@$!%*?&.#;:_^'\(\)<>=+/"|,{}[\]¬£~-]{8,}$/;
-;
+const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
 
 // Registration Validation Schema
 exports.registerSchema = (req, res, next) => {
@@ -33,7 +32,7 @@ exports.loginSchema = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().trim().email().required(),
     password: Joi.string().pattern(passwordPattern).required().messages({
-      "string.pattern.base": "Password must be at least 8 characters long, and include uppercase, lowercase, digit, and special character",
+    //   "string.pattern.base": "Password must be at least 8 characters long, and include uppercase, lowercase, digit, and special character",
     }),
   });
 

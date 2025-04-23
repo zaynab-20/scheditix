@@ -1,4 +1,4 @@
-const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview,getPaginatedEvents, eventPlannerEvent,getSingleEvent,searchEventCategory} = require('../controllers/eventController');
+const { createEvent, getOneEvent, getAllEvent, updateEvent, deleteEvent, getRecentEvents, getAllEventCategory, getFeaturedEventById, getTrendingEventById, getOverview,getPaginatedEvents, eventPlannerEvent,getSingleEvent,searchEventCategory, getAllUpcomingEventsByAUser, getAllPastEventsByAUser} = require('../controllers/eventController');
 const {validateEvent} = require('../middleware/validation');
 const { authenticate } = require('../middleware/authentication');
 const upload = require('../utils/multer');
@@ -1053,5 +1053,178 @@ router.get('/events/:eventPlannerId/:eventId',getSingleEvent);
  */
 router.get('/searchCategory', searchEventCategory);
 
+/**
+ * @swagger
+ * /api/v1/user/events/upcoming:
+ *   get:
+ *     summary: Get all upcoming events that a user has tickets for
+ *     tags:
+ *       - User Events
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of upcoming events the user has tickets for
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Successfully fetched upcoming events
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       eventTitle:
+ *                         type: string
+ *                       eventDescription:
+ *                         type: string
+ *                       eventLocation:
+ *                         type: string
+ *                       startDate:
+ *                         type: string
+ *                         format: date
+ *                       endDate:
+ *                         type: string
+ *                         format: date
+ *                       startTime:
+ *                         type: string
+ *                       endTime:
+ *                         type: string
+ *                       ticketPrice:
+ *                         type: number
+ *                       ticketQuantity:
+ *                         type: number
+ *                       ticketSold:
+ *                         type: number
+ *                       totalAttendee:
+ *                         type: number
+ *                       revenueGenerated:
+ *                         type: number
+ *       404:
+ *         description: No upcoming events found for the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No upcoming events found for this user
+ *       401:
+ *         description: Unauthorized - Token missing or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+router.get("/user/events/upcoming", authenticate, getAllUpcomingEventsByAUser);
+
+/**
+ * @swagger
+ * /api/v1/user/events/past:
+ *   get:
+ *     summary: Get all past events that a user has tickets for
+ *     tags:
+ *       - User Events
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: List of past events the user has tickets for
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Successfully fetched past events
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       _id:
+ *                         type: string
+ *                       eventTitle:
+ *                         type: string
+ *                       eventDescription:
+ *                         type: string
+ *                       eventLocation:
+ *                         type: string
+ *                       startDate:
+ *                         type: string
+ *                         format: date
+ *                       endDate:
+ *                         type: string
+ *                         format: date
+ *                       startTime:
+ *                         type: string
+ *                       endTime:
+ *                         type: string
+ *                       ticketPrice:
+ *                         type: number
+ *                       ticketQuantity:
+ *                         type: number
+ *                       ticketSold:
+ *                         type: number
+ *                       totalAttendee:
+ *                         type: number
+ *                       revenueGenerated:
+ *                         type: number
+ *       404:
+ *         description: No past events found for the user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No past events found for this user
+ *       401:
+ *         description: Unauthorized - Token missing or invalid
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Internal server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Internal server error
+ */
+
+router.get("/user/events/past", authenticate, getAllPastEventsByAUser);
 
 module.exports = router;
