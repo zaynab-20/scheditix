@@ -10,6 +10,7 @@ exports.createTicket = async (req, res) => {
     if (!planner) {
       return res.status(404).json({ message: "Event planner not found" });
     }
+
     const { eventId } = req.params;
     const {
       fullName,
@@ -18,22 +19,43 @@ exports.createTicket = async (req, res) => {
       needCarPackingSpace,
       specialRequest,
     } = req.body;
+
+    if (!fullName || fullName.trim() === "") {
+      return res.status(400).json({ message: "Full name is required" });
+    }
     
+    if (!email || email.trim() === "") {
+      return res.status(400).json({ message: "Email is required" });
+    }
+    
+    if (!specialRequest || specialRequest.trim() === "") {
+      return res.status(400).json({ message: "Special request is required" });
+    }
+
+    if (!numberOfTicket || numberOfTicket < 1) {
+      return res.status(400).json({
+        message: "You must purchase at least one ticket",
+      });
+    }
+
     const event = await eventModel.findById(eventId);
     if (!event) {
       return res.status(404).json({ message: "Event not found" });
     }
+
+    if (event.ticketSold + numberOfTicket > event.ticketQuantity) {
+      return res.status(400).json({
+        message: "Not enough tickets left for this event",
+      });
+    }
+
     const eventPlanner = await eventPlannerModel.findById(event.eventPlannerId);
     if (!eventPlanner) {
       return res.status(404).json({ message: "Event planner not found" });
     }
 
     const ticketPurchaseLimit = event.ticketPurchaseLimit || 3;
-
-    const purchasedTickets = await ticketModel.find({
-      eventId,
-      email,
-    });
+    const purchasedTickets = await ticketModel.find({ eventId, email });
 
     if (purchasedTickets.length >= ticketPurchaseLimit) {
       return res.status(400).json({
@@ -41,75 +63,31 @@ exports.createTicket = async (req, res) => {
       });
     }
 
-    if (eventPlanner.plan === "Basic" && event.totalQuantity > 100){
+    if (eventPlanner.plan === "Basic" && event.totalQuantity > 100) {
       return res.status(403).json({
         message: "Basic plan limit: Maximum of 100 tickets per event",
       });
     }
 
-    if (eventPlanner.plan === "Pro" && event.totalQuantity > 1000){
+    if (eventPlanner.plan === "Pro" && event.totalQuantity > 1000) {
       return res.status(403).json({
         message: "Pro plan limit: Maximum of 1000 tickets per event",
       });
     }
 
-    
-    let response = []
+    const ticketDocs = [];
+    const ticketIds = [];
 
-    if (numberOfTicket > 1) {
-      for(e = 1; e <= numberOfTicket; e++){
-        const checkInCode = generator.generate(5, {
-          upperCaseAlphabets: true,
-          lowerCaseAlphabets: true,
-          specialChars: false,
-        });
-    
-        let table = event.tableNumber;
-      let seat = event.seatNumber;
+    // Handle single or multiple tickets
+    const ticketCount = numberOfTicket > 0 ? numberOfTicket : 1;
 
-      if (seat <= event.seatPerTable) {
-        seat += 1;
-        event.seatNumber = seat;
-        await event.save();
-
-        if (seat > event.seatPerTable) {
-          table += 1;
-          event.tableNumber = table;
-          event.seatNumber = 1;
-          seat = event.seatNumber;
-          await event.save();
-        }
-        // await event.save()
-      }
-
-      const newTicket = new ticketModel({
-        eventId: event._id,
-        fullName,
-        email,
-        numberOfTicket,
-        checkInCode,
-        tableNumber: table,
-        seatNumber: seat,
-        carAccess: needCarPackingSpace,
-        specialRequest,
-        userId
-      });
-      // await event.save();
-      await newTicket.save();
-      response.push(newTicket)
-      }
-
-      res.status(201).json({
-        message: "Ticket created successfully",
-        data: response,
-      });
-    } else {
+    for (let i = 0; i < ticketCount; i++) {
       const checkInCode = generator.generate(5, {
         upperCaseAlphabets: true,
         lowerCaseAlphabets: true,
         specialChars: false,
       });
-  
+
       let table = event.tableNumber;
       let seat = event.seatNumber;
 
@@ -125,10 +103,9 @@ exports.createTicket = async (req, res) => {
           seat = event.seatNumber;
           await event.save();
         }
-        // await event.save()
       }
 
-      const newTicket = new ticketModel({
+      const ticket = new ticketModel({
         eventId,
         fullName,
         email,
@@ -141,13 +118,22 @@ exports.createTicket = async (req, res) => {
         userId
       });
 
-      // await event.save();
-      await newTicket.save();
-      res.status(201).json({
-        message: "Ticket created successfully",
-        data: newTicket,
-      });
+      await ticket.save();
+      ticketDocs.push(ticket);
+      ticketIds.push(ticket._id);
     }
+
+    // Add ticketIds to each ticket
+    await Promise.all(ticketDocs.map(ticket => {
+      ticket.ticketIds = ticketIds;
+      return ticket.save();
+    }));
+
+    res.status(201).json({
+      message: `Ticket${ticketDocs.length > 1 ? 's' : ''} created successfully`,
+      data: ticketDocs
+    });
+
   } catch (error) {
     res.status(500).json({
       message: "Internal Server Error",
@@ -155,6 +141,7 @@ exports.createTicket = async (req, res) => {
     });
   }
 };
+
 
 exports.getAllTickets = async (req, res) => {
   try {

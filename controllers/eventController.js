@@ -477,24 +477,100 @@ exports.searchEventCategory = async (req, res) => {
 //   }
 // }
 
-// exports.getAllUpcomingEventsByAUser = async (req, res) => {
-//   try {
-//     const userId = req.userId;
-//     const planner = await eventPlannerModel.findById(userId);
-//     if (!planner) {
-//       return res.status(404).json({ message: "Event planner not found" });
-//     }
-//     const tickets = await ticketModel.find({ userId });
-//     const allEvents = [];
-//     for(const ticket of tickets){
-//     const events = await eventModel.findById(ticket.eventId);
-//     }
+exports.getAllUpcomingEventsByAUser = async (req, res) => {
+  try {
+    const userId = req.userId; // Get userId from the request
 
-//     res
-//       .status(200)
-//       .json({ message: "Successfully Getting All Events", data: events });
-//   } catch (error) {
-//     console.log(error);
-//     res.status(500).json({ message: "internal server error" });
-//   }
-// };
+    // Find the event planner (optional, if needed for validation)
+    const planner = await eventPlannerModel.findById(userId);
+    if (!planner) {
+      return res.status(404).json({ message: "Event planner not found" });
+    }
+
+    // Fetch tickets for the user
+    const tickets = await ticketModel.find({ userId });
+    
+    // Store all upcoming events
+    const allEvents = [];
+
+    // Loop through the tickets and get the associated events
+    for (const ticket of tickets) {
+      const event = await eventModel.findById(ticket.eventId);
+
+      if (event) {
+        // Parse the startDate string into a Date object
+        const eventStartDate = new Date(event.startDate); // Assuming startDate is a string in the correct format
+
+        // Compare if the event's start date is in the future
+        const currentDate = new Date(); // Get current date and time
+
+        if (eventStartDate > currentDate) {
+          // If the event start date is in the future, add it to the list
+          allEvents.push(event);
+        }
+      }
+    }
+
+    // Check if we found any upcoming events
+    if (allEvents.length === 0) {
+      return res.status(404).json({ message: "No upcoming events found for this user" });
+    }
+
+    // Return the upcoming events
+    res.status(200).json({ message: "Successfully fetched upcoming events", data: allEvents });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+
+exports.getAllPastEventsByAUser = async (req, res) => {
+  try {
+    const userId = req.userId; // Get userId from the request
+
+    // Find the event planner (optional, if needed for validation)
+    const planner = await eventPlannerModel.findById(userId);
+    if (!planner) {
+      return res.status(404).json({ message: "Event planner not found" });
+    }
+
+    // Fetch tickets for the user
+    const tickets = await ticketModel.find({ userId });
+    
+    // Store all past events
+    const allPastEvents = [];
+
+    // Loop through the tickets and get the associated events
+    for (const ticket of tickets) {
+      const event = await eventModel.findById(ticket.eventId);
+
+      if (event) {
+        // Parse the startDate string into a Date object
+        const eventStartDate = new Date(event.startDate); // Assuming startDate is a string in the correct format
+
+        // Compare if the event's start date is in the past
+        const currentDate = new Date(); // Get current date and time
+
+        if (eventStartDate < currentDate) {
+          // If the event start date is in the past, add it to the list
+          allPastEvents.push(event);
+        }
+      }
+    }
+
+    // Check if we found any past events
+    if (allPastEvents.length === 0) {
+      return res.status(404).json({ message: "No past events found for this user" });
+    }
+
+    // Return the past events
+    res.status(200).json({ message: "Successfully fetched past events", data: allPastEvents });
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
