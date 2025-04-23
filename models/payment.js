@@ -30,6 +30,10 @@ const paymentSchema = new mongoose.Schema({
     type: Number,
     require: true
   },
+  ticketIds: [{
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'tickets',
+  }],
   status: {
     type:String,
     enum: ['Pending','Successful','Failed'],

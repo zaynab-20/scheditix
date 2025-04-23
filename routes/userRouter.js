@@ -101,7 +101,7 @@ router.get("/verify/user/:token", verifyUser);
  *       500:
  *         description: Internal Server Error
  */
-router.post("/login/user", loginSchema, logInUser);
+router.post("/login/user", logInUser);
 /**
  * @swagger
  * /api/v1/forgot-password/user:

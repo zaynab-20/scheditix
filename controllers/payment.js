@@ -4,7 +4,7 @@ const eventModel = require("../models/event")
 const axios = require("axios");
 const formattedData = new Date().toLocaleString()
 const generator = require("otp-generator");
-const { Successful, Failed} = require("../utils/html");
+const { successfulPaymentTemplate, failedPaymentTemplate } = require("../utils/html");
 const { send_mail } = require("../middleware/nodemailer");
 
 const korapaySecret = process.env.KORA_PAY_SECRET_KEY;
@@ -46,7 +46,7 @@ exports.initializePayment = async (req, res) => {
       amount: event.ticketPrice * ticket.numberOfTicket,
       currency: "NGN",
       reference: ref,
-      redirect_url: `https://schedi-tix-front-end.vercel.app/payment-verify/`
+      redirect_url: `https://schedi-tix-front-end.vercel.app/payment-verify`
     };
 
     const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize',paymentDetails,{
@@ -63,9 +63,10 @@ exports.initializePayment = async (req, res) => {
       attendeeEmail,
       attendeeName,
       reference: ref,
-      amount: event.ticketPrice,
+      amount: event.ticketPrice * ticket.numberOfTicket,
       paymentDate:formattedData,
-      totalTicket: ticket.numberOfTicket
+      totalTicket: ticket.numberOfTicket,
+      ticketIds: ticket.ticketIds
     })
 
     await payment.save();
@@ -73,10 +74,10 @@ exports.initializePayment = async (req, res) => {
       data: {
         reference: data?.reference,
         checkout_url: data?.checkout_url
-      }
+      },
+      paymentInfo: payment
     })
 
-    console.log(response);
   } catch (error) {
     console.log(error.message);
     res.status(500).json({
@@ -87,7 +88,7 @@ exports.initializePayment = async (req, res) => {
 
 
 exports.verifyPayment = async (req, res) => {
-  try{
+  try {
     const { reference } = req.query;
 
     if (!reference) {
@@ -103,50 +104,72 @@ exports.verifyPayment = async (req, res) => {
       }
     );
 
-
     const { data } = response;
-    // console.log(response)
-    const payment = await paymentModel.findOne({reference: data?.data?.reference});
-    
+    const payment = await paymentModel.findOne({ reference: data?.data?.reference });
+
     if (!payment) {
       return res.status(400).json({ message: "Transaction not found" });
     }
+
     const event = await eventModel.findById(payment.eventId);
-    // const ticket = await ticketModel.findOne({eventId: payment.eventId})
+    const tickets = await ticketModel.find({ _id: { $in: payment.ticketIds } });
 
     if (data?.status && data?.data?.status === 'success') {
+      // Update event ticketSold
       let total = payment.totalTicket;
       event.ticketSold += total;
       await event.save();
-      payment.status = 'Successful'
+
+      // Mark payment as successful
+      payment.status = 'Successful';
       await payment.save();
-      const firstName = ticket.fullName;
-      const checkInCode = ticket.checkInCode;
-      const tableNumber = ticket.tableNumber;
-      const seatNumber = ticket.seatNumber
+
+      // Iterate through all tickets and send email
+      for (const ticket of tickets) {
+        const firstName = ticket.fullName;
+        const checkInCode = ticket.checkInCode;
+        const tableNumber = ticket.tableNumber;
+        const seatNumber = ticket.seatNumber;
+        const specialRequest = ticket.specialRequest;
+        const carAccess = ticket.carAccess;
+
         const mailOptions = {
           email: ticket.email,
           subject: "Payment Successful",
-          html: Successful(firstName,checkInCode,tableNumber,seatNumber),
+          html: successfulPaymentTemplate({
+            firstName,
+            checkInCode,
+            tableNumber,
+            seatNumber,
+            specialRequest,
+            carAccess
+          }),
         };
-            
+
         await send_mail(mailOptions);
-        return res.status(200).json({ message: "Payment successful",data:payment});
-    }else{
-      payment.status = 'Failed'
+      }
+
+      return res.status(200).json({ message: "Payment successful", data: payment });
+    } else {
+      // Payment failed, update status
+      payment.status = 'Failed';
       await payment.save();
-      const firstName = ticket.fullName;
-        const mailOptions = {
-          email: ticket.email,
-          subject: "Payment Failed",
-          html: Failed(firstName),
-        };
-            
-        await send_mail(mailOptions);
-        return res.status(400).json({ message: "Payment not successful",data:payment });
+
+      // Send failure email
+      const firstName = payment.attendeeName;
+      const mailOptions = {
+        email: payment.attendeeEmail,
+        subject: "Payment Failed",
+        html: failedPaymentTemplate(firstName),
+      };
+
+      await send_mail(mailOptions);
+
+      return res.status(400).json({ message: "Payment not successful", data: payment });
     }
-  }catch(error){
-    console.log(error.message)
-    res.status(500).json({message: 'Error Verifying Payment',error:error.message})
+  } catch (error) {
+    console.log(error.message);
+    res.status(500).json({ message: 'Error Verifying Payment', error: error.message });
   }
 };
+

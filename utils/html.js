@@ -213,10 +213,15 @@ exports.reset = (link, firstName) => {
   `
 }
 
-
-
-exports.Successful = (firstName, checkInCode, tableNumber, seatNumber,
-  specialRequest, carAccess) => { return `
+exports.successfulPaymentTemplate = ({
+  firstName, 
+  checkInCode, 
+  tableNumber, 
+  seatNumber, 
+  specialRequest, 
+  carAccess
+}) => {
+  return `
   <!DOCTYPE html>
   <html lang="en">
     <head>
@@ -224,8 +229,7 @@ exports.Successful = (firstName, checkInCode, tableNumber, seatNumber,
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
       <title>Payment Successful</title>
       <style>
-        body,
-        html {
+        body, html {
           margin: 0;
           padding: 0;
           background-color: #ffffff;
@@ -280,8 +284,7 @@ exports.Successful = (firstName, checkInCode, tableNumber, seatNumber,
           color: #ff5722;
         }
         @media (prefers-color-scheme: dark) {
-          body,
-          html {
+          body, html {
             background-color: #121212;
             color: #ffffff;
           }
@@ -315,88 +318,276 @@ exports.Successful = (firstName, checkInCode, tableNumber, seatNumber,
       </div>
     </body>
   </html>
-  ` }
+  `;
+};
 
-
-  exports.Failed = (firstName) => { return `
-    <!DOCTYPE html>
-    <html lang="en">
-      <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Payment Failed</title>
-        <style>
-          body,
-          html {
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-            color: #1e1e1e;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
-              Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-            width: 100%;
-            height: 100%;
-          }
-          .container {
-            width: 100%;
-            padding: 40px 20px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+exports.failedPaymentTemplate = (firstName) => {
+  return `
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <title>Payment Failed</title>
+      <style>
+        body, html {
+          margin: 0;
+          padding: 0;
+          background-color: #ffffff;
+          color: #1e1e1e;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+            Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+          width: 100%;
+          height: 100%;
+        }
+        .container {
+          width: 100%;
+          padding: 40px 20px;
+          box-sizing: border-box;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+        }
+        .email-body {
+          width: 100%;
+          max-width: 500px;
+          background-color: #ffffff;
+          border-radius: 16px;
+          padding: 32px 24px;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+          text-align: center;
+        }
+        .email-header {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 16px;
+          color: red;
+        }
+        .email-text {
+          font-size: 16px;
+          line-height: 1.6;
+          margin-bottom: 16px;
+        }
+        .highlight {
+          color: #ff5722;
+          font-weight: 600;
+        }
+        @media (prefers-color-scheme: dark) {
+          body, html {
+            background-color: #121212;
+            color: #ffffff;
           }
           .email-body {
-            width: 100%;
-            max-width: 500px;
-            background-color: #ffffff;
-            border-radius: 16px;
-            padding: 32px 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            text-align: center;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
           }
-          .email-header {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 16px;
-            color: red;
-          }
-          .email-text {
-            font-size: 16px;
-            line-height: 1.6;
-            margin-bottom: 16px;
-          }
-          .highlight {
-            color: #ff5722;
-            font-weight: 600;
-          }
-          @media (prefers-color-scheme: dark) {
-            body,
-            html {
-              background-color: #121212;
-              color: #ffffff;
-            }
-            .email-body {
-              background-color: #1e1e1e;
-              color: #ffffff;
-              box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          <div class="email-body">
-            <h2 class="email-header">Payment Failed</h2>
-            <p class="email-text">
-              Hello <strong>${firstName}</strong>, unfortunately, your payment
-              attempt was unsuccessful.
-            </p>
-            <p class="email-text">
-              Please try again or reach out to support if the issue persists.
-            </p>
-            <p class="email-text">We hope to see you at the event soon!</p>
-          </div>
+        }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="email-body">
+          <h2 class="email-header">Payment Failed</h2>
+          <p class="email-text">
+            Hello <strong>${firstName}</strong>, unfortunately, your payment
+            attempt was unsuccessful.
+          </p>
+          <p class="email-text">
+            Please try again or reach out to support if the issue persists.
+          </p>
+          <p class="email-text">We hope to see you at the event soon!</p>
         </div>
-      </body>
-    </html>
-    `}
+      </div>
+    </body>
+  </html>
+  `;
+};
+
+
+
+// exports.Successful = (firstName, checkInCode, tableNumber, seatNumber,
+//   specialRequest, carAccess) => { return `
+//   <!DOCTYPE html>
+//   <html lang="en">
+//     <head>
+//       <meta charset="UTF-8" />
+//       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+//       <title>Payment Successful</title>
+//       <style>
+//         body,
+//         html {
+//           margin: 0;
+//           padding: 0;
+//           background-color: #ffffff;
+//           color: #1e1e1e;
+//           font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+//             Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+//           width: 100%;
+//           height: 100%;
+//         }
+//         .container {
+//           width: 100%;
+//           padding: 40px 20px;
+//           box-sizing: border-box;
+//           display: flex;
+//           justify-content: center;
+//           align-items: center;
+//         }
+//         .email-body {
+//           width: 100%;
+//           max-width: 500px;
+//           background-color: #ffffff;
+//           border-radius: 16px;
+//           padding: 32px 24px;
+//           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+//           text-align: center;
+//         }
+//         .email-header {
+//           font-size: 24px;
+//           font-weight: bold;
+//           margin-bottom: 16px;
+//           color: blue;
+//         }
+//         .email-text {
+//           font-size: 16px;
+//           line-height: 1.6;
+//           margin-bottom: 16px;
+//         }
+//         .highlight {
+//           color: #ff5722;
+//           font-weight: 600;
+//         }
+//         .email-info-box {
+//           background-color: #f9f9f9;
+//           padding: 16px;
+//           border-radius: 10px;
+//           margin-top: 20px;
+//           text-align: left;
+//           font-size: 15px;
+//           line-height: 1.5;
+//         }
+//         .email-info-box strong {
+//           color: #ff5722;
+//         }
+//         @media (prefers-color-scheme: dark) {
+//           body,
+//           html {
+//             background-color: #121212;
+//             color: #ffffff;
+//           }
+//           .email-body {
+//             background-color: #1e1e1e;
+//             color: #ffffff;
+//             box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+//           }
+//         }
+//       </style>
+//     </head>
+//     <body>
+//       <div class="container">
+//         <div class="email-body">
+//           <h2 class="email-header">Payment Successful</h2>
+//           <p class="email-text">
+//             Congratulations <strong>${firstName}</strong>! Your payment was
+//             successful 🙌 We're excited to welcome you to the event.
+//           </p>
+//           <div class="email-info-box">
+//             <p><strong>Check-in Code:</strong> ${checkInCode}</p>
+//             <p><strong>Seat:</strong> Table ${tableNumber}, Seat ${seatNumber}</p>
+//             <p><strong>Car Access:</strong> ${carAccess ? 'Yes' : 'No'}</p>
+//             <p><strong>Special Request:</strong> ${specialRequest || 'None'}</p>
+//           </div>
+//           <p class="email-text">
+//             Please keep this information safe. You'll need it to enter the event
+//             and get seated. 🪪
+//           </p>
+//         </div>
+//       </div>
+//     </body>
+//   </html>
+//   ` }
+
+
+//   exports.Failed = (firstName) => { return `
+//     <!DOCTYPE html>
+//     <html lang="en">
+//       <head>
+//         <meta charset="UTF-8" />
+//         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+//         <title>Payment Failed</title>
+//         <style>
+//           body,
+//           html {
+//             margin: 0;
+//             padding: 0;
+//             background-color: #ffffff;
+//             color: #1e1e1e;
+//             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+//               Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+//             width: 100%;
+//             height: 100%;
+//           }
+//           .container {
+//             width: 100%;
+//             padding: 40px 20px;
+//             box-sizing: border-box;
+//             display: flex;
+//             justify-content: center;
+//             align-items: center;
+//           }
+//           .email-body {
+//             width: 100%;
+//             max-width: 500px;
+//             background-color: #ffffff;
+//             border-radius: 16px;
+//             padding: 32px 24px;
+//             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+//             text-align: center;
+//           }
+//           .email-header {
+//             font-size: 24px;
+//             font-weight: bold;
+//             margin-bottom: 16px;
+//             color: red;
+//           }
+//           .email-text {
+//             font-size: 16px;
+//             line-height: 1.6;
+//             margin-bottom: 16px;
+//           }
+//           .highlight {
+//             color: #ff5722;
+//             font-weight: 600;
+//           }
+//           @media (prefers-color-scheme: dark) {
+//             body,
+//             html {
+//               background-color: #121212;
+//               color: #ffffff;
+//             }
+//             .email-body {
+//               background-color: #1e1e1e;
+//               color: #ffffff;
+//               box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+//             }
+//           }
+//         </style>
+//       </head>
+//       <body>
+//         <div class="container">
+//           <div class="email-body">
+//             <h2 class="email-header">Payment Failed</h2>
+//             <p class="email-text">
+//               Hello <strong>${firstName}</strong>, unfortunately, your payment
+//               attempt was unsuccessful.
+//             </p>
+//             <p class="email-text">
+//               Please try again or reach out to support if the issue persists.
+//             </p>
+//             <p class="email-text">We hope to see you at the event soon!</p>
+//           </div>
+//         </div>
+//       </body>
+//     </html>
+//     `}

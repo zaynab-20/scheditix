@@ -14,7 +14,7 @@ exports.registerSchema = (req, res, next) => {
       "string.max": "Phone number is too long",
     }),
     password: Joi.string().pattern(passwordPattern).required().messages({
-      "string.pattern.base": "Password must be at least 6 characters long, and include uppercase, lowercase, digit, and special character",
+      "string.pattern.base": "Password must be at least 8 characters long, and include uppercase, lowercase, digit, and special character",
     }),
     confirmPassword: Joi.string().valid(Joi.ref('password')).required().messages({
       "any.only": "Passwords do not match",
@@ -33,7 +33,7 @@ exports.loginSchema = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().trim().email().required(),
     password: Joi.string().pattern(passwordPattern).required().messages({
-      "string.pattern.base": "Password must be at least 6 characters long, and include uppercase, lowercase, digit, and special character",
+      "string.pattern.base": "Password must be at least 8 characters long, and include uppercase, lowercase, digit, and special character",
     }),
   });
 
@@ -61,7 +61,7 @@ exports.forgotPasswordSchema = (req, res, next) => {
 exports.resetPasswordSchema = (req, res, next) => {
   const schema = Joi.object({
     newPassword: Joi.string().pattern(passwordPattern).required().messages({
-      "string.pattern.base": "Password must be at least 6 characters long, and include uppercase, lowercase, digit, and special character",
+      "string.pattern.base": "Password must be at least 8 characters long, and include uppercase, lowercase, digit, and special character",
     }),
     confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required().messages({
       "any.only": "Passwords do not match",
@@ -80,7 +80,7 @@ exports.changeUserPasswordSchema = (req, res, next) => {
   const schema = Joi.object({
     currentPassword: Joi.string().required(),
     newPassword: Joi.string().pattern(passwordPattern).required().messages({
-      "string.pattern.base": "Password must be at least 6 characters long, and include uppercase, lowercase, digit, and special character",
+      "string.pattern.base": "Password must be at least 8 characters long, and include uppercase, lowercase, digit, and special character",
     }),
     confirmPassword: Joi.string().valid(Joi.ref('newPassword')).required().messages({
       "any.only": "Passwords do not match",

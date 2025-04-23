@@ -12,6 +12,10 @@ const ticketSchema = new mongoose.Schema({
     ref: 'eventPlanners',
     required: true
   },
+  ticketIds: [{
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'tickets',
+  }],
   fullName: {
     type: String,
     required: true
