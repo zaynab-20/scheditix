@@ -116,46 +116,39 @@ exports.verifyPayment = async (req, res) => {
 
     if (data?.status && data?.data?.status === 'success') {
       // Update event ticketSold
-      let total = payment.totalTicket;
-      event.ticketSold += total;
+      event.ticketSold += payment.totalTicket;
       await event.save();
 
-      // Mark payment as successful
+      // Update payment status
       payment.status = 'Successful';
       await payment.save();
 
-      // Iterate through all tickets and send email
-      for (const ticket of tickets) {
-        const firstName = ticket.fullName;
-        const checkInCode = ticket.checkInCode;
-        const tableNumber = ticket.tableNumber;
-        const seatNumber = ticket.seatNumber;
-        const specialRequest = ticket.specialRequest;
-        const carAccess = ticket.carAccess;
+      const firstName = tickets[0]?.fullName || payment.attendeeName;
+      const email = tickets[0]?.email || payment.attendeeEmail;
 
-        const mailOptions = {
-          email: ticket.email,
-          subject: "Payment Successful",
-          html: successfulPaymentTemplate({
-            firstName,
-            checkInCode,
-            tableNumber,
-            seatNumber,
-            specialRequest,
-            carAccess
-          }),
-        };
+      // Build ticket list HTML
+      const ticketDetails = tickets.map(ticket => ({
+        checkInCode: ticket.checkInCode,
+        tableNumber: ticket.tableNumber,
+        seatNumber: ticket.seatNumber,
+        specialRequest: ticket.specialRequest,
+        carAccess: ticket.carAccess
+      }));
 
-        await send_mail(mailOptions);
-      }
+      const mailOptions = {
+        email,
+        subject: "Payment Successful",
+        html: successfulPaymentTemplate({ firstName, ticketDetails }),
+      };
+
+      await send_mail(mailOptions);
 
       return res.status(200).json({ message: "Payment successful", data: payment });
     } else {
-      // Payment failed, update status
+      // Mark as failed
       payment.status = 'Failed';
       await payment.save();
 
-      // Send failure email
       const firstName = payment.attendeeName;
       const mailOptions = {
         email: payment.attendeeEmail,
@@ -168,8 +161,9 @@ exports.verifyPayment = async (req, res) => {
       return res.status(400).json({ message: "Payment not successful", data: payment });
     }
   } catch (error) {
-    console.log(error.message);
+    console.error(error.message);
     res.status(500).json({ message: 'Error Verifying Payment', error: error.message });
   }
 };
+
 
