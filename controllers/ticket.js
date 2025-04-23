@@ -5,6 +5,11 @@ const generator = require("otp-generator");
 
 exports.createTicket = async (req, res) => {
   try {
+    const userId = req.userId;
+    const planner = await eventPlannerModel.findById(userId);
+    if (!planner) {
+      return res.status(404).json({ message: "Event planner not found" });
+    }
     const { eventId } = req.params;
     const {
       fullName,
@@ -87,6 +92,7 @@ exports.createTicket = async (req, res) => {
         seatNumber: seat,
         carAccess: needCarPackingSpace,
         specialRequest,
+        userId
       });
       // await event.save();
       await newTicket.save();
@@ -132,6 +138,7 @@ exports.createTicket = async (req, res) => {
         seatNumber: seat,
         carAccess: needCarPackingSpace,
         specialRequest,
+        userId
       });
 
       // await event.save();

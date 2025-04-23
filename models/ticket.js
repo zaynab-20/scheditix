@@ -7,6 +7,11 @@ const ticketSchema = new mongoose.Schema({
     ref: 'events',
     required: true
   },
+  userId: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'eventPlanners',
+    required: true
+  },
   fullName: {
     type: String,
     required: true

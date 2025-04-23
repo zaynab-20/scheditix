@@ -3,6 +3,7 @@ const cloudinary = require('../config/cloudinary');
 const categoryModel = require("../models/category")
 const eventPlannerModel = require("../models/eventPlanner")
 const fs = require("fs");
+const ticketModel = require("../models/ticket");
 
 exports.createEvent = async (req, res) => {
   try {
@@ -475,3 +476,25 @@ exports.searchEventCategory = async (req, res) => {
 //     res.status(500).json({message: 'Internal Server Error', error:error.message})
 //   }
 // }
+
+// exports.getAllUpcomingEventsByAUser = async (req, res) => {
+//   try {
+//     const userId = req.userId;
+//     const planner = await eventPlannerModel.findById(userId);
+//     if (!planner) {
+//       return res.status(404).json({ message: "Event planner not found" });
+//     }
+//     const tickets = await ticketModel.find({ userId });
+//     const allEvents = [];
+//     for(const ticket of tickets){
+//     const events = await eventModel.findById(ticket.eventId);
+//     }
+
+//     res
+//       .status(200)
+//       .json({ message: "Successfully Getting All Events", data: events });
+//   } catch (error) {
+//     console.log(error);
+//     res.status(500).json({ message: "internal server error" });
+//   }
+// };
