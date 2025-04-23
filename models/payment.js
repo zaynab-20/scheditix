@@ -26,6 +26,10 @@ const paymentSchema = new mongoose.Schema({
     type: Number,
     require: true
   },
+  totalTicket: {
+    type: Number,
+    require: true
+  },
   status: {
     type:String,
     enum: ['Pending','Successful','Failed'],

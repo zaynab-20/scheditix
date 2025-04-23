@@ -1,4 +1,5 @@
 const { createTicket, getAllTickets, getOneTicketById,deleteTicket,updateTicket } = require('../controllers/ticket');
+const { authenticate } = require('../middleware/authentication');
 const { validateTicketPurchase } = require('../middleware/validation'); 
 const express = require('express');
 const router = express.Router();
@@ -120,7 +121,7 @@ const router = express.Router();
  *       500:
  *         description: Internal server error
  */
-router.post('/create/ticket/:eventId', validateTicketPurchase,createTicket);
+router.post('/create/ticket/:eventId', authenticate ,validateTicketPurchase,createTicket);
 
 /**
  * @swagger

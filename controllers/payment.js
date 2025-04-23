@@ -43,9 +43,10 @@ exports.initializePayment = async (req, res) => {
         name: attendeeName,
         email: attendeeEmail,
       },
-      amount: event.ticketPrice,
+      amount: event.ticketPrice * ticket.numberOfTicket,
       currency: "NGN",
       reference: ref,
+      redirect_url: `https://schedi-tix-front-end.vercel.app/payment-verify/`
     };
 
     const response = await axios.post('https://api.korapay.com/merchant/api/v1/charges/initialize',paymentDetails,{
@@ -63,7 +64,8 @@ exports.initializePayment = async (req, res) => {
       attendeeName,
       reference: ref,
       amount: event.ticketPrice,
-      paymentDate:formattedData
+      paymentDate:formattedData,
+      totalTicket: ticket.numberOfTicket
     })
 
     await payment.save();
@@ -91,15 +93,7 @@ exports.verifyPayment = async (req, res) => {
     if (!reference) {
       return res.status(400).json({ message: "Reference is required" });
     }
-    
-    const payment = await paymentModel.findOne({reference: reference});
-    
-    if (!payment) {
-      return res.status(400).json({ message: "Transaction not found" });
-    }
 
-    const event = await eventModel.findById(payment.eventId);
-    const ticket = await ticketModel.findOne({eventId: payment.eventId})
     const response = await axios.get(
       `https://api.korapay.com/merchant/api/v1/charges/${reference}`,
       {
@@ -112,14 +106,21 @@ exports.verifyPayment = async (req, res) => {
 
     const { data } = response;
     // console.log(response)
+    const payment = await paymentModel.findOne({reference: data?.data?.reference});
+    
+    if (!payment) {
+      return res.status(400).json({ message: "Transaction not found" });
+    }
+    const event = await eventModel.findById(payment.eventId);
+    // const ticket = await ticketModel.findOne({eventId: payment.eventId})
 
-    if (data.status && data.data.status === 'success') {
-      let total = ticket.soldTicket;
-      ticket.soldTicket = total += 1;
-      await ticket.save();
+    if (data?.status && data?.data?.status === 'success') {
+      let total = payment.totalTicket;
+      event.ticketSold += total;
+      await event.save();
       payment.status = 'Successful'
       await payment.save();
-      const firstName = ticket.fullname;
+      const firstName = ticket.fullName;
       const checkInCode = ticket.checkInCode;
       const tableNumber = ticket.tableNumber;
       const seatNumber = ticket.seatNumber
@@ -132,11 +133,9 @@ exports.verifyPayment = async (req, res) => {
         await send_mail(mailOptions);
         return res.status(200).json({ message: "Payment successful",data:payment});
     }else{
-      let total = ticket.soldTicket;
-      await ticket.save();
       payment.status = 'Failed'
       await payment.save();
-      const firstName = ticket.fullname;
+      const firstName = ticket.fullName;
         const mailOptions = {
           email: ticket.email,
           subject: "Payment Failed",

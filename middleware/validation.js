@@ -1,6 +1,6 @@
 const Joi = require("joi");
 
-const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&.+_-])[A-Za-z\d@$!%*?&.+_-]{6,}$/;
+const passwordPattern = /^(?=.[a-z])(?=.[A-Z])(?=.\d)(?=.[@$!%*?&.#;:_^'\(\)<>=+/"|,{}[\]¬£~-])[A-Za-z\d@$!%*?&.#;:_^'\(\)<>=+/"|,{}[\]¬£~-]{8,}$/;
 ;
 
 // Registration Validation Schema
