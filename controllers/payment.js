@@ -6,14 +6,15 @@ const formattedData = new Date().toLocaleString()
 const generator = require("otp-generator");
 const { Successful, Failed} = require("../utils/html");
 const { send_mail } = require("../middleware/nodemailer");
-const ref = generator.generate(12, {
-  upperCaseAlphabets: true,
-  lowerCaseAlphabets: true,
-  specialChars: false,
-});
+
 const korapaySecret = process.env.KORA_PAY_SECRET_KEY;
 exports.initializePayment = async (req, res) => {
   try {
+    const ref = generator.generate(12, {
+      upperCaseAlphabets: true,
+      lowerCaseAlphabets: true,
+      specialChars: false,
+    });
     const { ticketId } = req.params;
     const ticket = await ticketModel.findById(ticketId);
 
